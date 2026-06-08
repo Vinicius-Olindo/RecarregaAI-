@@ -9,13 +9,14 @@ const popupElements = {
   customTimerInput: document.querySelector("#custom-timer-input"),
   reloadPageButton: document.querySelector("#reload-page-button"),
   startTimerButton: document.querySelector("#start-timer-button"),
+  statusPanel: document.querySelector(".popup__status"),
   statusMessage: document.querySelector("#status-message"),
   stopTimerButton: document.querySelector("#stop-timer-button"),
   timerIntervalInputs: document.querySelectorAll("[name='timer-interval']")
 };
 
 const unsupportedPageMessage = "Essa pagina nao permite limpeza de cache pela extensao.";
-const defaultReloadButtonText = "Limpar cache e recarregar";
+const defaultReloadButtonText = "Limpar e recarregar";
 const defaultStartTimerButtonText = "Ativar timer";
 const presetTimerIntervals = [3, 5, 10];
 
@@ -25,8 +26,9 @@ const cacheDataTypes = {
   serviceWorkers: true
 };
 
-const updateStatusMessage = (message) => {
+const updateStatusMessage = (message, status = "neutral") => {
   popupElements.statusMessage.textContent = message;
+  popupElements.statusPanel.dataset.status = status;
 };
 
 const updateButtonState = (button, isLoading, loadingText, defaultText) => {
@@ -164,33 +166,36 @@ const clearCacheAndReloadCurrentPage = async () => {
       "Limpando...",
       defaultReloadButtonText
     );
-    updateStatusMessage("Coletando recursos carregados pela pagina...");
+    updateStatusMessage("Coletando recursos carregados pela pagina...", "working");
 
     const activeTab = await getActiveTab();
 
     if (typeof activeTab?.id !== "number") {
-      updateStatusMessage("Nao foi possivel encontrar a aba atual.");
+      updateStatusMessage("Nao foi possivel encontrar a aba atual.", "error");
       return;
     }
 
     const origin = getUrlOrigin(activeTab.url);
 
     if (!origin) {
-      updateStatusMessage(unsupportedPageMessage);
+      updateStatusMessage(unsupportedPageMessage, "error");
       return;
     }
 
     const loadedOrigins = await collectLoadedOrigins(activeTab.id, origin);
 
-    updateStatusMessage(`Limpando cache de ${loadedOrigins.length} origem(ns)...`);
+    updateStatusMessage(
+      `Limpando cache de ${loadedOrigins.length} origem(ns)...`,
+      "working"
+    );
 
     await clearPageCache(loadedOrigins);
     await reloadCurrentPageIgnoringCache(activeTab.id);
 
-    updateStatusMessage("Cache limpo e pagina recarregada.");
+    updateStatusMessage("Cache limpo e pagina recarregada.", "success");
   } catch (error) {
     console.error("Erro ao limpar cache e recarregar:", error);
-    updateStatusMessage("Nao foi possivel limpar o cache agora.");
+    updateStatusMessage("Nao foi possivel limpar o cache agora.", "error");
   } finally {
     updateButtonState(
       popupElements.reloadPageButton,
@@ -264,7 +269,8 @@ const loadTimerState = async () => {
 
   selectTimerInterval(timerSettings.intervalInMinutes);
   updateStatusMessage(
-    `Timer ativo: a cada ${formatTimerInterval(timerSettings.intervalInMinutes)}.`
+    `Timer ativo: a cada ${formatTimerInterval(timerSettings.intervalInMinutes)}.`,
+    "active"
   );
 };
 
@@ -276,19 +282,19 @@ const startTimer = async () => {
       "Ativando...",
       defaultStartTimerButtonText
     );
-    updateStatusMessage("Preparando timer para a aba atual...");
+    updateStatusMessage("Preparando timer para a aba atual...", "working");
 
     const activeTab = await getActiveTab();
 
     if (typeof activeTab?.id !== "number") {
-      updateStatusMessage("Nao foi possivel encontrar a aba atual.");
+      updateStatusMessage("Nao foi possivel encontrar a aba atual.", "error");
       return;
     }
 
     const origin = getUrlOrigin(activeTab.url);
 
     if (!origin) {
-      updateStatusMessage(unsupportedPageMessage);
+      updateStatusMessage(unsupportedPageMessage, "error");
       return;
     }
 
@@ -306,10 +312,16 @@ const startTimer = async () => {
       }
     });
 
-    updateStatusMessage(`Timer ativo: a cada ${formatTimerInterval(intervalInMinutes)}.`);
+    updateStatusMessage(
+      `Timer ativo: a cada ${formatTimerInterval(intervalInMinutes)}.`,
+      "active"
+    );
   } catch (error) {
     console.error("Erro ao ativar timer:", error);
-    updateStatusMessage(error.message || "Nao foi possivel ativar o timer agora.");
+    updateStatusMessage(
+      error.message || "Nao foi possivel ativar o timer agora.",
+      "error"
+    );
   } finally {
     updateButtonState(
       popupElements.startTimerButton,
@@ -326,10 +338,10 @@ const stopTimer = async () => {
       type: runtimeMessageTypes.stopTimer
     });
 
-    updateStatusMessage("Timer pausado.");
+    updateStatusMessage("Timer pausado.", "warning");
   } catch (error) {
     console.error("Erro ao parar timer:", error);
-    updateStatusMessage("Nao foi possivel parar o timer agora.");
+    updateStatusMessage("Nao foi possivel parar o timer agora.", "error");
   }
 };
 

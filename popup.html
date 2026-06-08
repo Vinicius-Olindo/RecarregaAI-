@@ -8,26 +8,55 @@
   </head>
   <body>
     <main class="popup" aria-labelledby="popup-title">
-      <section class="popup__header">
-        <span class="popup__logo" aria-hidden="true">R</span>
+      <header class="popup__header">
+        <span class="popup__logo" aria-hidden="true">
+          <svg class="popup__logo-icon" viewBox="0 0 24 24" focusable="false">
+            <path
+              d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3L5 19h5v-5l-2.1 2.1A5.5 5.5 0 0 0 17.5 12h2Z"
+            />
+            <path
+              d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19 5h-5v5l2.1-2.1A5.5 5.5 0 0 0 6.5 12h-2Z"
+            />
+          </svg>
+        </span>
 
         <div class="popup__heading">
           <h1 id="popup-title" class="popup__title">RecarregaAi!</h1>
-          <p class="popup__subtitle">Limpe o cache e recarregue a pagina atual.</p>
+          <p class="popup__subtitle">Cache limpo. Pagina nova. Sem enrolacao.</p>
+        </div>
+      </header>
+
+      <section class="popup__status" data-status="neutral" aria-live="polite">
+        <span class="popup__status-indicator" aria-hidden="true"></span>
+
+        <div class="popup__status-content">
+          <p class="popup__label">Status</p>
+          <strong id="status-message" class="popup__message">
+            Pronto para limpar o cache da aba aberta.
+          </strong>
         </div>
       </section>
 
-      <section class="popup__status" aria-live="polite">
-        <p class="popup__label">Status</p>
-        <strong id="status-message" class="popup__message">
-          Pronto para limpar o cache da aba aberta.
-        </strong>
+      <section class="quick-action" aria-labelledby="quick-action-title">
+        <div class="quick-action__copy">
+          <p id="quick-action-title" class="popup__label">Acao rapida</p>
+          <p class="quick-action__title">Limpar agora</p>
+          <p class="popup__hint">Remove cache e recarrega a aba atual uma vez.</p>
+        </div>
+
+        <button id="reload-page-button" class="popup__button" type="button">
+          Limpar e recarregar
+        </button>
       </section>
 
       <section class="popup__timer" aria-labelledby="timer-title">
         <div class="popup__section-heading">
-          <h2 id="timer-title" class="popup__section-title">Timer</h2>
-          <p class="popup__hint">Limpar cache e recarregar automaticamente a cada:</p>
+          <div>
+            <p class="popup__label">Automacao</p>
+            <h2 id="timer-title" class="popup__section-title">Timer recorrente</h2>
+          </div>
+
+          <span class="popup__badge">m:ss</span>
         </div>
 
         <fieldset class="timer-options">
@@ -35,36 +64,43 @@
 
           <label class="timer-options__item">
             <input type="radio" name="timer-interval" value="3" checked />
-            <span>3 min</span>
+            <span class="timer-options__value">3</span>
+            <span class="timer-options__label">min</span>
           </label>
 
           <label class="timer-options__item">
             <input type="radio" name="timer-interval" value="5" />
-            <span>5 min</span>
+            <span class="timer-options__value">5</span>
+            <span class="timer-options__label">min</span>
           </label>
 
           <label class="timer-options__item">
             <input type="radio" name="timer-interval" value="10" />
-            <span>10 min</span>
+            <span class="timer-options__value">10</span>
+            <span class="timer-options__label">min</span>
           </label>
 
           <label class="timer-options__item">
             <input type="radio" name="timer-interval" value="custom" />
-            <span>Personalizado</span>
+            <span class="timer-options__value">+</span>
+            <span class="timer-options__label">Personalizado</span>
           </label>
         </fieldset>
 
         <label class="custom-timer" for="custom-timer-input">
           <span class="custom-timer__label">Tempo personalizado em minutos</span>
-          <input
-            id="custom-timer-input"
-            class="custom-timer__input"
-            type="number"
-            min="1"
-            step="1"
-            value="15"
-            disabled
-          />
+          <span class="custom-timer__control">
+            <input
+              id="custom-timer-input"
+              class="custom-timer__input"
+              type="number"
+              min="1"
+              step="1"
+              value="15"
+              disabled
+            />
+            <span class="custom-timer__suffix">min</span>
+          </span>
         </label>
 
         <div class="popup__actions">
@@ -81,10 +117,6 @@
           </button>
         </div>
       </section>
-
-      <button id="reload-page-button" class="popup__button" type="button">
-        Limpar cache e recarregar
-      </button>
     </main>
 
     <script src="JS/popup.js"></script>
