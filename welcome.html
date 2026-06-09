@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bem-vindo ao RecarregaAi!</title>
+    <link rel="stylesheet" href="CSS/welcome.css" />
+  </head>
+  <body>
+    <main class="welcome">
+      <section class="hero" aria-labelledby="welcome-title">
+        <div class="hero__brand">
+          <img
+            class="hero__icon"
+            src="assets/icons/icon128.png"
+            alt=""
+            aria-hidden="true"
+          />
+
+          <div>
+            <p class="hero__eyebrow">RecarregaAi! V.1.2.0</p>
+            <h1 id="welcome-title" class="hero__title">
+              Tudo pronto para recarregar paginas sem cache.
+            </h1>
+          </div>
+        </div>
+
+        <p class="hero__description">
+          Escolha uma guia, defina o tempo e deixe o RecarregaAi! limpar o cache
+          e recarregar somente aquela pagina.
+        </p>
+
+        <div class="hero__actions">
+          <button id="finish-welcome-button" class="button button--primary" type="button">
+            Comecar a usar
+          </button>
+
+          <button id="theme-toggle-button" class="button button--secondary" type="button">
+            Tema claro
+          </button>
+        </div>
+      </section>
+
+      <section class="steps" aria-label="Como usar">
+        <article class="step">
+          <span class="step__number">1</span>
+          <h2 class="step__title">Fixe o icone</h2>
+          <p class="step__text">
+            No Chrome, fixe o RecarregaAi! na barra para acompanhar o contador
+            direto no icone.
+          </p>
+        </article>
+
+        <article class="step">
+          <span class="step__number">2</span>
+          <h2 class="step__title">Escolha uma guia</h2>
+          <p class="step__text">
+            Abra a pagina desejada e ative o timer. Apenas essa guia sera
+            controlada.
+          </p>
+        </article>
+
+        <article class="step">
+          <span class="step__number">3</span>
+          <h2 class="step__title">Acompanhe o tempo</h2>
+          <p class="step__text">
+            O badge mostra a contagem no formato `3:00`, `2:59`, `2:58` ate o
+            proximo reload.
+          </p>
+        </article>
+      </section>
+
+      <section class="notice" aria-label="Aviso importante">
+        <strong class="notice__title">Importante</strong>
+        <p class="notice__text">
+          O timer funciona em uma guia por vez. Se voce ativar em outra guia, a
+          anterior para de exibir o contador.
+        </p>
+      </section>
+    </main>
+
+    <script src="JS/welcome.js"></script>
+  </body>
+</html>

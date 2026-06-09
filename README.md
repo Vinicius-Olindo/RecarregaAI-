@@ -12,12 +12,15 @@ um timer para repetir esse processo automaticamente.
 RecarregaAI-/
 |-- manifest.json
 |-- popup.html
+|-- welcome.html
 |-- CSS/
-|   `-- popup.css
+|   |-- popup.css
+|   `-- welcome.css
 |-- JS/
 |   |-- background.js
 |   |-- content.js
-|   `-- popup.js
+|   |-- popup.js
+|   `-- welcome.js
 `-- assets/
     |-- icons/
     |   |-- icon16.png
@@ -34,6 +37,9 @@ RecarregaAI-/
 2. Ative o modo de desenvolvedor.
 3. Clique em `Carregar sem compactacao`.
 4. Selecione a pasta raiz deste projeto.
+
+Ao instalar a extensao pela primeira vez, o Chrome abre automaticamente
+`welcome.html` com as instrucoes iniciais.
 
 ## Funcionamento
 

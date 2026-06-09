@@ -3,6 +3,7 @@ const badgeCountdownAlarmName = "recarregaAiBadgeCountdown";
 const timerSettingsKey = "recarregaAiTimerSettings";
 const lastTimerRunKey = "recarregaAiLastTimerRun";
 const oneSecondInMilliseconds = 1000;
+const welcomePagePath = "welcome.html";
 
 let badgeCountdownTimerId = null;
 let scheduledRefreshInProgress = false;
@@ -484,6 +485,13 @@ const handleRuntimeMessage = async (message) => {
   };
 };
 
+const openWelcomePage = async () => {
+  await chrome.tabs.create({
+    active: true,
+    url: chrome.runtime.getURL(welcomePagePath)
+  });
+};
+
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason !== "install") {
     restoreTimerAlarm();
@@ -493,6 +501,9 @@ chrome.runtime.onInstalled.addListener((details) => {
   clearTimerBadge();
   chrome.storage.local.set({
     recarregaAiInstalledAt: new Date().toISOString()
+  });
+  openWelcomePage().catch((error) => {
+    console.error("Erro ao abrir boas-vindas do RecarregaAi:", error);
   });
 });
 
