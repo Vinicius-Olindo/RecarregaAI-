@@ -162,36 +162,71 @@ const stopBadgeCountdown = () => {
   badgeCountdownTimerId = null;
 };
 
-const clearTimerBadge = async () => {
+const getBadgeTarget = (timerSettings) => {
+  if (typeof timerSettings?.tabId !== "number") {
+    return {};
+  }
+
+  return {
+    tabId: timerSettings.tabId
+  };
+};
+
+const clearActionBadge = async (timerSettings) => {
+  const badgeTarget = getBadgeTarget(timerSettings);
+
+  try {
+    await chrome.action.setBadgeText({
+      ...badgeTarget,
+      text: ""
+    });
+    await chrome.action.setTitle({
+      ...badgeTarget,
+      title: "RecarregaAi!"
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel limpar badge do RecarregaAi:", error);
+  }
+};
+
+const clearGlobalActionBadge = async () => {
+  await clearActionBadge();
+};
+
+const clearTimerBadge = async (timerSettings) => {
   stopBadgeCountdown();
 
-  await chrome.action.setBadgeText({
-    text: ""
-  });
-  await chrome.action.setTitle({
-    title: "RecarregaAi!"
-  });
+  await clearActionBadge(timerSettings);
+  await clearGlobalActionBadge();
 };
 
 const updateTimerBadge = async (timerSettings) => {
   if (!timerSettings?.enabled || !timerSettings.nextRunAt) {
-    await clearTimerBadge();
+    await clearTimerBadge(timerSettings);
     return;
   }
 
   const badgeText = getBadgeText(timerSettings.nextRunAt);
   const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
   const countdownTime = formatCountdownTime(remainingSeconds);
+  const badgeTarget = getBadgeTarget(timerSettings);
 
-  await chrome.action.setBadgeBackgroundColor({
-    color: getBadgeColor(timerSettings.nextRunAt)
-  });
-  await chrome.action.setBadgeText({
-    text: badgeText
-  });
-  await chrome.action.setTitle({
-    title: `RecarregaAi! - proximo reload em ${countdownTime}`
-  });
+  try {
+    await chrome.action.setBadgeBackgroundColor({
+      ...badgeTarget,
+      color: getBadgeColor(timerSettings.nextRunAt)
+    });
+    await chrome.action.setBadgeText({
+      ...badgeTarget,
+      text: badgeText
+    });
+    await chrome.action.setTitle({
+      ...badgeTarget,
+      title: `RecarregaAi! - proximo reload em ${countdownTime}`
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel atualizar badge do RecarregaAi:", error);
+  }
 };
 
 const updateStoredTimerBadge = async () => {
@@ -218,7 +253,7 @@ const startBadgeCountdown = async (timerSettings) => {
   stopBadgeCountdown();
 
   if (!timerSettings?.enabled) {
-    await clearTimerBadge();
+    await clearTimerBadge(timerSettings);
     return;
   }
 
@@ -256,6 +291,7 @@ const createBadgeCountdownAlarm = async () => {
 };
 
 const startTimer = async (payload) => {
+  const previousTimerSettings = await getStoredTimerSettings();
   const intervalInMinutes = Math.floor(Number(payload.intervalInMinutes));
 
   if (!Number.isFinite(intervalInMinutes) || intervalInMinutes < 1) {
@@ -280,9 +316,19 @@ const startTimer = async (payload) => {
     origins,
     startedAt: new Date().toISOString(),
     tabId: payload.tabId,
+    tabTitle: payload.tabTitle || null,
+    tabUrl: payload.tabUrl || null,
     windowId: payload.windowId
   };
 
+  if (
+    previousTimerSettings?.enabled
+    && previousTimerSettings.tabId !== timerSettings.tabId
+  ) {
+    await clearActionBadge(previousTimerSettings);
+  }
+
+  await clearGlobalActionBadge();
   await chrome.storage.local.set({
     [timerSettingsKey]: timerSettings
   });
@@ -294,6 +340,8 @@ const startTimer = async (payload) => {
 };
 
 const stopTimer = async () => {
+  const timerSettings = await getStoredTimerSettings();
+
   await chrome.alarms.clear(timerAlarmName);
   await chrome.alarms.clear(badgeCountdownAlarmName);
   stopBadgeCountdown();
@@ -303,7 +351,7 @@ const stopTimer = async () => {
       stoppedAt: new Date().toISOString()
     }
   });
-  await clearTimerBadge();
+  await clearTimerBadge(timerSettings);
 };
 
 const saveTimerRunResult = async (timerSettings, result) => {
@@ -395,7 +443,7 @@ const restoreTimerAlarm = async () => {
   const timerSettings = await getStoredTimerSettings();
 
   if (!timerSettings?.enabled) {
-    await clearTimerBadge();
+    await clearTimerBadge(timerSettings);
     return;
   }
 
@@ -474,4 +522,18 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === timerAlarmName) {
     runScheduledRefresh();
   }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  getStoredTimerSettings()
+    .then((timerSettings) => {
+      if (timerSettings?.enabled && timerSettings.tabId === tabId) {
+        return stopTimer();
+      }
+
+      return null;
+    })
+    .catch((error) => {
+      console.error("Erro ao verificar guia removida no RecarregaAi:", error);
+    });
 });

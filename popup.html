@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,20 +10,31 @@
     <main class="popup" aria-labelledby="popup-title">
       <header class="popup__header">
         <span class="popup__logo" aria-hidden="true">
-          <svg class="popup__logo-icon" viewBox="0 0 24 24" focusable="false">
-            <path
-              d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3L5 19h5v-5l-2.1 2.1A5.5 5.5 0 0 0 17.5 12h2Z"
-            />
-            <path
-              d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19 5h-5v5l2.1-2.1A5.5 5.5 0 0 0 6.5 12h-2Z"
-            />
-          </svg>
+          <img class="popup__logo-icon" src="assets/icons/icon48.png" alt="" />
         </span>
 
         <div class="popup__heading">
-          <h1 id="popup-title" class="popup__title">RecarregaAi!</h1>
-          <p class="popup__subtitle">Cache limpo. Pagina nova. Sem enrolacao.</p>
+          <div class="popup__title-row">
+            <h1 id="popup-title" class="popup__title">RecarregaAi!</h1>
+            <span id="extension-version" class="popup__version">V.1.2.0</span>
+          </div>
+
+          <p class="popup__subtitle">
+            Cache limpo. Pagina nova. Sem enrolacao.
+          </p>
         </div>
+
+        <button
+          id="theme-toggle-button"
+          class="theme-toggle"
+          type="button"
+          aria-label="Alternar tema"
+          aria-pressed="true"
+          title="Mudar para tema claro"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true"></span>
+          <span id="theme-toggle-label" class="theme-toggle__label">Claro</span>
+        </button>
       </header>
 
       <section class="popup__status" data-status="neutral" aria-live="polite">
@@ -41,7 +52,9 @@
         <div class="quick-action__copy">
           <p id="quick-action-title" class="popup__label">Acao rapida</p>
           <p class="quick-action__title">Limpar agora</p>
-          <p class="popup__hint">Remove cache e recarrega a aba atual uma vez.</p>
+          <p class="popup__hint">
+            Remove cache e recarrega a aba atual uma vez.
+          </p>
         </div>
 
         <button id="reload-page-button" class="popup__button" type="button">
@@ -53,14 +66,18 @@
         <div class="popup__section-heading">
           <div>
             <p class="popup__label">Automacao</p>
-            <h2 id="timer-title" class="popup__section-title">Timer recorrente</h2>
+            <h2 id="timer-title" class="popup__section-title">
+              Timer recorrente
+            </h2>
           </div>
 
           <span class="popup__badge">m:ss</span>
         </div>
 
         <fieldset class="timer-options">
-          <legend class="screen-reader-only">Escolha o intervalo do timer</legend>
+          <legend class="screen-reader-only">
+            Escolha o intervalo do timer
+          </legend>
 
           <label class="timer-options__item">
             <input type="radio" name="timer-interval" value="3" checked />
@@ -88,7 +105,9 @@
         </fieldset>
 
         <label class="custom-timer" for="custom-timer-input">
-          <span class="custom-timer__label">Tempo personalizado em minutos</span>
+          <span class="custom-timer__label"
+            >Tempo personalizado em minutos</span
+          >
           <span class="custom-timer__control">
             <input
               id="custom-timer-input"
@@ -112,7 +131,11 @@
             Ativar timer
           </button>
 
-          <button id="stop-timer-button" class="popup__button popup__button--ghost" type="button">
+          <button
+            id="stop-timer-button"
+            class="popup__button popup__button--ghost"
+            type="button"
+          >
             Parar timer
           </button>
         </div>

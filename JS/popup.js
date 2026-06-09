@@ -1,4 +1,10 @@
 const timerSettingsKey = "recarregaAiTimerSettings";
+const themeStorageKey = "recarregaAiTheme";
+
+const themeModes = {
+  dark: "dark",
+  light: "light"
+};
 
 const runtimeMessageTypes = {
   startTimer: "RECARREGA_AI_START_TIMER",
@@ -7,11 +13,14 @@ const runtimeMessageTypes = {
 
 const popupElements = {
   customTimerInput: document.querySelector("#custom-timer-input"),
+  extensionVersion: document.querySelector("#extension-version"),
   reloadPageButton: document.querySelector("#reload-page-button"),
   startTimerButton: document.querySelector("#start-timer-button"),
   statusPanel: document.querySelector(".popup__status"),
   statusMessage: document.querySelector("#status-message"),
   stopTimerButton: document.querySelector("#stop-timer-button"),
+  themeToggleButton: document.querySelector("#theme-toggle-button"),
+  themeToggleLabel: document.querySelector("#theme-toggle-label"),
   timerIntervalInputs: document.querySelectorAll("[name='timer-interval']")
 };
 
@@ -34,6 +43,46 @@ const updateStatusMessage = (message, status = "neutral") => {
 const updateButtonState = (button, isLoading, loadingText, defaultText) => {
   button.disabled = isLoading;
   button.textContent = isLoading ? loadingText : defaultText;
+};
+
+const loadExtensionVersion = () => {
+  const manifest = chrome.runtime.getManifest();
+
+  popupElements.extensionVersion.textContent = manifest.version_name
+    || `V.${manifest.version}`;
+};
+
+const applyTheme = (theme) => {
+  const nextTheme = theme === themeModes.light
+    ? themeModes.light
+    : themeModes.dark;
+  const isDarkTheme = nextTheme === themeModes.dark;
+
+  document.documentElement.dataset.theme = nextTheme;
+  popupElements.themeToggleButton.setAttribute("aria-pressed", String(isDarkTheme));
+  popupElements.themeToggleButton.title = isDarkTheme
+    ? "Mudar para tema claro"
+    : "Mudar para tema escuro";
+  popupElements.themeToggleLabel.textContent = isDarkTheme ? "Claro" : "Escuro";
+};
+
+const loadTheme = async () => {
+  const storedData = await chrome.storage.local.get(themeStorageKey);
+
+  applyTheme(storedData[themeStorageKey] || themeModes.dark);
+};
+
+const toggleTheme = async () => {
+  const currentTheme = document.documentElement.dataset.theme;
+  const nextTheme = currentTheme === themeModes.dark
+    ? themeModes.light
+    : themeModes.dark;
+
+  applyTheme(nextTheme);
+
+  await chrome.storage.local.set({
+    [themeStorageKey]: nextTheme
+  });
 };
 
 const sendRuntimeMessage = (message) => new Promise((resolve, reject) => {
@@ -268,9 +317,21 @@ const loadTimerState = async () => {
   }
 
   selectTimerInterval(timerSettings.intervalInMinutes);
+
+  const activeTab = await getActiveTab();
+  const timerIntervalText = formatTimerInterval(timerSettings.intervalInMinutes);
+
+  if (activeTab?.id === timerSettings.tabId) {
+    updateStatusMessage(
+      `Timer ativo nesta guia: a cada ${timerIntervalText}.`,
+      "active"
+    );
+    return;
+  }
+
   updateStatusMessage(
-    `Timer ativo: a cada ${formatTimerInterval(timerSettings.intervalInMinutes)}.`,
-    "active"
+    `Timer ativo em outra guia. Ativar aqui substitui a guia anterior.`,
+    "warning"
   );
 };
 
@@ -308,6 +369,8 @@ const startTimer = async () => {
         mainOrigin: origin,
         origins: loadedOrigins,
         tabId: activeTab.id,
+        tabTitle: activeTab.title,
+        tabUrl: activeTab.url,
         windowId: activeTab.windowId
       }
     });
@@ -348,12 +411,21 @@ const stopTimer = async () => {
 popupElements.reloadPageButton.addEventListener("click", clearCacheAndReloadCurrentPage);
 popupElements.startTimerButton.addEventListener("click", startTimer);
 popupElements.stopTimerButton.addEventListener("click", stopTimer);
+popupElements.themeToggleButton.addEventListener("click", () => {
+  toggleTheme().catch((error) => {
+    console.error("Erro ao alternar tema:", error);
+  });
+});
 
 popupElements.timerIntervalInputs.forEach((timerInput) => {
   timerInput.addEventListener("change", syncCustomTimerInputState);
 });
 
 syncCustomTimerInputState();
+loadExtensionVersion();
+loadTheme().catch((error) => {
+  console.error("Erro ao carregar tema:", error);
+});
 loadTimerState().catch((error) => {
   console.error("Erro ao carregar estado do timer:", error);
 });

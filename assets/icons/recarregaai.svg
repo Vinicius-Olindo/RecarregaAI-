@@ -1,11 +1,37 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="128" height="128" rx="24" fill="#1F7AEF" />
+<svg
+  width="128"
+  height="128"
+  viewBox="0 0 128 128"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect x="8" y="8" width="112" height="112" rx="18" fill="#1F8FFF" />
   <path
-    d="M84 39H54C45.1634 39 38 46.1634 38 55V89H50V69H68.5L82 89H96L80.75 66.75C86.25 64.25 90 58.75 90 52.5C90 45.0442 85.3137 39 84 39Z"
-    fill="white"
+    d="M43 60C44.9 48.6 54.6 40 66.4 40C73.6 40 80.1 43.2 84.5 48.2"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   />
   <path
-    d="M50 58V51H78C80.2091 51 82 52.7909 82 55C82 56.6569 80.6569 58 79 58H50Z"
-    fill="#1F7AEF"
+    d="M84 36V49H71"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M85 68C83.1 79.4 73.4 88 61.6 88C54.4 88 47.9 84.8 43.5 79.8"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M44 92V79H57"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   />
 </svg>

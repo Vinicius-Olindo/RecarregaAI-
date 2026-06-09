@@ -1,5 +1,7 @@
 # RecarregaAi!
 
+Versao atual: **V.1.2.0**.
+
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
 um timer para repetir esse processo automaticamente.
@@ -46,6 +48,11 @@ Ao clicar no botao da extensao, o RecarregaAi!:
 ## Timer
 
 O timer permite repetir a limpeza e o recarregamento automaticamente na aba selecionada.
+Somente uma guia fica ativa por vez.
+
+Se voce tiver varias guias abertas, o RecarregaAi! funciona apenas na guia em que
+voce clicou em `Ativar timer`. Ao ativar o timer em outra guia, a guia anterior
+deixa de mostrar o contador e a nova guia passa a ser controlada.
 
 Opcoes disponiveis:
 
@@ -66,6 +73,14 @@ Para encerrar o agendamento, clique em `Parar timer`.
 Enquanto o timer estiver ativo, o icone da extensao mostra a contagem regressiva
 no badge, como `3:00`, `2:59`, `2:58` e assim por diante. Ao parar o timer, o
 badge e removido.
+
+O badge aparece somente na guia controlada pelo timer. Nas outras guias, o icone
+fica sem contador.
+
+## Tema
+
+O popup abre em tema escuro por padrao. Use o botao `Claro` ou `Escuro` no topo
+para alternar entre os temas. A escolha fica salva no navegador.
 
 ## Observacoes
 
