@@ -6,6 +6,10 @@ const themeModes = {
   light: "light"
 };
 
+const pauseReasons = {
+  typing: "typing"
+};
+
 const runtimeMessageTypes = {
   getTimerState: "RECARREGA_AI_GET_TIMER_STATE",
   openTimerTab: "RECARREGA_AI_OPEN_TIMER_TAB",
@@ -16,6 +20,9 @@ const runtimeMessageTypes = {
 };
 
 const popupElements = {
+  activeTimersCount: document.querySelector("#active-timers-count"),
+  activeTimersList: document.querySelector("#active-timers-list"),
+  activeTimersSection: document.querySelector("#active-timers-section"),
   controlledTabTitle: document.querySelector("#controlled-tab-title"),
   controlledTabUrl: document.querySelector("#controlled-tab-url"),
   customTimerInput: document.querySelector("#custom-timer-input"),
@@ -311,90 +318,193 @@ const formatCountdownTime = (remainingSeconds) => {
   return `${minutes}:${paddedSeconds}`;
 };
 
-const getTimerState = async () => (
+const getTimerState = async (activeTabId = null) => (
   sendRuntimeMessage({
+    payload: {
+      activeTabId
+    },
     type: runtimeMessageTypes.getTimerState
   })
 );
 
 const getTimerTabLabel = (timerSettings) => (
-  timerSettings.tabTitle || timerSettings.mainOrigin || "Guia controlada"
+  timerSettings.tabTitle || timerSettings.mainOrigin || "Guia monitorada"
 );
 
-const updateTimerActionButtons = (timerSettings, activeTab) => {
+const formatActiveTimerCount = (count) => {
+  if (count === 1) {
+    return "1 guia";
+  }
+
+  return `${count} guias`;
+};
+
+const getTimerVisualState = (timerSettings) => {
+  if (!timerSettings?.enabled) {
+    return {
+      countdownText: "--:--",
+      state: "empty"
+    };
+  }
+
+  const isPaused = Boolean(timerSettings.paused);
+  const isPausedByTyping = timerSettings.pauseReason === pauseReasons.typing;
+  const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
+  const isWarning = !isPaused && remainingSeconds <= 10;
+  let countdownText = formatCountdownTime(remainingSeconds);
+  let state = "active";
+
+  if (isWarning) {
+    state = "warning";
+  }
+
+  if (isPaused) {
+    state = isPausedByTyping ? "typing" : "paused";
+    countdownText = isPausedByTyping ? "Digitando" : "Pausado";
+  }
+
+  return {
+    countdownText,
+    state
+  };
+};
+
+const updateTimerActionButtons = (timerSettings) => {
   const hasTimer = Boolean(timerSettings?.enabled);
-  const isCurrentControlledTab = hasTimer && activeTab?.id === timerSettings.tabId;
   const isPaused = Boolean(timerSettings?.paused);
 
-  popupElements.openControlledTabButton.hidden = !hasTimer || isCurrentControlledTab;
+  popupElements.openControlledTabButton.hidden = true;
   popupElements.pauseTimerButton.hidden = !hasTimer || isPaused;
   popupElements.resumeTimerButton.hidden = !hasTimer || !isPaused;
   popupElements.stopTimerButton.disabled = !hasTimer;
 };
 
-const updateTimerOverview = async (timerSettings) => {
-  const activeTab = await getActiveTab();
-
+const updateTimerOverview = (timerSettings) => {
   if (!timerSettings?.enabled) {
     popupElements.timerOverview.dataset.state = "empty";
-    popupElements.controlledTabTitle.textContent = "Nenhuma guia monitorada";
-    popupElements.controlledTabUrl.textContent = "Ative o timer para iniciar.";
+    popupElements.controlledTabTitle.textContent = "Esta guia nao esta monitorada";
+    popupElements.controlledTabUrl.textContent = "Ative o timer para incluir esta aba.";
     popupElements.popupCountdown.textContent = "--:--";
-    updateTimerActionButtons(timerSettings, activeTab);
+    updateTimerActionButtons(timerSettings);
     return;
   }
 
-  const isPaused = Boolean(timerSettings.paused);
-  const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
-  const isWarning = !isPaused && remainingSeconds <= 10;
-  const state = isPaused ? "paused" : isWarning ? "warning" : "active";
+  const timerVisualState = getTimerVisualState(timerSettings);
 
-  popupElements.timerOverview.dataset.state = state;
+  popupElements.timerOverview.dataset.state = timerVisualState.state;
   popupElements.controlledTabTitle.textContent = getTimerTabLabel(timerSettings);
   popupElements.controlledTabUrl.textContent = timerSettings.tabUrl
     || timerSettings.mainOrigin
     || "Origem nao identificada";
-  popupElements.popupCountdown.textContent = isPaused
-    ? "Pausado"
-    : formatCountdownTime(remainingSeconds);
+  popupElements.popupCountdown.textContent = timerVisualState.countdownText;
 
-  updateTimerActionButtons(timerSettings, activeTab);
+  updateTimerActionButtons(timerSettings);
+};
+
+const createActiveTimerItem = (timerSettings, activeTab) => {
+  const item = document.createElement("article");
+  const copy = document.createElement("div");
+  const title = document.createElement("strong");
+  const url = document.createElement("span");
+  const meta = document.createElement("div");
+  const countdown = document.createElement("span");
+  const openButton = document.createElement("button");
+  const timerVisualState = getTimerVisualState(timerSettings);
+  const isCurrentTab = activeTab?.id === timerSettings.tabId;
+
+  item.className = "active-timers__item";
+  item.dataset.state = timerVisualState.state;
+  copy.className = "active-timers__copy";
+  title.className = "active-timers__title";
+  url.className = "active-timers__url";
+  meta.className = "active-timers__meta";
+  countdown.className = "active-timers__countdown";
+  openButton.className = "popup__button popup__button--ghost active-timers__button";
+  openButton.type = "button";
+
+  title.textContent = getTimerTabLabel(timerSettings);
+  url.textContent = timerSettings.tabUrl
+    || timerSettings.mainOrigin
+    || "Origem nao identificada";
+  countdown.textContent = timerVisualState.countdownText;
+  openButton.textContent = isCurrentTab ? "Atual" : "Abrir";
+  openButton.disabled = isCurrentTab;
+  openButton.dataset.openTimerTab = String(timerSettings.tabId);
+
+  copy.append(title, url);
+  meta.append(countdown, openButton);
+  item.append(copy, meta);
+
+  return item;
+};
+
+const updateActiveTimersList = (activeTimers, activeTab) => {
+  const hasCurrentTabTimer = activeTimers.some((timerSettings) => (
+    timerSettings.tabId === activeTab?.id
+  ));
+  const shouldShowActiveTimers = activeTimers.length > 0
+    && (!hasCurrentTabTimer || activeTimers.length > 1);
+
+  popupElements.activeTimersList.innerHTML = "";
+  popupElements.activeTimersSection.hidden = !shouldShowActiveTimers;
+  popupElements.activeTimersCount.textContent = String(activeTimers.length);
+
+  if (!shouldShowActiveTimers) {
+    return;
+  }
+
+  activeTimers.forEach((timerSettings) => {
+    popupElements.activeTimersList.append(
+      createActiveTimerItem(timerSettings, activeTab)
+    );
+  });
 };
 
 const refreshTimerState = async ({ updateStatus = false } = {}) => {
-  const response = await getTimerState();
+  const activeTab = await getActiveTab();
+  const response = await getTimerState(activeTab?.id);
   const timerSettings = response.timerSettings;
+  const activeTimers = response.activeTimers || [];
 
-  await updateTimerOverview(timerSettings);
+  updateTimerOverview(timerSettings);
+  updateActiveTimersList(activeTimers, activeTab);
 
   if (!updateStatus) {
     return timerSettings;
   }
 
   if (!timerSettings?.enabled) {
+    if (activeTimers.length > 0) {
+      updateStatusMessage(
+        `${formatActiveTimerCount(activeTimers.length)} com timer ativo. `
+          + "Esta guia ainda nao esta monitorada.",
+        "active"
+      );
+      return timerSettings;
+    }
+
     updateStatusMessage("Nenhuma guia sendo monitorada agora.", "neutral");
     return timerSettings;
   }
 
-  const activeTab = await getActiveTab();
   const timerIntervalText = formatTimerInterval(timerSettings.intervalInMinutes);
 
   if (timerSettings.paused) {
+    if (timerSettings.pauseReason === pauseReasons.typing) {
+      updateStatusMessage(
+        "Digitacao detectada. Timer pausado para proteger a pagina.",
+        "warning"
+      );
+      return timerSettings;
+    }
+
     updateStatusMessage("Timer pausado.", "warning");
     return timerSettings;
   }
 
-  if (activeTab?.id === timerSettings.tabId) {
-    updateStatusMessage(
-      `Timer ativo nesta guia: a cada ${timerIntervalText}.`,
-      "active"
-    );
-    return timerSettings;
-  }
-
   updateStatusMessage(
-    "Timer ativo em outra guia. Use Abrir guia para ir ate ela.",
-    "warning"
+    `Timer ativo nesta guia: a cada ${timerIntervalText}.`,
+    "active"
   );
 
   return timerSettings;
@@ -500,9 +610,24 @@ const startTimer = async () => {
   }
 };
 
+const getActiveTabIdForTimerAction = async () => {
+  const activeTab = await getActiveTab();
+
+  if (typeof activeTab?.id !== "number") {
+    throw new Error("Nao foi possivel encontrar a aba atual.");
+  }
+
+  return activeTab.id;
+};
+
 const stopTimer = async () => {
   try {
+    const tabId = await getActiveTabIdForTimerAction();
+
     await sendRuntimeMessage({
+      payload: {
+        tabId
+      },
       type: runtimeMessageTypes.stopTimer
     });
 
@@ -516,7 +641,12 @@ const stopTimer = async () => {
 
 const pauseTimer = async () => {
   try {
+    const tabId = await getActiveTabIdForTimerAction();
+
     await sendRuntimeMessage({
+      payload: {
+        tabId
+      },
       type: runtimeMessageTypes.pauseTimer
     });
 
@@ -530,7 +660,12 @@ const pauseTimer = async () => {
 
 const resumeTimer = async () => {
   try {
+    const tabId = await getActiveTabIdForTimerAction();
+
     await sendRuntimeMessage({
+      payload: {
+        tabId
+      },
       type: runtimeMessageTypes.resumeTimer
     });
 
@@ -542,14 +677,17 @@ const resumeTimer = async () => {
   }
 };
 
-const openControlledTab = async () => {
+const openControlledTab = async (tabId) => {
   try {
     await sendRuntimeMessage({
+      payload: {
+        tabId
+      },
       type: runtimeMessageTypes.openTimerTab
     });
   } catch (error) {
-    console.error("Erro ao abrir guia controlada:", error);
-    updateStatusMessage("Nao foi possivel abrir a guia controlada.", "error");
+    console.error("Erro ao abrir guia monitorada:", error);
+    updateStatusMessage("Nao foi possivel abrir a guia monitorada.", "error");
   }
 };
 
@@ -557,13 +695,23 @@ const openOptionsPage = () => {
   chrome.runtime.openOptionsPage();
 };
 
+const handleActiveTimersListClick = (event) => {
+  const openButton = event.target.closest("[data-open-timer-tab]");
+
+  if (!openButton || openButton.disabled) {
+    return;
+  }
+
+  openControlledTab(Number(openButton.dataset.openTimerTab));
+};
+
 popupElements.reloadPageButton.addEventListener("click", clearCacheAndReloadCurrentPage);
-popupElements.openControlledTabButton.addEventListener("click", openControlledTab);
 popupElements.openOptionsButton.addEventListener("click", openOptionsPage);
 popupElements.pauseTimerButton.addEventListener("click", pauseTimer);
 popupElements.resumeTimerButton.addEventListener("click", resumeTimer);
 popupElements.startTimerButton.addEventListener("click", startTimer);
 popupElements.stopTimerButton.addEventListener("click", stopTimer);
+popupElements.activeTimersList.addEventListener("click", handleActiveTimersListClick);
 popupElements.themeToggleButton.addEventListener("click", () => {
   toggleTheme().catch((error) => {
     console.error("Erro ao alternar tema:", error);

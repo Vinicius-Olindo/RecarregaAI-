@@ -16,7 +16,7 @@
         <div class="popup__heading">
           <div class="popup__title-row">
             <h1 id="popup-title" class="popup__title">RecarregaAi!</h1>
-            <span id="extension-version" class="popup__version">V.1.2.0</span>
+            <span id="extension-version" class="popup__version">V.1.2.1</span>
           </div>
 
           <p class="popup__subtitle">
@@ -51,7 +51,7 @@
       <section id="timer-overview" class="timer-overview" data-state="empty">
         <div class="timer-overview__main">
           <div class="timer-overview__copy">
-            <p class="popup__label">Guia controlada</p>
+            <p class="popup__label">Guia atual</p>
             <strong id="controlled-tab-title" class="timer-overview__title">
               Nenhuma guia monitorada
             </strong>
@@ -70,6 +70,7 @@
             id="open-controlled-tab-button"
             class="popup__button popup__button--ghost"
             type="button"
+            hidden
           >
             Abrir guia
           </button>
@@ -98,6 +99,30 @@
             Configuracoes
           </button>
         </div>
+      </section>
+
+      <section
+        id="active-timers-section"
+        class="active-timers"
+        aria-labelledby="active-timers-title"
+        hidden
+      >
+        <div class="popup__section-heading">
+          <div>
+            <p class="popup__label">Multiplas guias</p>
+            <h2 id="active-timers-title" class="popup__section-title">
+              Timers ativos
+            </h2>
+          </div>
+
+          <span id="active-timers-count" class="popup__badge">0</span>
+        </div>
+
+        <div
+          id="active-timers-list"
+          class="active-timers__list"
+          aria-live="polite"
+        ></div>
       </section>
 
       <section class="quick-action" aria-labelledby="quick-action-title">

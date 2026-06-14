@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.2.0**.
+Versao atual: **V.1.2.1**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -13,16 +13,19 @@ RecarregaAI-/
 |-- manifest.json
 |-- options.html
 |-- popup.html
+|-- uninstall.html
 |-- welcome.html
 |-- CSS/
 |   |-- options.css
 |   |-- popup.css
+|   |-- uninstall.css
 |   `-- welcome.css
 |-- JS/
 |   |-- background.js
 |   |-- content.js
 |   |-- options.js
 |   |-- popup.js
+|   |-- uninstall.js
 |   `-- welcome.js
 `-- assets/
     |-- icons/
@@ -44,6 +47,10 @@ RecarregaAI-/
 Ao instalar a extensao pela primeira vez, o Chrome abre automaticamente
 `welcome.html` com as instrucoes iniciais.
 
+Ao desinstalar, o Chrome abre a pagina de feedback configurada no background.
+Essa URL precisa estar hospedada em `http` ou `https`, conforme a API do Chrome.
+O projeto ja inclui `uninstall.html`, pronta para publicar junto com o site.
+
 ## Funcionamento
 
 Ao clicar no botao da extensao, o RecarregaAi!:
@@ -56,12 +63,12 @@ Ao clicar no botao da extensao, o RecarregaAi!:
 
 ## Timer
 
-O timer permite repetir a limpeza e o recarregamento automaticamente na aba selecionada.
-Somente uma guia fica ativa por vez.
+O timer permite repetir a limpeza e o recarregamento automaticamente na aba
+selecionada. Cada guia pode ter seu proprio timer.
 
-Se voce tiver varias guias abertas, o RecarregaAi! funciona apenas na guia em que
-voce clicou em `Ativar timer`. Ao ativar o timer em outra guia, a guia anterior
-deixa de mostrar o contador e a nova guia passa a ser controlada.
+Se voce tiver varias guias abertas, clique em `Ativar timer` nas guias que deseja
+monitorar. O Drive pode ficar com um timer, outro sistema pode ficar com outro,
+e cada contador aparece somente na guia correspondente.
 
 Opcoes disponiveis:
 
@@ -77,17 +84,21 @@ Para usar:
 3. Escolha o tempo.
 4. Clique em `Ativar timer`.
 
-Para encerrar o agendamento, clique em `Parar timer`.
+Para encerrar o agendamento da guia atual, clique em `Parar timer`.
 
-Tambem e possivel pausar, retomar e abrir diretamente a guia controlada pelo
-timer usando os botoes do popup.
+Tambem e possivel pausar e retomar o timer da guia atual. Quando existem timers
+em outras guias, o popup mostra uma lista compacta para abrir cada uma.
+
+Quando existe um campo de texto ativo em uma guia monitorada, como input,
+textarea ou editor da propria pagina, apenas o timer daquela guia pausa
+automaticamente. Ao sair do campo, a contagem continua do ponto em que parou.
 
 Enquanto o timer estiver ativo, o icone da extensao mostra a contagem regressiva
 no badge, como `3:00`, `2:59`, `2:58` e assim por diante. Ao parar o timer, o
 badge e removido.
 
-O badge aparece somente na guia controlada pelo timer. Nas outras guias, o icone
-fica sem contador.
+O badge aparece somente nas guias que possuem timer ativo. Nas outras guias, o
+icone fica sem contador.
 
 ## Configuracoes
 
@@ -98,7 +109,24 @@ A pagina `options.html` permite:
 - Remover sites cadastrados.
 - Ver uma explicacao clara das permissoes usadas pela extensao.
 
-O auto-inicio so entra em acao quando nao existe outro timer ativo.
+O auto-inicio cria um timer separado para cada guia carregada com um site
+favorito, desde que aquela guia ainda nao tenha timer ativo.
+
+## Feedback de desinstalacao
+
+A pagina `uninstall.html` coleta o motivo da desinstalacao, nota de experiencia,
+comentario opcional e email opcional. O envio abre uma issue preenchida no
+repositorio do projeto para o usuario revisar antes de confirmar.
+
+O background configura a URL de desinstalacao com:
+
+```text
+https://vinicius-olindo.github.io/RecarregaAI-/uninstall.html
+```
+
+Ative o GitHub Pages para essa URL funcionar em producao. Se a pagina for
+hospedada em outro endereco, atualize `uninstallFeedbackPageUrl` em
+`JS/background.js`.
 
 ## Tema
 
@@ -112,3 +140,4 @@ para alternar entre os temas. A escolha fica salva no navegador.
 - Os arquivos JavaScript ficam em `JS/`.
 - A tela inicial da extensao fica em `popup.html`.
 - A pagina de configuracoes fica em `options.html`.
+- A cada alteracao da extensao, incremente a versao no padrao `V.1.2.x`.

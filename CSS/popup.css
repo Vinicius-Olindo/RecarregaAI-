@@ -316,6 +316,11 @@ input {
   border-color: var(--color-border-strong);
 }
 
+.timer-overview[data-state="typing"] {
+  border-color: rgba(255, 173, 77, 0.62);
+  box-shadow: 0 0 0 3px rgba(255, 173, 77, 0.08);
+}
+
 .timer-overview__main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -366,6 +371,11 @@ input {
   background: rgba(255, 173, 77, 0.13);
 }
 
+.timer-overview[data-state="typing"] .timer-overview__countdown {
+  color: var(--color-warning);
+  background: rgba(255, 173, 77, 0.13);
+}
+
 .timer-overview[data-state="paused"] .timer-overview__countdown,
 .timer-overview[data-state="empty"] .timer-overview__countdown {
   color: var(--color-muted);
@@ -379,6 +389,111 @@ input {
 
 .timer-overview__actions [hidden] {
   display: none;
+}
+
+.active-timers {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.active-timers[hidden] {
+  display: none;
+}
+
+.active-timers__list {
+  display: grid;
+  gap: 8px;
+}
+
+.active-timers__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.active-timers__item[data-state="active"] {
+  border-color: rgba(45, 156, 255, 0.42);
+}
+
+.active-timers__item[data-state="warning"],
+.active-timers__item[data-state="typing"] {
+  border-color: rgba(255, 173, 77, 0.55);
+}
+
+.active-timers__item[data-state="paused"] {
+  border-color: var(--color-border-strong);
+}
+
+.active-timers__copy {
+  min-width: 0;
+}
+
+.active-timers__title,
+.active-timers__url {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.active-timers__title {
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.active-timers__url {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+}
+
+.active-timers__meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.active-timers__countdown {
+  min-width: 50px;
+  padding: 5px 8px;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: center;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.active-timers__item[data-state="warning"] .active-timers__countdown,
+.active-timers__item[data-state="typing"] .active-timers__countdown {
+  color: var(--color-warning);
+  background: rgba(255, 173, 77, 0.13);
+}
+
+.active-timers__item[data-state="paused"] .active-timers__countdown {
+  color: var(--color-muted);
+}
+
+.active-timers__button {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 0.7rem;
+  box-shadow: none;
+}
+
+.active-timers__button:disabled {
+  cursor: default;
+  opacity: 0.72;
 }
 
 .quick-action,
