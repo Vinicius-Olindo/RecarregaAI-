@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- RecarregaAi! V.1.2.6 -->
+<!-- RecarregaAi! V.1.2.7 -->
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -19,16 +19,16 @@
           />
 
           <div>
-            <p id="extension-version" class="hero__eyebrow">V.1.2.6</p>
+            <p id="extension-version" class="hero__eyebrow">V.1.2.7</p>
             <h1 id="uninstall-title" class="hero__title">
-              Sentiremos sua falta.
+              So uma pergunta rapida.
             </h1>
           </div>
         </div>
 
         <p class="hero__description">
-          Se voce decidiu remover o RecarregaAi!, conte rapidamente o motivo.
-          Esse retorno ajuda a melhorar a extensao nas proximas versoes.
+          Escolha um motivo e pronto. O feedback e enviado nesta pagina, sem
+          abrir GitHub, tela intermediaria ou outro formulario.
         </p>
       </section>
 
@@ -44,104 +44,115 @@
         <input id="feedback-version-input" type="hidden" name="Versao" />
         <input id="feedback-date-input" type="hidden" name="Data" />
         <input id="feedback-browser-input" type="hidden" name="Navegador" />
+        <input
+          id="feedback-reason-input"
+          type="hidden"
+          name="Motivo"
+          value="Nao informou motivo"
+        />
 
         <div class="feedback-card__heading">
-          <p class="feedback-card__eyebrow">Feedback</p>
-          <h2 class="feedback-card__title">O que podemos melhorar?</h2>
+          <p class="feedback-card__eyebrow">Feedback rapido</p>
+          <h2 class="feedback-card__title">Por que voce removeu?</h2>
           <p class="feedback-card__description">
-            O feedback e enviado direto para o email do projeto. Nenhuma
-            informacao e enviada antes de voce clicar no botao.
+            Um clique ja ajuda a melhorar o RecarregaAi!. Comentario e email
+            continuam opcionais.
           </p>
         </div>
 
-        <fieldset class="reason-list">
-          <legend class="field__label">Motivo principal</legend>
-
-          <label class="reason-list__item">
-            <input
-              type="radio"
-              name="Motivo"
-              value="Nao limpou o cache como eu esperava"
-              checked
-            />
-            <span>Nao limpou o cache como eu esperava</span>
-          </label>
-
-          <label class="reason-list__item">
-            <input
-              type="radio"
-              name="Motivo"
-              value="Recarregou a pagina na hora errada"
-            />
-            <span>Recarregou a pagina na hora errada</span>
-          </label>
-
-          <label class="reason-list__item">
-            <input type="radio" name="Motivo" value="Ficou confuso de usar" />
-            <span>Ficou confuso de usar</span>
-          </label>
-
-          <label class="reason-list__item">
-            <input
-              type="radio"
-              name="Motivo"
-              value="Faltou alguma funcao importante"
-            />
-            <span>Faltou alguma funcao importante</span>
-          </label>
-
-          <label class="reason-list__item">
-            <input type="radio" name="Motivo" value="Outro motivo" />
-            <span>Outro motivo</span>
-          </label>
-        </fieldset>
-
-        <label class="field" for="experience-rating">
-          <span class="field__label">Como foi sua experiencia?</span>
-          <select
-            id="experience-rating"
-            class="field__input"
-            name="Nota da experiencia"
+        <div
+          class="quick-reasons"
+          aria-label="Escolha o motivo para enviar feedback rapido"
+        >
+          <button
+            class="reason-button"
+            type="button"
+            data-feedback-reason="Nao limpou o cache como eu esperava"
           >
-            <option value="1">1 - Ruim</option>
-            <option value="2">2 - Pode melhorar</option>
-            <option value="3" selected>3 - Regular</option>
-            <option value="4">4 - Boa</option>
-            <option value="5">5 - Muito boa</option>
-          </select>
-        </label>
-
-        <label class="field" for="feedback-message">
-          <span class="field__label">Conte mais, se puder</span>
-          <textarea
-            id="feedback-message"
-            class="field__input field__input--textarea"
-            name="Comentario"
-            rows="5"
-            placeholder="Exemplo: eu precisava controlar duas abas, mas..."
-          ></textarea>
-        </label>
-
-        <label class="field" for="contact-email">
-          <span class="field__label">Email para contato, opcional</span>
-          <input
-            id="contact-email"
-            class="field__input"
-            type="email"
-            name="email"
-            placeholder="voce@email.com"
-          />
-        </label>
-
-        <div class="feedback-card__actions">
-          <button class="button button--primary" type="submit">
-            Enviar feedback
+            <strong>Cache</strong>
+            <span>Nao limpou como eu esperava</span>
           </button>
 
-          <button id="copy-feedback-button" class="button button--ghost" type="button">
-            Copiar resposta
+          <button
+            class="reason-button"
+            type="button"
+            data-feedback-reason="Recarregou a pagina na hora errada"
+          >
+            <strong>Reload</strong>
+            <span>Recarregou na hora errada</span>
+          </button>
+
+          <button
+            class="reason-button"
+            type="button"
+            data-feedback-reason="Ficou confuso de usar"
+          >
+            <strong>Uso</strong>
+            <span>Ficou confuso de usar</span>
+          </button>
+
+          <button
+            class="reason-button"
+            type="button"
+            data-feedback-reason="Faltou alguma funcao importante"
+          >
+            <strong>Funcao</strong>
+            <span>Faltou algo importante</span>
+          </button>
+
+          <button
+            class="reason-button"
+            type="button"
+            data-feedback-reason="Outro motivo"
+          >
+            <strong>Outro</strong>
+            <span>Quero informar outro motivo</span>
           </button>
         </div>
+
+        <details class="details-card">
+          <summary class="details-card__summary">
+            Quero deixar mais detalhes
+          </summary>
+
+          <div class="details-card__content">
+            <label class="field" for="feedback-message">
+              <span class="field__label">Comentario opcional</span>
+              <textarea
+                id="feedback-message"
+                class="field__input field__input--textarea"
+                name="Comentario"
+                rows="4"
+                placeholder="Exemplo: eu precisava controlar duas abas, mas..."
+              ></textarea>
+            </label>
+
+            <label class="field" for="contact-email">
+              <span class="field__label">Email para contato, opcional</span>
+              <input
+                id="contact-email"
+                class="field__input"
+                type="email"
+                name="email"
+                placeholder="voce@email.com"
+              />
+            </label>
+
+            <div class="feedback-card__actions">
+              <button class="button button--primary" type="submit">
+                Enviar detalhes
+              </button>
+
+              <button
+                id="copy-feedback-button"
+                class="button button--ghost"
+                type="button"
+              >
+                Copiar resposta
+              </button>
+            </div>
+          </div>
+        </details>
 
         <p id="feedback-status" class="feedback-card__status" role="status"></p>
       </form>

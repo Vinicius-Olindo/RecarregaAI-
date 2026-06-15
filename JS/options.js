@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.2.6
+// RecarregaAi! V.1.2.7
 
 const optionsSettingsKey = "recarregaAiSettings";
 const optionsThemeKey = "recarregaAiTheme";

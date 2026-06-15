@@ -1,4 +1,4 @@
-/* RecarregaAi! V.1.2.6 */
+/* RecarregaAi! V.1.2.7 */
 
 :root {
   --color-background: #07111f;
@@ -137,22 +137,19 @@ textarea {
   gap: 6px;
 }
 
-.reason-list {
+.quick-reasons {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  padding: 0;
-  margin: 0;
-  border: 0;
 }
 
-.reason-list__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 46px;
-  padding: 12px;
+.reason-button {
+  display: grid;
+  gap: 4px;
+  min-height: 82px;
+  padding: 16px;
   color: var(--color-text);
+  text-align: left;
   background: var(--color-surface-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -163,21 +160,59 @@ textarea {
     transform 160ms ease;
 }
 
-.reason-list__item:hover {
+.reason-button:hover {
+  color: var(--color-primary);
   border-color: var(--color-border-strong);
   transform: translateY(-1px);
 }
 
-.reason-list__item:has(input:checked) {
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  border-color: rgba(45, 156, 255, 0.54);
+.reason-button:focus-visible {
+  outline: 3px solid rgba(45, 156, 255, 0.3);
+  outline-offset: 2px;
 }
 
-.reason-list__item input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
+.reason-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
+.reason-button strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.reason-button span {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.details-card {
+  background: #0a1322;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.details-card[open] {
+  border-color: var(--color-border-strong);
+}
+
+.details-card__summary {
+  padding: 14px 16px;
+  color: var(--color-text);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.details-card__summary::marker {
+  color: var(--color-primary);
+}
+
+.details-card__content {
+  display: grid;
+  gap: 14px;
+  padding: 0 16px 16px;
 }
 
 .field {
@@ -288,7 +323,7 @@ textarea {
     flex-direction: column;
   }
 
-  .reason-list {
+  .quick-reasons {
     grid-template-columns: 1fr;
   }
 
