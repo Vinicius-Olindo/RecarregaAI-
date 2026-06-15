@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.2.7
+// RecarregaAi! V.1.2.8
 
 const legacyTimerAlarmName = "recarregaAiAutomaticReload";
 const timerAlarmPrefix = "recarregaAiAutomaticReload:";
@@ -45,24 +45,9 @@ const createEmptyTimerCollection = () => ({
   version: 2
 });
 
-const getExtensionVersionLabel = () => {
-  const manifest = chrome.runtime.getManifest();
-
-  return manifest.version_name || `V.${manifest.version}`;
-};
-
-const getUninstallFeedbackUrl = () => {
-  const params = new URLSearchParams({
-    source: "uninstall",
-    version: getExtensionVersionLabel()
-  });
-
-  return `${uninstallFeedbackPageUrl}?${params.toString()}`;
-};
-
 const configureUninstallFeedbackPage = async () => {
   try {
-    await chrome.runtime.setUninstallURL(getUninstallFeedbackUrl());
+    await chrome.runtime.setUninstallURL(uninstallFeedbackPageUrl);
   } catch (error) {
     console.warn("Nao foi possivel configurar feedback de desinstalacao:", error);
   }

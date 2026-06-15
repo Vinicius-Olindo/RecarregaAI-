@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.2.7**.
+Versao atual: **V.1.2.8**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -129,8 +129,11 @@ O background configura a URL de desinstalacao com:
 https://vinicius-olindo.github.io/RecarregaAI-/uninstall.html
 ```
 
-Essa URL precisa estar publicada pelo GitHub Pages ou por um dominio proprio.
-Sem essa publicacao, o Chrome abre `404` depois da desinstalacao.
+Esse link deve permanecer fixo, sem parametros no final e sem troca por CDN,
+GitHub issue, RawGitHack ou outro servico intermediario.
+
+Essa URL precisa estar publicada pelo GitHub Pages. Sem essa publicacao, o
+Chrome abre `404` depois da desinstalacao.
 
 No repositorio, ative:
 
@@ -141,9 +144,6 @@ Settings > Pages > Deploy from a branch > main > /root
 Servicos com etapa intermediaria foram evitados porque exibem uma confirmacao
 antes de abrir HTML. CDN cru tambem nao serve porque pode mostrar o codigo da
 pagina em vez da interface.
-
-Se futuramente voce hospedar em dominio proprio, atualize
-`uninstallFeedbackPageUrl` em `JS/background.js`.
 
 O formulario envia para:
 

@@ -1,7 +1,7 @@
-// RecarregaAi! V.1.2.7
+// RecarregaAi! V.1.2.8
 
 const feedbackSubmitUrl = "https://formsubmit.co/ajax/vinim0106@icloud.com";
-const defaultVersionLabel = "V.1.2.7";
+const defaultVersionLabel = "V.1.2.8";
 const defaultReason = "Nao informou motivo";
 
 const uninstallElements = {
@@ -20,13 +20,7 @@ const uninstallElements = {
 
 let isSendingFeedback = false;
 
-const getPageParams = () => new URLSearchParams(window.location.search);
-
-const getVersionLabel = () => {
-  const params = getPageParams();
-
-  return params.get("version") || defaultVersionLabel;
-};
+const getVersionLabel = () => defaultVersionLabel;
 
 const getSelectedReason = () => uninstallElements.feedbackReasonInput.value
   || defaultReason;
