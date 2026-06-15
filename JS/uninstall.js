@@ -1,7 +1,7 @@
-// RecarregaAi! V.1.2.8
+// RecarregaAi! V.1.2.9
 
 const feedbackSubmitUrl = "https://formsubmit.co/ajax/vinim0106@icloud.com";
-const defaultVersionLabel = "V.1.2.8";
+const defaultVersionLabel = "V.1.2.9";
 const defaultReason = "Nao informou motivo";
 
 const uninstallElements = {
@@ -15,7 +15,8 @@ const uninstallElements = {
   feedbackMessage: document.querySelector("#feedback-message"),
   feedbackReasonInput: document.querySelector("#feedback-reason-input"),
   feedbackStatus: document.querySelector("#feedback-status"),
-  feedbackVersionInput: document.querySelector("#feedback-version-input")
+  feedbackVersionInput: document.querySelector("#feedback-version-input"),
+  selectedReasonFeedback: document.querySelector("#selected-reason-feedback")
 };
 
 let isSendingFeedback = false;
@@ -27,6 +28,35 @@ const getSelectedReason = () => uninstallElements.feedbackReasonInput.value
 
 const updateStatus = (message) => {
   uninstallElements.feedbackStatus.textContent = message;
+};
+
+const updateSelectedReasonFeedback = (label) => {
+  if (!label) {
+    uninstallElements.selectedReasonFeedback.textContent =
+      "Nenhum motivo selecionado.";
+    return;
+  }
+
+  const labelElement = document.createElement("strong");
+
+  labelElement.textContent = label;
+  uninstallElements.selectedReasonFeedback.replaceChildren(
+    "Selecionado: ",
+    labelElement
+  );
+};
+
+const selectFeedbackReason = (selectedButton) => {
+  uninstallElements.feedbackButtons.forEach((button) => {
+    const isSelected = button === selectedButton;
+
+    button.classList.toggle("reason-button--selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+
+  uninstallElements.feedbackReasonInput.value =
+    selectedButton.dataset.feedbackReason || defaultReason;
+  updateSelectedReasonFeedback(selectedButton.dataset.feedbackLabel);
 };
 
 const setFeedbackControlsDisabled = (isDisabled) => {
@@ -100,7 +130,6 @@ const submitFeedback = async (reason, successMessage) => {
 
     updateStatus(successMessage);
     clearOptionalFields();
-    uninstallElements.feedbackReasonInput.value = defaultReason;
     prepareHiddenFields();
   } catch (error) {
     console.error("Erro ao enviar feedback automaticamente:", error);
@@ -137,6 +166,7 @@ const submitDetailedFeedback = (event) => {
 };
 
 const submitQuickFeedback = (button) => {
+  selectFeedbackReason(button);
   submitFeedback(
     button.dataset.feedbackReason,
     "Feedback recebido. Obrigado por responder tao rapido."

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- RecarregaAi! V.1.2.8 -->
+<!-- RecarregaAi! V.1.2.9 -->
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
           />
 
           <div>
-            <p id="extension-version" class="hero__eyebrow">V.1.2.8</p>
+            <p id="extension-version" class="hero__eyebrow">V.1.2.9</p>
             <h1 id="uninstall-title" class="hero__title">
               So uma pergunta rapida.
             </h1>
@@ -67,6 +67,8 @@
           <button
             class="reason-button"
             type="button"
+            aria-pressed="false"
+            data-feedback-label="Cache"
             data-feedback-reason="Nao limpou o cache como eu esperava"
           >
             <strong>Cache</strong>
@@ -76,6 +78,8 @@
           <button
             class="reason-button"
             type="button"
+            aria-pressed="false"
+            data-feedback-label="Reload"
             data-feedback-reason="Recarregou a pagina na hora errada"
           >
             <strong>Reload</strong>
@@ -85,6 +89,8 @@
           <button
             class="reason-button"
             type="button"
+            aria-pressed="false"
+            data-feedback-label="Uso"
             data-feedback-reason="Ficou confuso de usar"
           >
             <strong>Uso</strong>
@@ -94,6 +100,8 @@
           <button
             class="reason-button"
             type="button"
+            aria-pressed="false"
+            data-feedback-label="Funcao"
             data-feedback-reason="Faltou alguma funcao importante"
           >
             <strong>Funcao</strong>
@@ -103,12 +111,22 @@
           <button
             class="reason-button"
             type="button"
+            aria-pressed="false"
+            data-feedback-label="Outro"
             data-feedback-reason="Outro motivo"
           >
             <strong>Outro</strong>
             <span>Quero informar outro motivo</span>
           </button>
         </div>
+
+        <p
+          id="selected-reason-feedback"
+          class="selected-reason"
+          aria-live="polite"
+        >
+          Nenhum motivo selecionado.
+        </p>
 
         <details class="details-card">
           <summary class="details-card__summary">
