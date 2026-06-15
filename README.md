@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.4.5**.
+Versao atual: **V.1.4.6**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -164,6 +164,18 @@ https://formsubmit.co/ajax/vinim0106@icloud.com
 ```
 
 No primeiro envio, o FormSubmit pode pedir confirmacao no email de destino.
+
+## Engenharia e qualidade
+
+- As permissoes de site ficam em `optional_host_permissions`.
+- O auto-inicio pede permissao apenas para o dominio cadastrado pelo usuario.
+- O service worker usa modulos ES em `JS/modules/`.
+- O `setInterval` atualiza a UI/badge; o reload fica com `chrome.alarms`.
+- O timer fica preso ao dominio original e pausa se a aba sair dele.
+- Campos de senha nao entram na protecao de digitacao.
+- URLs e endpoints fixos ficam em `JS/modules/config.js`.
+- Use `npm run check` para validar scripts e manifest.
+- Use `npm run zip` para gerar o pacote em `dist/recarregaai.zip`.
 
 ## Tema
 

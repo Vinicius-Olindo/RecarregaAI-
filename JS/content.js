@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.5
+// RecarregaAi! V.1.4.6
 
 (() => {
   const watcherFlag = "__recarregaAiTypingWatcherLoaded";
@@ -7,7 +7,6 @@
   const editableInputTypes = new Set([
     "email",
     "number",
-    "password",
     "search",
     "tel",
     "text",

@@ -1,0 +1,12 @@
+{
+  "name": "recarregaai",
+  "version": "1.4.6",
+  "private": true,
+  "description": "Extensao MV3 para limpar cache e recarregar paginas.",
+  "scripts": {
+    "check": "npm run check:js && npm run check:manifest",
+    "check:js": "node scripts/check-js.mjs",
+    "check:manifest": "node scripts/check-manifest.mjs",
+    "zip": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-extension.ps1"
+  }
+}

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "RecarregaAi!",
-  "version": "1.4.5",
-  "version_name": "V.1.4.5",
+  "version": "1.4.6",
+  "version_name": "V.1.4.6",
   "description": "Limpe cache e recarregue paginas automaticamente.",
   "action": {
     "default_icon": {
@@ -15,7 +15,8 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "JS/background.js"
+    "service_worker": "JS/background.js",
+    "type": "module"
   },
   "options_page": "options.html",
   "icons": {
@@ -32,7 +33,7 @@
     "storage",
     "tabs"
   ],
-  "host_permissions": [
+  "optional_host_permissions": [
     "http://*/*",
     "https://*/*"
   ]

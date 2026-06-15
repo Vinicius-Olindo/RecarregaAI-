@@ -1,17 +1,11 @@
-// RecarregaAi! V.1.4.5
+// RecarregaAi! V.1.4.6
 
-const optionsSettingsKey = "recarregaAiSettings";
-const optionsThemeKey = "recarregaAiTheme";
-
-const defaultOptionsSettings = {
-  autoStartSites: [],
-  defaultIntervalInMinutes: 3
-};
-
-const optionsThemeModes = {
-  dark: "dark",
-  light: "light"
-};
+import {
+  defaultAppSettings,
+  getPermissionPatternForOrigin,
+  storageKeys,
+  themeModes
+} from "./modules/shared.js";
 
 const optionsElements = {
   addSiteButton: document.querySelector("#add-site-button"),
@@ -26,18 +20,18 @@ const optionsElements = {
   themeToggleButton: document.querySelector("#theme-toggle-button")
 };
 
-let currentSettings = { ...defaultOptionsSettings };
+let currentSettings = { ...defaultAppSettings };
 
 const updateOptionsStatus = (message) => {
   optionsElements.optionsStatus.textContent = message;
 };
 
 const getStoredOptionsSettings = async () => {
-  const storedData = await chrome.storage.local.get(optionsSettingsKey);
-  const storedSettings = storedData[optionsSettingsKey] || {};
+  const storedData = await chrome.storage.local.get(storageKeys.appSettings);
+  const storedSettings = storedData[storageKeys.appSettings] || {};
 
   return {
-    ...defaultOptionsSettings,
+    ...defaultAppSettings,
     ...storedSettings,
     autoStartSites: Array.isArray(storedSettings.autoStartSites)
       ? storedSettings.autoStartSites
@@ -47,7 +41,37 @@ const getStoredOptionsSettings = async () => {
 
 const saveOptionsSettings = async () => {
   await chrome.storage.local.set({
-    [optionsSettingsKey]: currentSettings
+    [storageKeys.appSettings]: currentSettings
+  });
+};
+
+const requestAutoStartPermission = async (origin) => {
+  const originPattern = getPermissionPatternForOrigin(origin);
+  const hasPermission = await chrome.permissions.contains({
+    origins: [originPattern]
+  });
+
+  if (hasPermission) {
+    return true;
+  }
+
+  return chrome.permissions.request({
+    origins: [originPattern]
+  });
+};
+
+const removeAutoStartPermissionIfUnused = async (origin) => {
+  const originPattern = getPermissionPatternForOrigin(origin);
+  const isStillUsed = currentSettings.autoStartSites.some((site) => (
+    site.origin === origin
+  ));
+
+  if (isStillUsed) {
+    return;
+  }
+
+  await chrome.permissions.remove({
+    origins: [originPattern]
   });
 };
 
@@ -120,6 +144,15 @@ const saveDefaultInterval = async () => {
 const addAutoStartSite = async () => {
   try {
     const origin = normalizeSiteOrigin(optionsElements.siteOriginInput.value);
+    const hasPermission = await requestAutoStartPermission(origin);
+
+    if (!hasPermission) {
+      updateOptionsStatus(
+        "Permissao negada. O auto-inicio precisa acessar esse dominio."
+      );
+      return;
+    }
+
     const rawInterval = Number(optionsElements.siteIntervalInput.value);
     const intervalInMinutes = Number.isFinite(rawInterval) && rawInterval >= 1
       ? Math.floor(rawInterval)
@@ -145,17 +178,24 @@ const addAutoStartSite = async () => {
 };
 
 const removeAutoStartSite = async (index) => {
+  const removedSite = currentSettings.autoStartSites[index];
+
   currentSettings.autoStartSites.splice(index, 1);
   await saveOptionsSettings();
+
+  if (removedSite?.origin) {
+    await removeAutoStartPermissionIfUnused(removedSite.origin);
+  }
+
   renderSites();
   updateOptionsStatus("Site removido.");
 };
 
 const applyOptionsTheme = (theme) => {
-  const nextTheme = theme === optionsThemeModes.light
-    ? optionsThemeModes.light
-    : optionsThemeModes.dark;
-  const isDarkTheme = nextTheme === optionsThemeModes.dark;
+  const nextTheme = theme === themeModes.light
+    ? themeModes.light
+    : themeModes.dark;
+  const isDarkTheme = nextTheme === themeModes.dark;
 
   document.documentElement.dataset.theme = nextTheme;
   optionsElements.themeToggleButton.textContent = isDarkTheme
@@ -164,21 +204,21 @@ const applyOptionsTheme = (theme) => {
 };
 
 const loadOptionsTheme = async () => {
-  const storedData = await chrome.storage.local.get(optionsThemeKey);
+  const storedData = await chrome.storage.local.get(storageKeys.theme);
 
-  applyOptionsTheme(storedData[optionsThemeKey] || optionsThemeModes.dark);
+  applyOptionsTheme(storedData[storageKeys.theme] || themeModes.dark);
 };
 
 const toggleOptionsTheme = async () => {
   const currentTheme = document.documentElement.dataset.theme;
-  const nextTheme = currentTheme === optionsThemeModes.dark
-    ? optionsThemeModes.light
-    : optionsThemeModes.dark;
+  const nextTheme = currentTheme === themeModes.dark
+    ? themeModes.light
+    : themeModes.dark;
 
   applyOptionsTheme(nextTheme);
 
   await chrome.storage.local.set({
-    [optionsThemeKey]: nextTheme
+    [storageKeys.theme]: nextTheme
   });
 };
 

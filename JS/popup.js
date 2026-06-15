@@ -1,25 +1,19 @@
-// RecarregaAi! V.1.4.5
+// RecarregaAi! V.1.4.6
 
-const timerSettingsKey = "recarregaAiTimerSettings";
-const themeStorageKey = "recarregaAiTheme";
-
-const themeModes = {
-  dark: "dark",
-  light: "light"
-};
-
-const pauseReasons = {
-  typing: "typing"
-};
-
-const runtimeMessageTypes = {
-  getTimerState: "RECARREGA_AI_GET_TIMER_STATE",
-  openTimerTab: "RECARREGA_AI_OPEN_TIMER_TAB",
-  pauseTimer: "RECARREGA_AI_PAUSE_TIMER",
-  resumeTimer: "RECARREGA_AI_RESUME_TIMER",
-  startTimer: "RECARREGA_AI_START_TIMER",
-  stopTimer: "RECARREGA_AI_STOP_TIMER"
-};
+import {
+  formatCountdownTime,
+  getRemainingSeconds,
+  getUrlOrigin,
+  pauseReasons,
+  runtimeMessageTypes,
+  storageKeys,
+  themeModes
+} from "./modules/shared.js";
+import {
+  clearCacheForOrigins,
+  reloadTabIgnoringCache
+} from "./modules/cache.js";
+import { collectLoadedOrigins } from "./modules/tabs.js";
 
 const popupElements = {
   activeTimersCount: document.querySelector("#active-timers-count"),
@@ -49,12 +43,6 @@ const unsupportedPageMessage = "Essa pagina nao permite limpeza de cache pela ex
 const defaultReloadButtonText = "Limpar e recarregar";
 const defaultStartTimerButtonText = "Ativar timer";
 const presetTimerIntervals = [3, 5, 10];
-
-const cacheDataTypes = {
-  cache: true,
-  cacheStorage: true,
-  serviceWorkers: true
-};
 
 const updateStatusMessage = (message, status = "neutral") => {
   popupElements.statusMessage.textContent = message;
@@ -89,9 +77,9 @@ const applyTheme = (theme) => {
 };
 
 const loadTheme = async () => {
-  const storedData = await chrome.storage.local.get(themeStorageKey);
+  const storedData = await chrome.storage.local.get(storageKeys.theme);
 
-  applyTheme(storedData[themeStorageKey] || themeModes.dark);
+  applyTheme(storedData[storageKeys.theme] || themeModes.dark);
 };
 
 const toggleTheme = async () => {
@@ -103,7 +91,7 @@ const toggleTheme = async () => {
   applyTheme(nextTheme);
 
   await chrome.storage.local.set({
-    [themeStorageKey]: nextTheme
+    [storageKeys.theme]: nextTheme
   });
 };
 
@@ -134,101 +122,6 @@ const getActiveTab = async () => {
   return activeTab;
 };
 
-const getUrlOrigin = (urlValue) => {
-  try {
-    const url = new URL(urlValue);
-
-    if (!["http:", "https:"].includes(url.protocol)) {
-      return null;
-    }
-
-    return url.origin;
-  } catch (error) {
-    console.error("URL invalida para limpeza de cache:", error);
-    return null;
-  }
-};
-
-const collectFrameOrigins = () => {
-  const allowedProtocols = ["http:", "https:"];
-  const origins = new Set();
-
-  const addOriginFromUrl = (urlValue) => {
-    if (!urlValue) {
-      return;
-    }
-
-    try {
-      const url = new URL(urlValue, window.location.href);
-
-      if (allowedProtocols.includes(url.protocol)) {
-        origins.add(url.origin);
-      }
-    } catch (error) {
-      console.debug("URL ignorada pelo RecarregaAi:", error);
-    }
-  };
-
-  addOriginFromUrl(window.location.href);
-
-  performance.getEntries().forEach((entry) => {
-    addOriginFromUrl(entry.name);
-  });
-
-  document.querySelectorAll("[href], [src]").forEach((element) => {
-    addOriginFromUrl(element.href);
-    addOriginFromUrl(element.src);
-    addOriginFromUrl(element.currentSrc);
-    addOriginFromUrl(element.getAttribute("href"));
-    addOriginFromUrl(element.getAttribute("src"));
-  });
-
-  return Array.from(origins);
-};
-
-const collectLoadedOrigins = async (tabId, mainOrigin) => {
-  const origins = new Set([mainOrigin]);
-
-  try {
-    const frameResults = await chrome.scripting.executeScript({
-      target: {
-        tabId,
-        allFrames: true
-      },
-      func: collectFrameOrigins
-    });
-
-    frameResults.forEach((frameResult) => {
-      if (!Array.isArray(frameResult.result)) {
-        return;
-      }
-
-      frameResult.result.forEach((origin) => {
-        origins.add(origin);
-      });
-    });
-  } catch (error) {
-    console.warn("Nao foi possivel coletar todas as origens carregadas:", error);
-  }
-
-  return Array.from(origins);
-};
-
-const clearPageCache = async (origins) => {
-  await chrome.browsingData.remove(
-    {
-      origins
-    },
-    cacheDataTypes
-  );
-};
-
-const reloadCurrentPageIgnoringCache = async (tabId) => {
-  await chrome.tabs.reload(tabId, {
-    bypassCache: true
-  });
-};
-
 const clearCacheAndReloadCurrentPage = async () => {
   try {
     updateButtonState(
@@ -253,15 +146,15 @@ const clearCacheAndReloadCurrentPage = async () => {
       return;
     }
 
-    const loadedOrigins = await collectLoadedOrigins(activeTab.id, origin);
+    const loadedOrigins = await collectLoadedOrigins(activeTab.id, [origin]);
 
     updateStatusMessage(
       `Limpando cache de ${loadedOrigins.length} origem(ns)...`,
       "working"
     );
 
-    await clearPageCache(loadedOrigins);
-    await reloadCurrentPageIgnoringCache(activeTab.id);
+    await clearCacheForOrigins(loadedOrigins);
+    await reloadTabIgnoringCache(activeTab.id);
 
     updateStatusMessage("Cache limpo e pagina recarregada.", "success");
   } catch (error) {
@@ -299,25 +192,6 @@ const formatTimerInterval = (intervalInMinutes) => {
   }
 
   return `${intervalInMinutes} minutos`;
-};
-
-const getRemainingSeconds = (nextRunAt) => {
-  if (!nextRunAt) {
-    return 0;
-  }
-
-  return Math.max(
-    0,
-    Math.ceil((new Date(nextRunAt).getTime() - Date.now()) / 1000)
-  );
-};
-
-const formatCountdownTime = (remainingSeconds) => {
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = remainingSeconds % 60;
-  const paddedSeconds = String(seconds).padStart(2, "0");
-
-  return `${minutes}:${paddedSeconds}`;
 };
 
 const getTimerState = async (activeTabId = null) => (
@@ -576,7 +450,7 @@ const startTimer = async () => {
     }
 
     const intervalInMinutes = getSelectedTimerInterval();
-    const loadedOrigins = await collectLoadedOrigins(activeTab.id, origin);
+    const loadedOrigins = await collectLoadedOrigins(activeTab.id, [origin]);
 
     await sendRuntimeMessage({
       type: runtimeMessageTypes.startTimer,

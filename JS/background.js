@@ -1,151 +1,59 @@
-// RecarregaAi! V.1.4.5
+// RecarregaAi! V.1.4.6
 
-const legacyTimerAlarmName = "recarregaAiAutomaticReload";
-const timerAlarmPrefix = "recarregaAiAutomaticReload:";
-const badgeCountdownAlarmName = "recarregaAiBadgeCountdown";
-const timerSettingsKey = "recarregaAiTimerSettings";
-const lastTimerRunKey = "recarregaAiLastTimerRun";
-const appSettingsKey = "recarregaAiSettings";
-const oneSecondInMilliseconds = 1000;
-const welcomePagePath = "welcome.html";
-const uninstallFeedbackPageUrl =
-  "https://vinicius-olindo.github.io/RecarregaAI-/uninstall.html";
+import { appConfig } from "./modules/config.js";
+import {
+  clearCacheForOrigins,
+  reloadTabIgnoringCache
+} from "./modules/cache.js";
+import {
+  alarmNames,
+  defaultAppSettings,
+  formatCountdownTime,
+  getBadgeColor,
+  getBadgeText,
+  getNextRunDate,
+  getNextRunDateFromSeconds,
+  getPermissionPatternForOrigin,
+  getRemainingSeconds,
+  getTabIdFromTimerAlarmName,
+  getTimerAlarmName,
+  getUrlOrigin,
+  normalizeOrigins,
+  oneSecondInMilliseconds,
+  pauseReasons,
+  runtimeMessageTypes
+} from "./modules/shared.js";
+import {
+  getAllTimerSettings,
+  getAllTimerSettingsFromCollection,
+  getAppSettings,
+  getLastTimerRun,
+  getStoredTimerCollection,
+  getTimerSettingsByTabId,
+  getTimerSettingsFromCollection,
+  removeTimerSettingsByTabId,
+  saveLastTimerRun,
+  saveTimerCollection,
+  updateTimerSettingsByTabId,
+  upsertTimerSettings
+} from "./modules/storage.js";
+import { collectLoadedOrigins } from "./modules/tabs.js";
 
 let badgeCountdownTimerId = null;
 const scheduledRefreshTabIds = new Set();
 
-const runtimeMessageTypes = {
-  getTimerState: "RECARREGA_AI_GET_TIMER_STATE",
-  openTimerTab: "RECARREGA_AI_OPEN_TIMER_TAB",
-  pauseTimer: "RECARREGA_AI_PAUSE_TIMER",
-  resumeTimer: "RECARREGA_AI_RESUME_TIMER",
-  startTimer: "RECARREGA_AI_START_TIMER",
-  stopTimer: "RECARREGA_AI_STOP_TIMER",
-  typingState: "RECARREGA_AI_TYPING_STATE"
-};
-
-const pauseReasons = {
-  manual: "manual",
-  typing: "typing"
-};
-
-const defaultAppSettings = {
-  autoStartSites: [],
-  defaultIntervalInMinutes: 3
-};
-
-const cacheDataTypes = {
-  cache: true,
-  cacheStorage: true,
-  serviceWorkers: true
-};
-
-const createEmptyTimerCollection = () => ({
-  timers: {},
-  version: 2
-});
-
 const configureUninstallFeedbackPage = async () => {
   try {
-    await chrome.runtime.setUninstallURL(uninstallFeedbackPageUrl);
+    await chrome.runtime.setUninstallURL(appConfig.uninstallFeedbackPageUrl);
   } catch (error) {
     console.warn("Nao foi possivel configurar feedback de desinstalacao:", error);
   }
-};
-
-const getUrlOrigin = (urlValue) => {
-  try {
-    const url = new URL(urlValue);
-
-    if (!["http:", "https:"].includes(url.protocol)) {
-      return null;
-    }
-
-    return url.origin;
-  } catch (error) {
-    console.error("URL invalida para limpeza de cache:", error);
-    return null;
-  }
-};
-
-const normalizeOrigins = (origins) => Array.from(
-  new Set(
-    origins
-      .map((origin) => getUrlOrigin(origin))
-      .filter(Boolean)
-  )
-);
-
-const collectFrameOrigins = () => {
-  const allowedProtocols = ["http:", "https:"];
-  const origins = new Set();
-
-  const addOriginFromUrl = (urlValue) => {
-    if (!urlValue) {
-      return;
-    }
-
-    try {
-      const url = new URL(urlValue, window.location.href);
-
-      if (allowedProtocols.includes(url.protocol)) {
-        origins.add(url.origin);
-      }
-    } catch (error) {
-      console.debug("URL ignorada pelo RecarregaAi:", error);
-    }
-  };
-
-  addOriginFromUrl(window.location.href);
-
-  performance.getEntries().forEach((entry) => {
-    addOriginFromUrl(entry.name);
-  });
-
-  document.querySelectorAll("[href], [src]").forEach((element) => {
-    addOriginFromUrl(element.href);
-    addOriginFromUrl(element.src);
-    addOriginFromUrl(element.currentSrc);
-    addOriginFromUrl(element.getAttribute("href"));
-    addOriginFromUrl(element.getAttribute("src"));
-  });
-
-  return Array.from(origins);
-};
-
-const collectLoadedOrigins = async (tabId, fallbackOrigins) => {
-  const origins = new Set(fallbackOrigins);
-
-  try {
-    const frameResults = await chrome.scripting.executeScript({
-      target: {
-        tabId,
-        allFrames: true
-      },
-      func: collectFrameOrigins
-    });
-
-    frameResults.forEach((frameResult) => {
-      if (!Array.isArray(frameResult.result)) {
-        return;
-      }
-
-      frameResult.result.forEach((origin) => {
-        origins.add(origin);
-      });
-    });
-  } catch (error) {
-    console.warn("Nao foi possivel atualizar todas as origens do timer:", error);
-  }
-
-  return normalizeOrigins(Array.from(origins));
 };
 
 const hasEditableFocusInFrame = () => {
   const editableInputTypes = new Set([
     "email",
     "number",
-    "password",
     "search",
     "tel",
     "text",
@@ -211,192 +119,6 @@ const injectTypingProtection = async (tabId) => {
   } catch (error) {
     console.warn("Nao foi possivel ativar protecao de digitacao:", error);
   }
-};
-
-const normalizeTimerSettings = (timerSettings) => {
-  const tabId = Number(timerSettings?.tabId);
-
-  if (!Number.isInteger(tabId) || timerSettings?.enabled === false) {
-    return null;
-  }
-
-  return {
-    ...timerSettings,
-    enabled: true,
-    paused: Boolean(timerSettings.paused),
-    tabId
-  };
-};
-
-const normalizeTimerCollection = (storedSettings) => {
-  const collection = createEmptyTimerCollection();
-  const storedTimers = storedSettings?.version === 2
-    ? Object.values(storedSettings.timers || {})
-    : [storedSettings];
-
-  storedTimers.forEach((timerSettings) => {
-    const normalizedTimerSettings = normalizeTimerSettings(timerSettings);
-
-    if (!normalizedTimerSettings) {
-      return;
-    }
-
-    collection.timers[String(normalizedTimerSettings.tabId)] =
-      normalizedTimerSettings;
-  });
-
-  return collection;
-};
-
-const getStoredTimerCollection = async () => {
-  const storedData = await chrome.storage.local.get(timerSettingsKey);
-
-  return normalizeTimerCollection(storedData[timerSettingsKey]);
-};
-
-const saveTimerCollection = async (timerCollection) => {
-  await chrome.storage.local.set({
-    [timerSettingsKey]: timerCollection
-  });
-};
-
-const getTimerSettingsFromCollection = (timerCollection, tabId) => {
-  if (typeof tabId !== "number") {
-    return null;
-  }
-
-  return timerCollection.timers[String(tabId)] || null;
-};
-
-const getAllTimerSettingsFromCollection = (timerCollection) => (
-  Object.values(timerCollection.timers)
-    .sort((firstTimer, secondTimer) => (
-      String(firstTimer.tabTitle || firstTimer.mainOrigin)
-        .localeCompare(String(secondTimer.tabTitle || secondTimer.mainOrigin))
-    ))
-);
-
-const getAllTimerSettings = async () => {
-  const timerCollection = await getStoredTimerCollection();
-
-  return getAllTimerSettingsFromCollection(timerCollection);
-};
-
-const getTimerSettingsByTabId = async (tabId) => {
-  const timerCollection = await getStoredTimerCollection();
-
-  return getTimerSettingsFromCollection(timerCollection, tabId);
-};
-
-const upsertTimerSettings = async (timerSettings) => {
-  const timerCollection = await getStoredTimerCollection();
-
-  timerCollection.timers[String(timerSettings.tabId)] = timerSettings;
-
-  await saveTimerCollection(timerCollection);
-
-  return timerCollection;
-};
-
-const removeTimerSettingsByTabId = async (tabId) => {
-  const timerCollection = await getStoredTimerCollection();
-
-  delete timerCollection.timers[String(tabId)];
-  await saveTimerCollection(timerCollection);
-
-  return timerCollection;
-};
-
-const updateTimerSettingsByTabId = async (tabId, updater) => {
-  const timerCollection = await getStoredTimerCollection();
-  const timerSettings = getTimerSettingsFromCollection(timerCollection, tabId);
-
-  if (!timerSettings) {
-    return null;
-  }
-
-  const updatedTimerSettings = updater(timerSettings);
-
-  timerCollection.timers[String(tabId)] = updatedTimerSettings;
-  await saveTimerCollection(timerCollection);
-
-  return updatedTimerSettings;
-};
-
-const getLastTimerRun = async () => {
-  const storedData = await chrome.storage.local.get(lastTimerRunKey);
-
-  return storedData[lastTimerRunKey];
-};
-
-const getAppSettings = async () => {
-  const storedData = await chrome.storage.local.get(appSettingsKey);
-  const storedSettings = storedData[appSettingsKey] || {};
-
-  return {
-    ...defaultAppSettings,
-    ...storedSettings,
-    autoStartSites: Array.isArray(storedSettings.autoStartSites)
-      ? storedSettings.autoStartSites
-      : []
-  };
-};
-
-const getNextRunDate = (intervalInMinutes) => (
-  new Date(Date.now() + intervalInMinutes * 60 * 1000).toISOString()
-);
-
-const getNextRunDateFromSeconds = (remainingSeconds) => (
-  new Date(Date.now() + remainingSeconds * oneSecondInMilliseconds).toISOString()
-);
-
-const getRemainingSeconds = (nextRunAt) => {
-  const remainingMilliseconds = new Date(nextRunAt).getTime() - Date.now();
-
-  return Math.max(
-    0,
-    Math.ceil(remainingMilliseconds / oneSecondInMilliseconds)
-  );
-};
-
-const formatCountdownTime = (remainingSeconds) => {
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = remainingSeconds % 60;
-  const paddedSeconds = String(seconds).padStart(2, "0");
-
-  return `${minutes}:${paddedSeconds}`;
-};
-
-const getBadgeText = (nextRunAt) => {
-  const remainingSeconds = getRemainingSeconds(nextRunAt);
-
-  if (remainingSeconds > 5999) {
-    return "99+";
-  }
-
-  return formatCountdownTime(remainingSeconds);
-};
-
-const getBadgeColor = (nextRunAt) => {
-  const remainingSeconds = getRemainingSeconds(nextRunAt);
-
-  if (remainingSeconds <= 10) {
-    return "#ef7a1f";
-  }
-
-  return "#1f7aef";
-};
-
-const getTimerAlarmName = (tabId) => `${timerAlarmPrefix}${tabId}`;
-
-const getTabIdFromTimerAlarmName = (alarmName) => {
-  if (!alarmName.startsWith(timerAlarmPrefix)) {
-    return null;
-  }
-
-  const tabId = Number(alarmName.slice(timerAlarmPrefix.length));
-
-  return Number.isInteger(tabId) ? tabId : null;
 };
 
 const stopBadgeCountdown = () => {
@@ -510,9 +232,9 @@ const createTimerAlarm = async (
 };
 
 const createBadgeCountdownAlarm = async () => {
-  await chrome.alarms.clear(badgeCountdownAlarmName);
+  await chrome.alarms.clear(alarmNames.badgeCountdown);
 
-  chrome.alarms.create(badgeCountdownAlarmName, {
+  chrome.alarms.create(alarmNames.badgeCountdown, {
     delayInMinutes: 0.5,
     periodInMinutes: 0.5
   });
@@ -522,17 +244,6 @@ const handleBadgeCountdownTick = async () => {
   const timerSettingsList = await getAllTimerSettings();
 
   await updateAllTimerBadges(timerSettingsList);
-
-  for (const timerSettings of timerSettingsList) {
-    const shouldRunTimer = timerSettings.enabled
-      && !timerSettings.paused
-      && timerSettings.nextRunAt
-      && getRemainingSeconds(timerSettings.nextRunAt) === 0;
-
-    if (shouldRunTimer) {
-      await runScheduledRefresh(timerSettings.tabId);
-    }
-  }
 };
 
 const startBadgeCountdown = async () => {
@@ -541,7 +252,7 @@ const startBadgeCountdown = async () => {
   const timerSettingsList = await getAllTimerSettings();
 
   if (timerSettingsList.length === 0) {
-    await chrome.alarms.clear(badgeCountdownAlarmName);
+    await chrome.alarms.clear(alarmNames.badgeCountdown);
     await clearAllTimerBadges();
     return;
   }
@@ -663,6 +374,29 @@ const pauseTimerForTyping = async (timerSettings) => {
   return pausedTimerSettings;
 };
 
+const pauseTimerForNavigation = async (timerSettings, tab) => {
+  const pausedTimerSettings = {
+    ...timerSettings,
+    lastError: "Timer pausado porque a aba saiu do dominio original.",
+    paused: true,
+    pausedAt: new Date().toISOString(),
+    pauseReason: pauseReasons.navigation,
+    remainingSecondsWhenPaused: Math.max(
+      1,
+      getRemainingSeconds(timerSettings.nextRunAt)
+    ),
+    tabTitle: tab.title || timerSettings.tabTitle,
+    tabUrl: tab.url || timerSettings.tabUrl,
+    windowId: tab.windowId
+  };
+
+  await upsertTimerSettings(pausedTimerSettings);
+  await clearTimerAlarm(timerSettings.tabId);
+  await updateTimerBadge(pausedTimerSettings);
+
+  return pausedTimerSettings;
+};
+
 const resumeTimer = async (tabId, { expectedPauseReason = null } = {}) => {
   const timerSettings = await getTimerSettingsByTabId(tabId);
 
@@ -718,7 +452,7 @@ const stopTimer = async (tabId) => {
   await clearTimerBadge(timerSettings);
 
   if (timerSettingsList.length === 0) {
-    await chrome.alarms.clear(badgeCountdownAlarmName);
+    await chrome.alarms.clear(alarmNames.badgeCountdown);
     await clearAllTimerBadges();
     return timerSettings;
   }
@@ -760,6 +494,12 @@ const getMatchingAutoStartSite = (tabUrl, appSettings) => {
   )) || null;
 };
 
+const hasAutoStartPermission = async (origin) => (
+  chrome.permissions.contains({
+    origins: [getPermissionPatternForOrigin(origin)]
+  })
+);
+
 const autoStartTimerForTab = async (tabId, tab) => {
   if (!tab?.url) {
     return;
@@ -779,6 +519,12 @@ const autoStartTimerForTab = async (tabId, tab) => {
   }
 
   const mainOrigin = getUrlOrigin(tab.url);
+  const hasPermission = await hasAutoStartPermission(mainOrigin);
+
+  if (!hasPermission) {
+    return;
+  }
+
   const intervalInMinutes = matchingSite.intervalInMinutes
     || appSettings.defaultIntervalInMinutes
     || defaultAppSettings.defaultIntervalInMinutes;
@@ -796,12 +542,17 @@ const autoStartTimerForTab = async (tabId, tab) => {
   });
 };
 
-const updateTimerAfterTabLoad = async (tabId, tab) => {
+const updateTimerAfterTabLoad = async (tabId, tab, timerSettings) => {
   const tabOrigin = getUrlOrigin(tab.url);
+
+  if (tabOrigin && tabOrigin !== timerSettings.mainOrigin) {
+    return pauseTimerForNavigation(timerSettings, tab);
+  }
 
   return updateTimerSettingsByTabId(tabId, (timerSettings) => ({
     ...timerSettings,
-    mainOrigin: tabOrigin || timerSettings.mainOrigin,
+    mainOrigin: timerSettings.mainOrigin,
+    origins: normalizeOrigins([timerSettings.mainOrigin]),
     tabTitle: tab.title || timerSettings.tabTitle,
     tabUrl: tab.url || timerSettings.tabUrl,
     windowId: tab.windowId
@@ -812,8 +563,16 @@ const handleCompletedTabUpdate = async (tabId, tab) => {
   const timerSettings = await getTimerSettingsByTabId(tabId);
 
   if (timerSettings?.enabled) {
-    await updateTimerAfterTabLoad(tabId, tab);
-    await injectTypingProtection(tabId);
+    const updatedTimerSettings = await updateTimerAfterTabLoad(
+      tabId,
+      tab,
+      timerSettings
+    );
+
+    if (updatedTimerSettings?.pauseReason !== pauseReasons.navigation) {
+      await injectTypingProtection(tabId);
+    }
+
     await startBadgeCountdown();
     return;
   }
@@ -839,9 +598,7 @@ const saveTimerRunResult = async (timerSettings, result) => {
     origins: result.origins || latestTimerSettings.origins
   };
 
-  await chrome.storage.local.set({
-    [lastTimerRunKey]: result
-  });
+  await saveLastTimerRun(result);
   await upsertTimerSettings(updatedTimerSettings);
 
   if (!updatedTimerSettings.paused) {
@@ -856,6 +613,12 @@ const saveTimerRunResult = async (timerSettings, result) => {
 const clearCacheAndReloadTab = async (timerSettings) => {
   const tab = await chrome.tabs.get(timerSettings.tabId);
   const tabOrigin = getUrlOrigin(tab.url);
+
+  if (!tabOrigin || tabOrigin !== timerSettings.mainOrigin) {
+    await pauseTimerForNavigation(timerSettings, tab);
+    throw new Error("Timer pausado porque a aba saiu do dominio original.");
+  }
+
   const fallbackOrigins = normalizeOrigins([
     timerSettings.mainOrigin,
     tabOrigin,
@@ -867,15 +630,8 @@ const clearCacheAndReloadTab = async (timerSettings) => {
     throw new Error("Nenhuma origem valida para limpeza de cache.");
   }
 
-  await chrome.browsingData.remove(
-    {
-      origins
-    },
-    cacheDataTypes
-  );
-  await chrome.tabs.reload(timerSettings.tabId, {
-    bypassCache: true
-  });
+  await clearCacheForOrigins(origins);
+  await reloadTabIgnoringCache(timerSettings.tabId);
 
   return origins;
 };
@@ -892,6 +648,14 @@ const runScheduledRefresh = async (tabId) => {
     timerSettings = await getTimerSettingsByTabId(tabId);
 
     if (!timerSettings?.enabled || timerSettings.paused) {
+      return;
+    }
+
+    if (
+      !timerSettings.nextRunAt
+      || getRemainingSeconds(timerSettings.nextRunAt) > 0
+    ) {
+      await updateTimerBadge(timerSettings);
       return;
     }
 
@@ -927,13 +691,13 @@ const runScheduledRefresh = async (tabId) => {
 };
 
 const restoreTimerAlarms = async () => {
-  await chrome.alarms.clear(legacyTimerAlarmName);
+  await chrome.alarms.clear(alarmNames.legacyTimer);
 
   const timerCollection = await getStoredTimerCollection();
   const timerSettingsList = getAllTimerSettingsFromCollection(timerCollection);
 
   if (timerSettingsList.length === 0) {
-    await chrome.alarms.clear(badgeCountdownAlarmName);
+    await chrome.alarms.clear(alarmNames.badgeCountdown);
     await clearAllTimerBadges();
     return;
   }
@@ -1101,7 +865,7 @@ const handleRuntimeMessage = async (message, sender = {}) => {
 const openWelcomePage = async () => {
   await chrome.tabs.create({
     active: true,
-    url: chrome.runtime.getURL(welcomePagePath)
+    url: chrome.runtime.getURL(appConfig.welcomePagePath)
   });
 };
 
@@ -1141,7 +905,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === badgeCountdownAlarmName) {
+  if (alarm.name === alarmNames.badgeCountdown) {
     startStoredBadgeCountdown().catch((error) => {
       console.error("Erro ao restaurar badges do RecarregaAi:", error);
     });
