@@ -1,23 +1,29 @@
-// RecarregaAi! V.1.3.2
+// RecarregaAi! V.1.3.9
 
 const feedbackSubmitUrl = "https://formsubmit.co/ajax/vinim0106@icloud.com";
-const defaultVersionLabel = "V.1.3.2";
+const feedbackFallbackUrl = "https://formsubmit.co/vinim0106@icloud.com";
+const defaultVersionLabel = "V.1.3.9";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Nao informou motivo";
 const languageStorageKey = "recarregaAiUninstallLanguage";
 
 const translations = {
   "pt-BR": {
-    backToTop: "Voltar ao topo",
+    backToTop: "Voltar ao inicio",
+    closeDialog: "Fechar",
     commentLabel: "Comentario",
     commentPlaceholder: "Conte em poucas palavras o que poderiamos melhorar.",
-    copyButton: "Copiar resposta",
-    copyError: "Nao foi possivel copiar agora. Selecione o texto manualmente.",
-    copySuccess: "Feedback copiado. Obrigado por ajudar.",
     emailLabel: "Email para contato",
-    feedbackLink: "Feedback",
+    footerLegal: "RecarregaAi! Todos os direitos reservados.",
+    footerProject: "Projeto",
+    footerSupport: "Suporte",
+    footerText:
+      "Seu feedback ajuda a deixar a extensao mais simples, estavel e util.",
+    footerTitle: "Obrigado por testar o RecarregaAi!",
     formSubmitError:
-      "Nao consegui enviar. Confirme o FormSubmit no email ou use Copiar resposta.",
+      "Nao consegui confirmar o envio agora. Tente novamente em alguns instantes.",
+    formSubmitFallbackSuccess:
+      "Feedback registrado. Obrigado por ajudar a melhorar o RecarregaAi!",
     formSubmitLoading: "Enviando feedback...",
     formSubmitSuccess: "Feedback enviado com sucesso. Obrigado por ajudar.",
     introFirst: [
@@ -26,26 +32,35 @@ const translations = {
     ].join(" "),
     introSecond:
       "Selecione um motivo ou deixe uma mensagem opcional descrevendo sua experiencia.",
+    languageDialogText:
+      "Altere o idioma da pagina para o seu idioma preferido.",
+    languageDialogTitle: "Idioma",
     languageLabel: "Idioma",
+    installButton: "Adicionar ao Chrome",
     noReason: "Nenhum motivo selecionado.",
     optionalCommentSummary: "Adicionar comentario opcional",
     pageTitle: "Lamentamos sua partida.",
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "Versao 1.3.2"
+    versionLabel: "Versao 1.3.9"
   },
   en: {
-    backToTop: "Back to top",
+    backToTop: "Back to start",
+    closeDialog: "Close",
     commentLabel: "Comment",
     commentPlaceholder: "Tell us briefly what we could improve.",
-    copyButton: "Copy response",
-    copyError: "Could not copy right now. Select the text manually.",
-    copySuccess: "Feedback copied. Thanks for helping.",
     emailLabel: "Contact email",
-    feedbackLink: "Feedback",
+    footerLegal: "RecarregaAi! All rights reserved.",
+    footerProject: "Project",
+    footerSupport: "Support",
+    footerText:
+      "Your feedback helps make the extension simpler, stable, and useful.",
+    footerTitle: "Thank you for trying RecarregaAi!",
     formSubmitError:
-      "I could not send it. Confirm FormSubmit by email or use Copy response.",
+      "I could not confirm the send right now. Try again in a few moments.",
+    formSubmitFallbackSuccess:
+      "Feedback registered. Thanks for helping improve RecarregaAi!",
     formSubmitLoading: "Sending feedback...",
     formSubmitSuccess: "Feedback sent successfully. Thanks for helping.",
     introFirst: [
@@ -54,26 +69,34 @@ const translations = {
     ].join(" "),
     introSecond:
       "Select a reason or leave an optional message describing your experience.",
+    languageDialogText: "Change this page to your preferred language.",
+    languageDialogTitle: "Language",
     languageLabel: "Language",
+    installButton: "Add to Chrome",
     noReason: "No reason selected.",
     optionalCommentSummary: "Add optional comment",
     pageTitle: "Sorry to see you go.",
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "Version 1.3.2"
+    versionLabel: "Version 1.3.9"
   },
   es: {
-    backToTop: "Volver arriba",
+    backToTop: "Volver al inicio",
+    closeDialog: "Cerrar",
     commentLabel: "Comentario",
     commentPlaceholder: "Cuentanos brevemente que podriamos mejorar.",
-    copyButton: "Copiar respuesta",
-    copyError: "No se pudo copiar ahora. Selecciona el texto manualmente.",
-    copySuccess: "Feedback copiado. Gracias por ayudar.",
     emailLabel: "Email de contacto",
-    feedbackLink: "Feedback",
+    footerLegal: "RecarregaAi! Todos los derechos reservados.",
+    footerProject: "Proyecto",
+    footerSupport: "Soporte",
+    footerText:
+      "Tu feedback ayuda a que la extension sea mas simple, estable y util.",
+    footerTitle: "Gracias por probar RecarregaAi!",
     formSubmitError:
-      "No pude enviarlo. Confirma FormSubmit por email o usa Copiar respuesta.",
+      "No pude confirmar el envio ahora. Intentalo de nuevo en unos momentos.",
+    formSubmitFallbackSuccess:
+      "Feedback registrado. Gracias por ayudar a mejorar RecarregaAi!",
     formSubmitLoading: "Enviando feedback...",
     formSubmitSuccess: "Feedback enviado correctamente. Gracias por ayudar.",
     introFirst: [
@@ -82,14 +105,17 @@ const translations = {
     ].join(" "),
     introSecond:
       "Selecciona un motivo o deja un mensaje opcional describiendo tu experiencia.",
+    languageDialogText: "Cambia esta pagina a tu idioma preferido.",
+    languageDialogTitle: "Idioma",
     languageLabel: "Idioma",
+    installButton: "Agregar a Chrome",
     noReason: "Ningun motivo seleccionado.",
     optionalCommentSummary: "Agregar comentario opcional",
     pageTitle: "Lamentamos que te vayas.",
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "Version 1.3.2"
+    versionLabel: "Version 1.3.9"
   }
 };
 
@@ -200,8 +226,8 @@ const reasonTranslations = {
 
 const uninstallElements = {
   backToTopButton: document.querySelector("#back-to-top-button"),
+  closeLanguageButton: document.querySelector("#close-language-button"),
   contactEmail: document.querySelector("#contact-email"),
-  copyFeedbackButton: document.querySelector("#copy-feedback-button"),
   extensionVersion: document.querySelector("#extension-version"),
   feedbackBrowserInput: document.querySelector("#feedback-browser-input"),
   feedbackDateInput: document.querySelector("#feedback-date-input"),
@@ -211,7 +237,9 @@ const uninstallElements = {
   feedbackReasonInput: document.querySelector("#feedback-reason-input"),
   feedbackStatus: document.querySelector("#feedback-status"),
   feedbackVersionInput: document.querySelector("#feedback-version-input"),
-  languageSelect: document.querySelector("#language-select"),
+  languageDialog: document.querySelector("#language-dialog"),
+  languageOptionButtons: document.querySelectorAll("[data-language-option]"),
+  openLanguageButton: document.querySelector("#open-language-button"),
   pageRoot: document.querySelector("#page-root"),
   reasonInputs: document.querySelectorAll("[data-reason-id]"),
   reasonTextElements: document.querySelectorAll("[data-reason-text]"),
@@ -269,7 +297,6 @@ const updateSelectedReasonFeedback = () => {
 
 const syncReasonSelection = () => {
   uninstallElements.feedbackReasonInput.value = getSelectedReason();
-  uninstallElements.copyFeedbackButton.disabled = !hasSelectedReason();
   uninstallElements.sendFeedbackButton.disabled = !hasSelectedReason();
   updateSelectedReasonFeedback();
 };
@@ -280,9 +307,10 @@ const setFeedbackControlsDisabled = (isDisabled) => {
   });
   uninstallElements.contactEmail.disabled = isDisabled;
   uninstallElements.feedbackMessage.disabled = isDisabled;
-  uninstallElements.languageSelect.disabled = isDisabled;
-  uninstallElements.copyFeedbackButton.disabled =
-    isDisabled || !hasSelectedReason();
+  uninstallElements.openLanguageButton.disabled = isDisabled;
+  uninstallElements.languageOptionButtons.forEach((button) => {
+    button.disabled = isDisabled;
+  });
   uninstallElements.sendFeedbackButton.disabled =
     isDisabled || !hasSelectedReason();
 };
@@ -294,32 +322,78 @@ const prepareHiddenFields = () => {
   uninstallElements.feedbackLanguageInput.value = activeLanguage;
 };
 
-const buildFeedbackBody = () => {
+const buildFeedbackPayload = () => {
   const message = uninstallElements.feedbackMessage.value.trim()
     || "O usuario nao informou detalhes adicionais.";
-  const email = uninstallElements.contactEmail.value.trim()
-    || "Nao informado";
+  const contactEmail = uninstallElements.contactEmail.value.trim();
+  const emailLabel = contactEmail || "Nao informado";
+  const payload = {
+    _captcha: "false",
+    _subject: "Feedback RecarregaAi!",
+    _template: "table",
+    Comentario: message,
+    Data: new Date().toISOString(),
+    "Email para contato": emailLabel,
+    Idioma: activeLanguage,
+    Motivo: getSelectedReason(),
+    Navegador: navigator.userAgent,
+    Versao: getVersionLabel()
+  };
 
-  return [
-    "Feedback de desinstalacao",
-    "",
-    `Versao: ${getVersionLabel()}`,
-    `Idioma: ${activeLanguage}`,
-    `Motivo: ${getSelectedReason()}`,
-    `Email para contato: ${email}`,
-    `Data: ${new Date().toISOString()}`,
-    "",
-    "Comentario:",
-    message,
-    "",
-    `Navegador: ${navigator.userAgent}`
-  ].join("\n");
+  if (contactEmail) {
+    payload.email = contactEmail;
+  }
+
+  return payload;
 };
 
 const clearOptionalFields = () => {
   uninstallElements.feedbackMessage.value = "";
   uninstallElements.contactEmail.value = "";
 };
+
+const createEncodedPayload = (payload) => {
+  const encodedPayload = new URLSearchParams();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    encodedPayload.append(key, value);
+  });
+
+  return encodedPayload;
+};
+
+const submitFeedbackWithHiddenForm = (payload) => new Promise((resolve) => {
+  const frameName = `recarregaai-feedback-${Date.now()}`;
+  const iframe = document.createElement("iframe");
+  const form = document.createElement("form");
+
+  iframe.name = frameName;
+  iframe.hidden = true;
+
+  form.action = feedbackFallbackUrl;
+  form.hidden = true;
+  form.method = "POST";
+  form.target = frameName;
+
+  Object.entries(payload).forEach(([key, value]) => {
+    const input = document.createElement("input");
+
+    input.name = key;
+    input.type = "hidden";
+    input.value = value;
+    form.append(input);
+  });
+
+  document.body.append(iframe, form);
+
+  window.setTimeout(() => {
+    form.remove();
+    iframe.remove();
+    resolve();
+  }, 1400);
+
+  form.submit();
+});
 
 const submitFeedback = async () => {
   if (isSendingFeedback || !hasSelectedReason()) {
@@ -330,15 +404,15 @@ const submitFeedback = async () => {
   prepareHiddenFields();
   updateStatus(getCopy("formSubmitLoading"));
 
-  const formData = new FormData(uninstallElements.feedbackForm);
-  formData.delete("reason");
+  const feedbackPayload = buildFeedbackPayload();
   setFeedbackControlsDisabled(true);
 
   try {
     const response = await fetch(feedbackSubmitUrl, {
-      body: formData,
+      body: createEncodedPayload(feedbackPayload),
       headers: {
-        Accept: "application/json"
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       method: "POST"
     });
@@ -352,30 +426,55 @@ const submitFeedback = async () => {
     prepareHiddenFields();
   } catch (error) {
     console.error("Erro ao enviar feedback automaticamente:", error);
-    updateStatus(getCopy("formSubmitError"), {
-      isError: true
-    });
+    await submitFeedbackWithHiddenForm(feedbackPayload);
+    updateStatus(getCopy("formSubmitFallbackSuccess"));
+    clearOptionalFields();
+    prepareHiddenFields();
   } finally {
     isSendingFeedback = false;
     setFeedbackControlsDisabled(false);
   }
 };
 
-const copyFeedback = async () => {
-  try {
-    await navigator.clipboard.writeText(buildFeedbackBody());
-    updateStatus(getCopy("copySuccess"));
-  } catch (error) {
-    console.error("Erro ao copiar feedback:", error);
-    updateStatus(getCopy("copyError"), {
-      isError: true
-    });
+const updateLanguageOptions = () => {
+  uninstallElements.languageOptionButtons.forEach((button) => {
+    const isSelected = button.dataset.languageOption === activeLanguage;
+
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+};
+
+const openLanguageDialog = () => {
+  uninstallElements.languageDialog.hidden = false;
+  document.body.classList.add("has-open-dialog");
+
+  const selectedButton = document.querySelector(
+    `[data-language-option="${activeLanguage}"]`
+  );
+
+  (selectedButton || uninstallElements.closeLanguageButton).focus();
+};
+
+const closeLanguageDialog = ({ shouldFocusTrigger = false } = {}) => {
+  uninstallElements.languageDialog.hidden = true;
+  document.body.classList.remove("has-open-dialog");
+
+  if (shouldFocusTrigger) {
+    uninstallElements.openLanguageButton.focus();
   }
 };
 
 const updateLocalizedText = () => {
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     element.textContent = getCopy(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute(
+      "aria-label",
+      getCopy(element.dataset.i18nAriaLabel)
+    );
   });
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
@@ -392,13 +491,13 @@ const updateLocalizedText = () => {
 
   uninstallElements.extensionVersion.textContent = getCopy("versionLabel");
   uninstallElements.pageRoot.lang = activeLanguage;
+  updateLanguageOptions();
   syncReasonSelection();
   prepareHiddenFields();
 };
 
 const setLanguage = (language) => {
   activeLanguage = translations[language] ? language : defaultLanguage;
-  uninstallElements.languageSelect.value = activeLanguage;
   localStorage.setItem(languageStorageKey, activeLanguage);
   updateLocalizedText();
 };
@@ -414,13 +513,6 @@ const handleFeedbackSubmit = (event) => {
   }
 
   submitFeedback();
-};
-
-const handleBackToTopVisibility = () => {
-  uninstallElements.backToTopButton.classList.toggle(
-    "is-visible",
-    window.scrollY > 260
-  );
 };
 
 const initializePage = () => {
@@ -439,23 +531,47 @@ uninstallElements.reasonInputs.forEach((input) => {
   });
 });
 
-uninstallElements.languageSelect.addEventListener("change", (event) => {
-  setLanguage(event.target.value);
-  updateStatus("");
+uninstallElements.openLanguageButton.addEventListener("click", () => {
+  openLanguageDialog();
+});
+
+uninstallElements.closeLanguageButton.addEventListener("click", () => {
+  closeLanguageDialog({
+    shouldFocusTrigger: true
+  });
+});
+
+uninstallElements.languageDialog.addEventListener("click", (event) => {
+  if (event.target.matches("[data-close-language]")) {
+    closeLanguageDialog({
+      shouldFocusTrigger: true
+    });
+  }
+});
+
+uninstallElements.languageOptionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setLanguage(button.dataset.languageOption);
+    updateStatus("");
+    closeLanguageDialog({
+      shouldFocusTrigger: true
+    });
+  });
 });
 
 uninstallElements.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
-uninstallElements.copyFeedbackButton.addEventListener("click", () => {
-  copyFeedback();
-});
 uninstallElements.backToTopButton.addEventListener("click", () => {
   window.scrollTo({
     behavior: "smooth",
     top: 0
   });
 });
-window.addEventListener("scroll", handleBackToTopVisibility, {
-  passive: true
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !uninstallElements.languageDialog.hidden) {
+    closeLanguageDialog({
+      shouldFocusTrigger: true
+    });
+  }
 });
 
 initializePage();

@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.3.2
+// RecarregaAi! V.1.3.9
 
 const welcomeThemeStorageKey = "recarregaAiTheme";
 

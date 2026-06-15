@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.3.2**.
+Versao atual: **V.1.3.9**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -119,13 +119,17 @@ um texto curto, escolhe um motivo em uma lista de opcoes e envia o feedback na
 propria pagina. Comentario e email continuam opcionais, mas ficam em uma area
 recolhida para nao alongar o fluxo.
 
-Tambem possui selecao de idioma, link direto para a area de feedback e botao
-flutuante para voltar ao topo da pagina.
+Tambem possui acoes flutuantes compactas para idioma e voltar ao inicio. Os
+nomes aparecem no hover ou foco, e o idioma abre uma janela com os 3 idiomas
+disponiveis: Portugues (BR), English e Espanol.
+
+O topo da pagina possui um botao `Adicionar ao Chrome`, pensado para apontar
+para a pagina publica da extensao quando ela estiver publicada.
 
 O envio automatico vai direto para o email do projeto por FormSubmit, sem abrir
-GitHub, tela intermediaria ou outro formulario. Se o envio automatico falhar, a
-pagina mostra uma mensagem e permite copiar a resposta, sem redirecionar o
-usuario.
+GitHub, tela intermediaria ou outro formulario. A pagina tenta primeiro o envio
+AJAX e, se o servico recusar o envio automatico, faz uma segunda tentativa em
+segundo plano usando o formulario comum.
 
 O background configura a URL de desinstalacao com:
 
