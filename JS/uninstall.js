@@ -1,7 +1,7 @@
-// RecarregaAi! V.1.2.9
+// RecarregaAi! V.1.2.10
 
 const feedbackSubmitUrl = "https://formsubmit.co/ajax/vinim0106@icloud.com";
-const defaultVersionLabel = "V.1.2.9";
+const defaultVersionLabel = "V.1.2.10";
 const defaultReason = "Nao informou motivo";
 
 const uninstallElements = {
@@ -16,6 +16,7 @@ const uninstallElements = {
   feedbackReasonInput: document.querySelector("#feedback-reason-input"),
   feedbackStatus: document.querySelector("#feedback-status"),
   feedbackVersionInput: document.querySelector("#feedback-version-input"),
+  sendFeedbackButton: document.querySelector("#send-feedback-button"),
   selectedReasonFeedback: document.querySelector("#selected-reason-feedback")
 };
 
@@ -25,6 +26,8 @@ const getVersionLabel = () => defaultVersionLabel;
 
 const getSelectedReason = () => uninstallElements.feedbackReasonInput.value
   || defaultReason;
+
+const hasSelectedReason = () => getSelectedReason() !== defaultReason;
 
 const updateStatus = (message) => {
   uninstallElements.feedbackStatus.textContent = message;
@@ -57,17 +60,21 @@ const selectFeedbackReason = (selectedButton) => {
   uninstallElements.feedbackReasonInput.value =
     selectedButton.dataset.feedbackReason || defaultReason;
   updateSelectedReasonFeedback(selectedButton.dataset.feedbackLabel);
+  uninstallElements.copyFeedbackButton.disabled = false;
+  uninstallElements.sendFeedbackButton.disabled = false;
+  updateStatus("Motivo selecionado. Clique em Enviar feedback para concluir.");
 };
 
 const setFeedbackControlsDisabled = (isDisabled) => {
   uninstallElements.feedbackButtons.forEach((button) => {
     button.disabled = isDisabled;
   });
-  uninstallElements.feedbackForm
-    .querySelectorAll("button, input, textarea")
-    .forEach((field) => {
-      field.disabled = isDisabled;
-    });
+  uninstallElements.copyFeedbackButton.disabled =
+    isDisabled || !hasSelectedReason();
+  uninstallElements.contactEmail.disabled = isDisabled;
+  uninstallElements.feedbackMessage.disabled = isDisabled;
+  uninstallElements.sendFeedbackButton.disabled =
+    isDisabled || !hasSelectedReason();
 };
 
 const prepareHiddenFields = () => {
@@ -134,7 +141,7 @@ const submitFeedback = async (reason, successMessage) => {
   } catch (error) {
     console.error("Erro ao enviar feedback automaticamente:", error);
     updateStatus(
-      "Nao consegui enviar automaticamente. Use Copiar resposta para guardar."
+      "Nao consegui enviar. Confirme o FormSubmit no email ou use Copiar resposta."
     );
   } finally {
     isSendingFeedback = false;
@@ -153,24 +160,21 @@ const copyFeedback = async () => {
 };
 
 const submitDetailedFeedback = (event) => {
-  const currentReason = uninstallElements.feedbackReasonInput.value;
-  const detailedReason = currentReason === defaultReason
-    ? "Feedback detalhado"
-    : currentReason;
-
   event.preventDefault();
+
+  if (!hasSelectedReason()) {
+    updateStatus("Selecione um motivo antes de enviar.");
+    return;
+  }
+
   submitFeedback(
-    detailedReason,
+    getSelectedReason(),
     "Feedback enviado. Obrigado por ajudar a melhorar."
   );
 };
 
-const submitQuickFeedback = (button) => {
+const handleFeedbackReasonClick = (button) => {
   selectFeedbackReason(button);
-  submitFeedback(
-    button.dataset.feedbackReason,
-    "Feedback recebido. Obrigado por responder tao rapido."
-  );
 };
 
 const initializePage = () => {
@@ -180,7 +184,7 @@ const initializePage = () => {
 
 uninstallElements.feedbackButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    submitQuickFeedback(button);
+    handleFeedbackReasonClick(button);
   });
 });
 uninstallElements.feedbackForm.addEventListener("submit", submitDetailedFeedback);

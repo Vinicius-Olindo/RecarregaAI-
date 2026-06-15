@@ -1,4 +1,4 @@
-/* RecarregaAi! V.1.2.9 */
+/* RecarregaAi! V.1.2.10 */
 
 :root {
   --color-background: #07111f;
@@ -300,6 +300,10 @@ textarea {
   gap: 10px;
 }
 
+.feedback-card__actions--main {
+  margin-top: -4px;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -320,6 +324,12 @@ textarea {
   transform: translateY(1px);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+  transform: none;
+}
+
 .button:focus-visible {
   outline: 3px solid rgba(45, 156, 255, 0.3);
   outline-offset: 2px;
@@ -334,6 +344,10 @@ textarea {
 
 .button--primary:hover {
   background: var(--color-primary-hover);
+}
+
+.button--primary:disabled:hover {
+  background: var(--color-primary);
 }
 
 .button--ghost {

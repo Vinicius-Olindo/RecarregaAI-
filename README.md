@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.2.9**.
+Versao atual: **V.1.2.10**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -114,9 +114,10 @@ favorito, desde que aquela guia ainda nao tenha timer ativo.
 
 ## Feedback de desinstalacao
 
-A pagina `uninstall.html` foi pensada para ser rapida: o usuario escolhe um
-motivo e o feedback e enviado na propria pagina. Comentario e email continuam
-opcionais, mas ficam em uma area recolhida para nao alongar o fluxo.
+A pagina `uninstall.html` foi pensada para ser clara e rapida: o usuario escolhe
+um motivo, ve o motivo selecionado na tela e envia o feedback na propria pagina.
+Comentario e email continuam opcionais, mas ficam em uma area recolhida para nao
+alongar o fluxo.
 
 O envio automatico vai direto para o email do projeto por FormSubmit, sem abrir
 GitHub, tela intermediaria ou outro formulario. Se o envio automatico falhar, a
