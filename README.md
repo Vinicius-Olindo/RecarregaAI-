@@ -207,7 +207,7 @@ No primeiro envio, o FormSubmit pode pedir confirmacao no email de destino.
 ## Tema
 
 O popup abre em tema escuro por padrao. Use o botao `Claro` ou `Escuro` no topo
-para alternar entre os temas. A escolha fica salva no navegador.
+para alternar entre os temas. A escolha fica salva no navegador
 
 ## Observacoes
 
