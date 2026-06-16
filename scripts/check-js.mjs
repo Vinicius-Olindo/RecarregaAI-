@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 import { spawnSync } from "node:child_process";
 

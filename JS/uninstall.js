@@ -1,10 +1,10 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 import { appConfig } from "./modules/config.js";
 
 const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
 const feedbackFallbackUrl = appConfig.feedbackFallbackUrl;
-const defaultVersionLabel = "V.1.4.6";
+const defaultVersionLabel = "V.1.4.7";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Nao informou motivo";
 const languageStorageKey = "recarregaAiUninstallLanguage";
@@ -17,6 +17,7 @@ const translations = {
     commentPlaceholder: "Conte em poucas palavras o que poderiamos melhorar.",
     emailLabel: "Email para contato",
     footerLegal: "RecarregaAi! Todos os direitos reservados.",
+    footerPrivacy: "Privacidade",
     footerProject: "Projeto",
     footerSupport: "Suporte",
     footerText:
@@ -45,7 +46,7 @@ const translations = {
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "Versao 1.4.6"
+    versionLabel: "Versao 1.4.7"
   },
   en: {
     backToTop: "Back to start",
@@ -54,6 +55,7 @@ const translations = {
     commentPlaceholder: "Tell us briefly what we could improve.",
     emailLabel: "Contact email",
     footerLegal: "RecarregaAi! All rights reserved.",
+    footerPrivacy: "Privacy",
     footerProject: "Project",
     footerSupport: "Support",
     footerText:
@@ -81,7 +83,7 @@ const translations = {
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "Version 1.4.6"
+    versionLabel: "Version 1.4.7"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -90,6 +92,7 @@ const translations = {
     commentPlaceholder: "Cuentanos brevemente que podriamos mejorar.",
     emailLabel: "Email de contacto",
     footerLegal: "RecarregaAi! Todos los derechos reservados.",
+    footerPrivacy: "Privacidad",
     footerProject: "Proyecto",
     footerSupport: "Soporte",
     footerText:
@@ -117,7 +120,7 @@ const translations = {
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "Version 1.4.6"
+    versionLabel: "Version 1.4.7"
   }
 };
 

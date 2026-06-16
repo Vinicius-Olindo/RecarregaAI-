@@ -1,4 +1,4 @@
-/* RecarregaAi! V.1.4.6 */
+/* RecarregaAi! V.1.4.7 */
 
 :root {
   --color-background: #eef4fb;
@@ -381,6 +381,13 @@ input {
 .timer-overview[data-state="paused"] .timer-overview__countdown,
 .timer-overview[data-state="empty"] .timer-overview__countdown {
   color: var(--color-muted);
+}
+
+.timer-overview__note {
+  margin: -2px 0 0;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
 }
 
 .timer-overview__actions {

@@ -1,7 +1,8 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 import {
   formatCountdownTime,
+  getPermissionPatternForOrigin,
   getRemainingSeconds,
   getUrlOrigin,
   pauseReasons,
@@ -43,6 +44,8 @@ const unsupportedPageMessage = "Essa pagina nao permite limpeza de cache pela ex
 const defaultReloadButtonText = "Limpar e recarregar";
 const defaultStartTimerButtonText = "Ativar timer";
 const presetTimerIntervals = [3, 5, 10];
+
+let currentActiveTab = null;
 
 const updateStatusMessage = (message, status = "neutral") => {
   popupElements.statusMessage.textContent = message;
@@ -121,6 +124,12 @@ const getActiveTab = async () => {
 
   return activeTab;
 };
+
+const requestTimerPermission = async (origin) => (
+  chrome.permissions.request({
+    origins: [getPermissionPatternForOrigin(origin)]
+  })
+);
 
 const clearCacheAndReloadCurrentPage = async () => {
   try {
@@ -338,6 +347,9 @@ const updateActiveTimersList = (activeTimers, activeTab) => {
 
 const refreshTimerState = async ({ updateStatus = false } = {}) => {
   const activeTab = await getActiveTab();
+
+  currentActiveTab = activeTab || null;
+
   const response = await getTimerState(activeTab?.id);
   const timerSettings = response.timerSettings;
   const activeTimers = response.activeTimers || [];
@@ -435,10 +447,13 @@ const startTimer = async () => {
     );
     updateStatusMessage("Preparando timer para a aba atual...", "working");
 
-    const activeTab = await getActiveTab();
+    const activeTab = currentActiveTab;
 
     if (typeof activeTab?.id !== "number") {
-      updateStatusMessage("Nao foi possivel encontrar a aba atual.", "error");
+      updateStatusMessage(
+        "Aguarde a guia atual carregar no popup e tente de novo.",
+        "error"
+      );
       return;
     }
 
@@ -446,6 +461,16 @@ const startTimer = async () => {
 
     if (!origin) {
       updateStatusMessage(unsupportedPageMessage, "error");
+      return;
+    }
+
+    const hasPermission = await requestTimerPermission(origin);
+
+    if (!hasPermission) {
+      updateStatusMessage(
+        "Permissao negada. O timer precisa acessar esse dominio.",
+        "error"
+      );
       return;
     }
 

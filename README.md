@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **V.1.4.6**.
+Versao atual: **V.1.4.7**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -12,11 +12,13 @@ um timer para repetir esse processo automaticamente.
 RecarregaAI-/
 |-- manifest.json
 |-- options.html
+|-- privacy.html
 |-- popup.html
 |-- uninstall.html
 |-- welcome.html
 |-- CSS/
 |   |-- options.css
+|   |-- privacy.css
 |   |-- popup.css
 |   |-- uninstall.css
 |   `-- welcome.css
@@ -101,6 +103,11 @@ Enquanto o timer estiver ativo, o icone da extensao mostra a contagem regressiva
 no badge, como `3:00`, `2:59`, `2:58` e assim por diante. Ao parar o timer, o
 badge e removido.
 
+O badge do icone deve ser tratado como indicador aproximado quando o popup esta
+fechado. No Manifest V3, o service worker pode dormir e o `chrome.alarms` nao e
+um cronometro exato de segundo. Com o popup aberto, a interface atualiza a
+contagem com mais frequencia.
+
 O badge aparece somente nas guias que possuem timer ativo. Nas outras guias, o
 icone fica sem contador.
 
@@ -115,6 +122,21 @@ A pagina `options.html` permite:
 
 O auto-inicio cria um timer separado para cada guia carregada com um site
 favorito, desde que aquela guia ainda nao tenha timer ativo.
+
+Ao ativar um timer manual ou cadastrar um site de auto-inicio, a permissao do
+dominio e solicitada durante a acao do usuario. Isso deixa o timer mais
+confiavel apos reiniciar o Chrome.
+
+## Privacidade
+
+A pagina `privacy.html` resume como a extensao lida com dados:
+
+- Nao vende dados.
+- Nao coleta conteudo das paginas.
+- Salva configuracoes localmente no Chrome.
+- Usa permissoes opcionais apenas para dominios escolhidos pelo usuario.
+- Feedback de desinstalacao e opcional e enviado via FormSubmit.
+- Email de contato no feedback tambem e opcional.
 
 ## Feedback de desinstalacao
 

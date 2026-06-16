@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 const welcomeThemeStorageKey = "recarregaAiTheme";
 const welcomeLanguageStorageKey = "recarregaAiWelcomeLanguage";

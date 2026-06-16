@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -869,26 +869,43 @@ const openWelcomePage = async () => {
   });
 };
 
-chrome.runtime.onInstalled.addListener((details) => {
-  configureUninstallFeedbackPage();
+const bootstrapRecarregaAi = async ({
+  markInstalled = false,
+  openWelcome = false,
+  restoreAlarms = true
+} = {}) => {
+  await configureUninstallFeedbackPage();
 
-  if (details.reason !== "install") {
-    restoreTimerAlarms();
-    return;
+  if (markInstalled) {
+    await chrome.storage.local.set({
+      recarregaAiInstalledAt: new Date().toISOString()
+    });
   }
 
-  clearAllTimerBadges();
-  chrome.storage.local.set({
-    recarregaAiInstalledAt: new Date().toISOString()
-  });
-  openWelcomePage().catch((error) => {
-    console.error("Erro ao abrir boas-vindas do RecarregaAi:", error);
+  if (restoreAlarms) {
+    await restoreTimerAlarms();
+  }
+
+  if (openWelcome) {
+    await clearAllTimerBadges();
+    await openWelcomePage();
+  }
+};
+
+chrome.runtime.onInstalled.addListener((details) => {
+  bootstrapRecarregaAi({
+    markInstalled: details.reason === "install",
+    openWelcome: details.reason === "install",
+    restoreAlarms: details.reason !== "install"
+  }).catch((error) => {
+    console.error("Erro ao instalar/atualizar RecarregaAi:", error);
   });
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  configureUninstallFeedbackPage();
-  restoreTimerAlarms();
+  bootstrapRecarregaAi().catch((error) => {
+    console.error("Erro ao iniciar RecarregaAi:", error);
+  });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -935,4 +952,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   });
 });
 
-configureUninstallFeedbackPage();
+bootstrapRecarregaAi().catch((error) => {
+  console.error("Erro ao carregar service worker do RecarregaAi:", error);
+});

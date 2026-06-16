@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.6
+// RecarregaAi! V.1.4.7
 
 import {
   defaultAppSettings,
@@ -47,13 +47,6 @@ const saveOptionsSettings = async () => {
 
 const requestAutoStartPermission = async (origin) => {
   const originPattern = getPermissionPatternForOrigin(origin);
-  const hasPermission = await chrome.permissions.contains({
-    origins: [originPattern]
-  });
-
-  if (hasPermission) {
-    return true;
-  }
 
   return chrome.permissions.request({
     origins: [originPattern]

@@ -1,4 +1,4 @@
-# RecarregaAi! V.1.4.6
+# RecarregaAi! V.1.4.7
 
 $ErrorActionPreference = "Stop"
 
@@ -11,6 +11,7 @@ $includePaths = @(
     "JS",
     "manifest.json",
     "options.html",
+    "privacy.html",
     "popup.html",
     "uninstall.html",
     "welcome.html"
