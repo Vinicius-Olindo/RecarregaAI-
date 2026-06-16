@@ -1,4 +1,4 @@
-# RecarregaAi! V.1.4.9
+# RecarregaAi! V.1.5.0
 
 # Script legado para Windows. O empacotamento principal usa Node:
 # npm run zip
@@ -26,10 +26,51 @@ if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }
 
-$items = $includePaths | ForEach-Object {
-    Join-Path $root $_
-}
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-Compress-Archive -Path $items -DestinationPath $zipPath -CompressionLevel Optimal
+$archiveStream = [System.IO.File]::Open(
+    $zipPath,
+    [System.IO.FileMode]::CreateNew,
+    [System.IO.FileAccess]::ReadWrite
+)
+$archive = New-Object System.IO.Compression.ZipArchive(
+    $archiveStream,
+    [System.IO.Compression.ZipArchiveMode]::Create
+)
+
+try {
+    foreach ($includePath in $includePaths) {
+        $absolutePath = Join-Path $root $includePath
+        $item = Get-Item -LiteralPath $absolutePath
+
+        if (-not $item.PSIsContainer) {
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $archive,
+                $item.FullName,
+                $includePath.Replace("\", "/"),
+                [System.IO.Compression.CompressionLevel]::Optimal
+            ) | Out-Null
+
+            continue
+        }
+
+        Get-ChildItem -LiteralPath $item.FullName -Recurse -File | ForEach-Object {
+            $relativePath = $_.FullName.Substring($root.Path.Length)
+            $relativePath = $relativePath.TrimStart([char[]]@("\", "/"))
+            $relativePath = $relativePath.Replace("\", "/")
+
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $archive,
+                $_.FullName,
+                $relativePath,
+                [System.IO.Compression.CompressionLevel]::Optimal
+            ) | Out-Null
+        }
+    }
+} finally {
+    $archive.Dispose()
+    $archiveStream.Dispose()
+}
 
 Write-Host "Pacote criado em $zipPath"

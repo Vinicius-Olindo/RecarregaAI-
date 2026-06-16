@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.9
+// RecarregaAi! V.1.5.0
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -791,69 +791,61 @@ const getMessageTabId = (message, sender) => {
   return sender?.tab?.id;
 };
 
-const handleRuntimeMessage = async (message, sender = {}) => {
-  if (message?.type === runtimeMessageTypes.getTimerState) {
-    const activeTabId = Number(message.payload?.activeTabId);
+const createTimerSettingsResponse = (timerSettings) => ({
+  ok: true,
+  timerSettings
+});
+
+const runtimeMessageHandlers = {
+  [runtimeMessageTypes.getTimerState]: async (message) => {
+    const activeTabId = Number(message?.payload?.activeTabId);
 
     return getTimerStateResponse(
       Number.isInteger(activeTabId) ? activeTabId : null
     );
-  }
-
-  if (message?.type === runtimeMessageTypes.openTimerTab) {
+  },
+  [runtimeMessageTypes.openTimerTab]: async (message, sender) => {
     const timerSettings = await openTimerTab(getMessageTabId(message, sender));
 
-    return {
-      ok: true,
-      timerSettings
-    };
-  }
-
-  if (message?.type === runtimeMessageTypes.pauseTimer) {
+    return createTimerSettingsResponse(timerSettings);
+  },
+  [runtimeMessageTypes.pauseTimer]: async (message, sender) => {
     const timerSettings = await pauseTimer(getMessageTabId(message, sender));
 
-    return {
-      ok: true,
-      timerSettings
-    };
-  }
-
-  if (message?.type === runtimeMessageTypes.resumeTimer) {
+    return createTimerSettingsResponse(timerSettings);
+  },
+  [runtimeMessageTypes.resumeTimer]: async (message, sender) => {
     const timerSettings = await resumeTimer(getMessageTabId(message, sender));
 
-    return {
-      ok: true,
-      timerSettings
-    };
-  }
-
-  if (message?.type === runtimeMessageTypes.startTimer) {
+    return createTimerSettingsResponse(timerSettings);
+  },
+  [runtimeMessageTypes.startTimer]: async (message) => {
     const timerSettings = await startTimer(message.payload);
 
-    return {
-      ok: true,
-      timerSettings
-    };
-  }
-
-  if (message?.type === runtimeMessageTypes.stopTimer) {
+    return createTimerSettingsResponse(timerSettings);
+  },
+  [runtimeMessageTypes.stopTimer]: async (message, sender) => {
     await stopTimer(getMessageTabId(message, sender));
 
     return {
       ok: true
     };
-  }
-
-  if (message?.type === runtimeMessageTypes.typingState) {
+  },
+  [runtimeMessageTypes.typingState]: async (message, sender) => {
     const timerSettings = await handleTypingState(
       message.payload,
       sender.tab?.id
     );
 
-    return {
-      ok: true,
-      timerSettings
-    };
+    return createTimerSettingsResponse(timerSettings);
+  }
+};
+
+const handleRuntimeMessage = async (message, sender = {}) => {
+  const messageHandler = runtimeMessageHandlers[message?.type];
+
+  if (messageHandler) {
+    return messageHandler(message, sender);
   }
 
   return {

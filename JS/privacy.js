@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.4.9
+// RecarregaAi! V.1.5.0
 
 const policyNavLinks = [...document.querySelectorAll(".policy-nav a[href^='#']")];
 const privacyHeader = document.querySelector(".privacy-header");
