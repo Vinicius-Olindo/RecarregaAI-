@@ -1,11 +1,15 @@
 <!doctype html>
-<!-- RecarregaAi! 1.5.4 -->
+<!-- RecarregaAi! 1.5.11 -->
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Política de Privacidade do RecarregaAi!</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon16.png" />
     <link rel="stylesheet" href="CSS/privacy.css" />
+    <link rel="stylesheet" href="CSS/shared-footer.css" />
+    <link rel="stylesheet" href="CSS/shared-floating-tools.css" />
+    <link rel="stylesheet" href="CSS/shared-language-dialog.css" />
   </head>
   <body>
     <header class="privacy-header">
@@ -18,7 +22,7 @@
         />
         <span>
           <strong>RecarregaAi!</strong>
-          <small>1.5.4</small>
+          <small>1.5.11</small>
         </span>
       </a>
 
@@ -321,28 +325,149 @@
             alt=""
             aria-hidden="true"
           />
-          <span>
-            <strong>RecarregaAi!</strong>
-            <small>Limpeza de cache e reload com timer.</small>
-          </span>
         </a>
 
         <nav class="privacy-footer__nav" aria-label="Links finais">
           <a href="privacy.html">Política de privacidade</a>
           <a href="uninstall.html">Feedback</a>
           <a href="welcome.html">Início</a>
-          <a href="https://github.com/Vinicius-Olindo/RecarregaAI-">
+          <a
+            href="https://github.com/Vinicius-Olindo/RecarregaAI-"
+            rel="noopener"
+            target="_blank"
+          >
             Projeto
           </a>
         </nav>
 
-        <p class="privacy-footer__contact">Contato: a definir</p>
+        <nav class="privacy-footer__social" aria-label="Canais de contato">
+          <a class="privacy-footer__icon-link" href="mailto:" aria-label="E-mail" title="E-mail">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
+            </svg>
+          </a>
+          <a
+            class="privacy-footer__icon-link"
+            href="https://www.instagram.com/"
+            rel="noopener"
+            target="_blank"
+            aria-label="Instagram"
+            title="Instagram"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="5" />
+              <circle cx="12" cy="12" r="3.5" />
+              <path d="M17.5 6.5h.01" />
+            </svg>
+          </a>
+          <a
+            class="privacy-footer__icon-link"
+            href="uninstall.html"
+            aria-label="Feedback"
+            title="Feedback"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5h14v10H8l-3 3z" />
+              <path d="M9 9h6" />
+              <path d="M9 12h4" />
+            </svg>
+          </a>
+        </nav>
 
         <p class="privacy-footer__legal">
-          © RecarregaAi! 1.5.4. Política atualizada em 16/06/2026.
+          © RecarregaAi! 1.5.11. Política atualizada em 16/06/2026.
         </p>
       </div>
     </footer>
-    <script src="JS/privacy.js" defer></script>
+
+    <div class="floating-tools" aria-label="Ações rápidas">
+      <button
+        id="open-language-button"
+        class="floating-action"
+        type="button"
+        aria-label="Idioma"
+        aria-haspopup="dialog"
+        aria-controls="language-dialog"
+      >
+        <svg class="floating-action__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18" />
+          <path d="M12 3c2.3 2.5 3.5 5.5 3.5 9s-1.2 6.5-3.5 9" />
+          <path d="M12 3c-2.3 2.5-3.5 5.5-3.5 9s1.2 6.5 3.5 9" />
+        </svg>
+        <span class="floating-action__label">Idioma</span>
+      </button>
+
+      <button
+        id="back-to-top-button"
+        class="floating-action"
+        type="button"
+        aria-label="Voltar ao início"
+      >
+        <svg class="floating-action__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 4h14" />
+          <path d="m6 15 6-6 6 6" />
+          <path d="M12 9v11" />
+        </svg>
+        <span class="floating-action__label">Voltar ao início</span>
+      </button>
+    </div>
+
+    <div
+      id="language-dialog"
+      class="language-dialog"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="language-dialog-title"
+    >
+      <button
+        class="language-dialog__backdrop"
+        type="button"
+        aria-label="Fechar"
+        data-close-language
+      ></button>
+
+      <section class="language-dialog__panel">
+        <button
+          id="close-language-button"
+          class="language-dialog__close"
+          type="button"
+          aria-label="Fechar"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <h2 id="language-dialog-title" class="language-dialog__title">
+          Idioma
+        </h2>
+        <p class="language-dialog__description">
+          Escolha o idioma preferido para navegar pelo RecarregaAi!.
+        </p>
+
+        <div class="language-grid" aria-label="Idiomas disponíveis">
+          <button class="language-card" type="button" data-language-option="pt-BR">
+            <span class="language-card__badge">BR</span>
+            <span class="language-card__name">Português (BR)</span>
+            <span class="language-card__code">PT-BR</span>
+          </button>
+
+          <button class="language-card" type="button" data-language-option="en">
+            <span class="language-card__badge">US</span>
+            <span class="language-card__name">English</span>
+            <span class="language-card__code">EN</span>
+          </button>
+
+          <button class="language-card" type="button" data-language-option="es">
+            <span class="language-card__badge">ES</span>
+            <span class="language-card__name">Español</span>
+            <span class="language-card__code">ES</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="JS/privacy.js"></script>
   </body>
 </html>

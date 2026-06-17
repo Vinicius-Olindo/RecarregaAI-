@@ -1,10 +1,11 @@
-// RecarregaAi! 1.5.4
+// RecarregaAi! 1.5.11
 
 import { appConfig } from "./modules/config.js";
+import { initFloatingTools } from "./modules/floating-tools.js";
 
 const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
 const feedbackFallbackUrl = appConfig.feedbackFallbackUrl;
-const defaultVersionLabel = "1.5.4";
+const defaultVersionLabel = "1.5.11";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Nao informou motivo";
 const languageStorageKey = "recarregaAiUninstallLanguage";
@@ -16,13 +17,11 @@ const translations = {
     commentLabel: "Comentario",
     commentPlaceholder: "Conte em poucas palavras o que poderiamos melhorar.",
     emailLabel: "Email para contato",
-    footerLegal: "RecarregaAi! Todos os direitos reservados.",
+    footerFeedback: "Feedback",
+    footerHome: "Inicio",
+    footerLegal: "© RecarregaAi! 1.5.11. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     footerProject: "Projeto",
-    footerSupport: "Suporte",
-    footerText:
-      "Seu feedback ajuda a deixar a extensao mais simples, estavel e util.",
-    footerTitle: "Obrigado por testar o RecarregaAi!",
     formSubmitError:
       "Nao consegui confirmar o envio agora. Tente novamente em alguns instantes.",
     formSubmitFallbackSuccess:
@@ -46,7 +45,7 @@ const translations = {
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "1.5.4"
+    versionLabel: "1.5.11"
   },
   en: {
     backToTop: "Back to start",
@@ -54,13 +53,11 @@ const translations = {
     commentLabel: "Comment",
     commentPlaceholder: "Tell us briefly what we could improve.",
     emailLabel: "Contact email",
-    footerLegal: "RecarregaAi! All rights reserved.",
+    footerFeedback: "Feedback",
+    footerHome: "Home",
+    footerLegal: "© RecarregaAi! 1.5.11. All rights reserved.",
     footerPrivacy: "Privacy",
     footerProject: "Project",
-    footerSupport: "Support",
-    footerText:
-      "Your feedback helps make the extension simpler, stable, and useful.",
-    footerTitle: "Thank you for trying RecarregaAi!",
     formSubmitError:
       "I could not confirm the send right now. Try again in a few moments.",
     formSubmitFallbackSuccess:
@@ -83,7 +80,7 @@ const translations = {
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "1.5.4"
+    versionLabel: "1.5.11"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -91,13 +88,11 @@ const translations = {
     commentLabel: "Comentario",
     commentPlaceholder: "Cuentanos brevemente que podriamos mejorar.",
     emailLabel: "Email de contacto",
-    footerLegal: "RecarregaAi! Todos los derechos reservados.",
+    footerFeedback: "Feedback",
+    footerHome: "Inicio",
+    footerLegal: "© RecarregaAi! 1.5.11. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     footerProject: "Proyecto",
-    footerSupport: "Soporte",
-    footerText:
-      "Tu feedback ayuda a que la extension sea mas simple, estable y util.",
-    footerTitle: "Gracias por probar RecarregaAi!",
     formSubmitError:
       "No pude confirmar el envio ahora. Intentalo de nuevo en unos momentos.",
     formSubmitFallbackSuccess:
@@ -120,7 +115,7 @@ const translations = {
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "1.5.4"
+    versionLabel: "1.5.11"
   }
 };
 
@@ -230,7 +225,6 @@ const reasonTranslations = {
 };
 
 const uninstallElements = {
-  backToTopButton: document.querySelector("#back-to-top-button"),
   closeLanguageButton: document.querySelector("#close-language-button"),
   contactEmail: document.querySelector("#contact-email"),
   extensionVersion: document.querySelector("#extension-version"),
@@ -565,12 +559,6 @@ uninstallElements.languageOptionButtons.forEach((button) => {
 });
 
 uninstallElements.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
-uninstallElements.backToTopButton.addEventListener("click", () => {
-  window.scrollTo({
-    behavior: "smooth",
-    top: 0
-  });
-});
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !uninstallElements.languageDialog.hidden) {
     closeLanguageDialog({
@@ -580,3 +568,4 @@ window.addEventListener("keydown", (event) => {
 });
 
 initializePage();
+initFloatingTools();

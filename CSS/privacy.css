@@ -1,4 +1,4 @@
-/* RecarregaAi! 1.5.4 */
+/* RecarregaAi! 1.5.11 */
 
 :root {
   --anchor-offset: 108px;
@@ -81,8 +81,7 @@ a {
 
 .brand,
 .header-nav,
-.header-link,
-.privacy-footer nav {
+.header-link {
   display: inline-flex;
   align-items: center;
 }
@@ -128,8 +127,7 @@ a {
 }
 
 .header-nav a,
-.header-link,
-.privacy-footer a {
+.header-link {
   text-decoration: none;
 }
 
@@ -524,95 +522,6 @@ a {
   text-align-last: left;
 }
 
-.privacy-footer {
-  padding: 30px 24px 26px;
-  color: var(--color-muted);
-  background: #ffffff;
-  border-top: 1px solid var(--color-border);
-}
-
-.privacy-footer__inner {
-  display: grid;
-  grid-template-columns: minmax(230px, 1fr) auto minmax(180px, 1fr);
-  gap: 16px 36px;
-  align-items: center;
-  width: min(1260px, 100%);
-  margin: 0 auto;
-}
-
-.privacy-footer__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.privacy-footer__logo {
-  width: 42px;
-  height: 42px;
-  filter: drop-shadow(0 8px 16px rgba(18, 97, 216, 0.14));
-}
-
-.privacy-footer__brand strong {
-  display: block;
-  color: var(--color-text);
-  font-size: 1.02rem;
-  font-weight: 920;
-  line-height: 1.2;
-}
-
-.privacy-footer__brand small {
-  display: block;
-  margin-top: 4px;
-  color: var(--color-muted);
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-
-.privacy-footer__nav {
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: clamp(18px, 3vw, 34px);
-  text-align: center;
-}
-
-.privacy-footer a {
-  color: var(--color-text);
-  font-size: 0.92rem;
-  font-weight: 650;
-  transition:
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-.privacy-footer a:hover,
-.privacy-footer a:focus-visible {
-  color: var(--color-primary);
-  transform: translateY(-1px);
-}
-
-.privacy-footer__contact,
-.privacy-footer__legal {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 0.9rem;
-  line-height: 1.55;
-}
-
-.privacy-footer__contact {
-  justify-self: end;
-  text-align: right;
-}
-
-.privacy-footer__legal {
-  grid-column: 1 / -1;
-  justify-self: center;
-  padding-top: 10px;
-  color: var(--color-muted);
-  text-align: center;
-}
-
 @keyframes floatingPanel {
   0%,
   100% {
@@ -662,21 +571,6 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .privacy-footer__inner {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
-  }
-
-  .privacy-footer__brand {
-    justify-content: center;
-  }
-
-  .privacy-footer__contact {
-    justify-self: center;
-    text-align: center;
-  }
-
   .trust-panel {
     animation: none;
   }
@@ -714,15 +608,6 @@ a {
     padding: 24px;
   }
 
-  .privacy-footer {
-    padding: 28px 18px 24px;
-  }
-
-  .privacy-footer__logo {
-    width: 40px;
-    height: 40px;
-  }
-
   .policy-section h2 {
     font-size: 1.24rem;
   }
@@ -750,8 +635,4 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .privacy-footer__brand {
-    align-items: flex-start;
-    flex-direction: column;
-  }
 }

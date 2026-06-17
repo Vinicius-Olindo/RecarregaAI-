@@ -1,5 +1,7 @@
-// RecarregaAi! 1.5.4
+// RecarregaAi! 1.5.11
 
+import { initFloatingTools } from "./modules/floating-tools.js";
+import { initLanguageDialog } from "./modules/language-dialog.js";
 import {
   defaultAppSettings,
   getPermissionPatternForOrigin,
@@ -9,6 +11,8 @@ import {
   loadThemePreference,
   toggleThemePreference
 } from "./modules/theme.js";
+
+const optionsPreviewStorageKey = "recarregaAiOptionsPreviewSettings";
 
 const optionsElements = {
   addSiteButton: document.querySelector("#add-site-button"),
@@ -27,6 +31,26 @@ const optionsElements = {
 };
 
 let currentSettings = { ...defaultAppSettings };
+
+const getOptionsStorageArea = () => {
+  if (typeof chrome === "undefined" || !chrome.storage?.local) {
+    return null;
+  }
+
+  return chrome.storage.local;
+};
+
+const getPreviewSettings = () => {
+  try {
+    return JSON.parse(localStorage.getItem(optionsPreviewStorageKey)) || {};
+  } catch {
+    return {};
+  }
+};
+
+const savePreviewSettings = (settings) => {
+  localStorage.setItem(optionsPreviewStorageKey, JSON.stringify(settings));
+};
 
 const updateOptionsStatus = (message, status = "neutral") => {
   optionsElements.optionsStatus.textContent = message;
@@ -63,7 +87,12 @@ const updateSettingsSummary = () => {
 };
 
 const getStoredOptionsSettings = async () => {
-  const storedData = await chrome.storage.local.get(storageKeys.appSettings);
+  const storageArea = getOptionsStorageArea();
+  const storedData = storageArea
+    ? await storageArea.get(storageKeys.appSettings)
+    : {
+      [storageKeys.appSettings]: getPreviewSettings()
+    };
   const storedSettings = storedData[storageKeys.appSettings] || {};
 
   return {
@@ -76,12 +105,23 @@ const getStoredOptionsSettings = async () => {
 };
 
 const saveOptionsSettings = async () => {
-  await chrome.storage.local.set({
+  const storageArea = getOptionsStorageArea();
+
+  if (!storageArea) {
+    savePreviewSettings(currentSettings);
+    return;
+  }
+
+  await storageArea.set({
     [storageKeys.appSettings]: currentSettings
   });
 };
 
 const requestAutoStartPermission = async (origin) => {
+  if (typeof chrome === "undefined" || !chrome.permissions?.request) {
+    return true;
+  }
+
   const originPattern = getPermissionPatternForOrigin(origin);
 
   return chrome.permissions.request({
@@ -90,6 +130,10 @@ const requestAutoStartPermission = async (origin) => {
 };
 
 const removeAutoStartPermissionIfUnused = async (origin) => {
+  if (typeof chrome === "undefined" || !chrome.permissions?.remove) {
+    return;
+  }
+
   const originPattern = getPermissionPatternForOrigin(origin);
   const isStillUsed = currentSettings.autoStartSites.some((site) => (
     site.origin === origin
@@ -257,6 +301,10 @@ const toggleOptionsTheme = async () => {
 };
 
 const loadOptionsVersion = () => {
+  if (typeof chrome === "undefined" || !chrome.runtime?.getManifest) {
+    return;
+  }
+
   const manifest = chrome.runtime.getManifest();
 
   optionsElements.extensionVersion.textContent = manifest.version_name
@@ -294,6 +342,11 @@ optionsElements.themeToggleButton.addEventListener("click", () => {
   toggleOptionsTheme().catch((error) => {
     updateOptionsStatus(error.message || "Erro ao alternar tema.", "error");
   });
+});
+
+initFloatingTools();
+initLanguageDialog({
+  storageKey: "recarregaAiOptionsLanguage"
 });
 
 loadOptionsVersion();

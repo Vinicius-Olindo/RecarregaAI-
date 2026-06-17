@@ -1,11 +1,14 @@
 <!doctype html>
-<!-- RecarregaAi! 1.5.4 -->
-<html lang="pt-BR" data-theme="dark">
+<!-- RecarregaAi! 1.5.11 -->
+<html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bem-vindo ao RecarregaAi!</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon16.png" />
     <link rel="stylesheet" href="CSS/welcome.css" />
+    <link rel="stylesheet" href="CSS/shared-footer.css" />
+    <link rel="stylesheet" href="CSS/shared-floating-tools.css" />
   </head>
   <body>
     <header class="welcome-header">
@@ -19,7 +22,7 @@
 
         <span>
           <strong class="brand__name">RecarregaAi!</strong>
-          <span class="brand__version">1.5.4</span>
+          <span class="brand__version">1.5.11</span>
         </span>
       </a>
 
@@ -53,34 +56,12 @@
       <div class="top-controls" aria-label="Acoes iniciais">
         <button
           id="theme-toggle-button"
-          class="theme-button"
+          class="theme-toggle"
           type="button"
-          aria-label="Tema claro"
-          title="Tema claro"
+          aria-label="Tema escuro"
+          title="Tema escuro"
         >
-          <svg
-            class="theme-button__icon theme-button__icon--sun"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2" />
-            <path d="M12 20v2" />
-            <path d="m4.93 4.93 1.41 1.41" />
-            <path d="m17.66 17.66 1.41 1.41" />
-            <path d="M2 12h2" />
-            <path d="M20 12h2" />
-            <path d="m6.34 17.66-1.41 1.41" />
-            <path d="m19.07 4.93-1.41 1.41" />
-          </svg>
-          <svg
-            class="theme-button__icon theme-button__icon--moon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M21 12.8A8.4 8.4 0 1 1 11.2 3" />
-            <path d="M21 12.8A6.6 6.6 0 0 1 11.2 3" />
-          </svg>
+          <span class="theme-toggle__icon" aria-hidden="true"></span>
         </button>
         <button
           class="button button--primary"
@@ -403,41 +384,73 @@
             Comecar agora
           </button>
         </div>
-
-        <footer class="site-footer" aria-label="Rodape">
-          <a class="site-footer__brand" href="#top" aria-label="RecarregaAi!">
-            <img src="assets/icons/icon128.png" alt="" aria-hidden="true" />
-            <span>
-              <strong>RecarregaAi!</strong>
-              <small>Cache limpo. Pagina nova.</small>
-            </span>
-          </a>
-
-          <nav class="site-footer__links" aria-label="Links do rodape">
-            <a href="#features">
-              <span class="site-footer__dot" aria-hidden="true"></span>
-              Funcionalidades
-            </a>
-            <a href="#use-cases">
-              <span class="site-footer__dot" aria-hidden="true"></span>
-              Usos
-            </a>
-            <a href="#faq">
-              <span class="site-footer__dot" aria-hidden="true"></span>
-              FAQ
-            </a>
-            <a href="privacy.html">
-              <span class="site-footer__dot" aria-hidden="true"></span>
-              Privacidade
-            </a>
-          </nav>
-
-          <p class="site-footer__copy">
-            1.5.4 - Projeto RecarregaAi!
-          </p>
-        </footer>
       </section>
     </main>
+
+    <footer class="privacy-footer">
+      <div class="privacy-footer__inner">
+        <a class="privacy-footer__brand" href="#top" aria-label="RecarregaAi!">
+          <img
+            class="privacy-footer__logo"
+            src="assets/icons/icon128.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </a>
+
+        <nav class="privacy-footer__nav" aria-label="Links finais">
+          <a href="privacy.html">Política de privacidade</a>
+          <a href="uninstall.html">Feedback</a>
+          <a href="#top">Início</a>
+          <a
+            href="https://github.com/Vinicius-Olindo/RecarregaAI-"
+            rel="noopener"
+            target="_blank"
+          >
+            Projeto
+          </a>
+        </nav>
+
+        <nav class="privacy-footer__social" aria-label="Canais de contato">
+          <a class="privacy-footer__icon-link" href="mailto:" aria-label="E-mail" title="E-mail">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
+            </svg>
+          </a>
+          <a
+            class="privacy-footer__icon-link"
+            href="https://www.instagram.com/"
+            rel="noopener"
+            target="_blank"
+            aria-label="Instagram"
+            title="Instagram"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="5" />
+              <circle cx="12" cy="12" r="3.5" />
+              <path d="M17.5 6.5h.01" />
+            </svg>
+          </a>
+          <a
+            class="privacy-footer__icon-link"
+            href="uninstall.html"
+            aria-label="Feedback"
+            title="Feedback"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 5h14v10H8l-3 3z" />
+              <path d="M9 9h6" />
+              <path d="M9 12h4" />
+            </svg>
+          </a>
+        </nav>
+
+        <p class="privacy-footer__legal">
+          © RecarregaAi! 1.5.11. Todos os direitos reservados.
+        </p>
+      </div>
+    </footer>
 
     <div class="floating-tools" aria-label="Acoes rapidas">
       <button

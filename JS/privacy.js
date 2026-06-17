@@ -1,4 +1,7 @@
-// RecarregaAi! 1.5.4
+// RecarregaAi! 1.5.11
+
+import { initFloatingTools } from "./modules/floating-tools.js";
+import { initLanguageDialog } from "./modules/language-dialog.js";
 
 const policyNavLinks = [...document.querySelectorAll(".policy-nav a[href^='#']")];
 const privacyHeader = document.querySelector(".privacy-header");
@@ -77,3 +80,8 @@ if ("IntersectionObserver" in window && policyHeadings.length > 0) {
     activeHeadingObserver.observe(heading);
   });
 }
+
+initFloatingTools();
+initLanguageDialog({
+  storageKey: "recarregaAiPrivacyLanguage"
+});

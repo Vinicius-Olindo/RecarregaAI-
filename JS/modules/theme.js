@@ -1,9 +1,9 @@
-// RecarregaAi! 1.5.4
+// RecarregaAi! 1.5.11
 
 import { storageKeys, themeModes } from "./shared.js";
 
 export const normalizeTheme = (theme) => (
-  theme === themeModes.light ? themeModes.light : themeModes.dark
+  theme === themeModes.dark ? themeModes.dark : themeModes.light
 );
 
 export const getNextTheme = (theme) => (
@@ -41,7 +41,7 @@ export const applyThemePreference = ({
 };
 
 export const loadThemePreference = async ({
-  defaultTheme = themeModes.dark,
+  defaultTheme = themeModes.light,
   onChange = null,
   root = document.documentElement,
   storageArea = getChromeLocalStorage()

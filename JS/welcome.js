@@ -1,5 +1,6 @@
-// RecarregaAi! 1.5.4
+// RecarregaAi! 1.5.11
 
+import { initFloatingTools } from "./modules/floating-tools.js";
 import {
   loadThemePreference,
   toggleThemePreference
@@ -11,7 +12,6 @@ const defaultWelcomeLanguage = "pt-BR";
 const supportedWelcomeLanguages = ["pt-BR", "en", "es"];
 
 const welcomeElements = {
-  backToTopButton: document.querySelector("#back-to-top-button"),
   closeLanguageButton: document.querySelector("#close-language-button"),
   finishButtons: document.querySelectorAll("[data-finish-welcome]"),
   languageBackdrop: document.querySelector("[data-close-language]"),
@@ -121,13 +121,6 @@ const closeLanguageDialog = () => {
   welcomeElements.openLanguageButton.focus();
 };
 
-const backToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-};
-
 const finishWelcome = async () => {
   const storageArea = getChromeLocalStorage();
   const tabsApi = getChromeTabs();
@@ -177,10 +170,6 @@ welcomeElements.languageOptionButtons.forEach((button) => {
   });
 });
 
-welcomeElements.backToTopButton.addEventListener("click", () => {
-  backToTop();
-});
-
 welcomeElements.finishButtons.forEach((button) => {
   button.addEventListener("click", () => {
     finishWelcome().catch((error) => {
@@ -201,3 +190,5 @@ Promise.all([
 ]).catch((error) => {
   console.error("Erro ao carregar boas-vindas:", error);
 });
+
+initFloatingTools();
