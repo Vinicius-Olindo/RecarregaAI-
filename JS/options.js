@@ -1,4 +1,4 @@
-// RecarregaAi! V.1.5.3
+// RecarregaAi! V.1.5.4
 
 import {
   defaultAppSettings,
@@ -20,13 +20,46 @@ const optionsElements = {
   siteOriginInput: document.querySelector("#site-origin-input"),
   sitesEmptyState: document.querySelector("#sites-empty-state"),
   sitesList: document.querySelector("#sites-list"),
-  themeToggleButton: document.querySelector("#theme-toggle-button")
+  summaryDefaultInterval: document.querySelector("#summary-default-interval"),
+  summarySitesCount: document.querySelector("#summary-sites-count"),
+  themeToggleButton: document.querySelector("#theme-toggle-button"),
+  themeToggleLabel: document.querySelector("#theme-toggle-label")
 };
 
 let currentSettings = { ...defaultAppSettings };
 
-const updateOptionsStatus = (message) => {
+const updateOptionsStatus = (message, status = "neutral") => {
   optionsElements.optionsStatus.textContent = message;
+  optionsElements.optionsStatus.dataset.status = status;
+};
+
+const formatMinuteLabel = (minutes) => {
+  if (minutes === 1) {
+    return "1 minuto";
+  }
+
+  return `${minutes} minutos`;
+};
+
+const formatSiteCount = (count) => {
+  if (count === 0) {
+    return "Nenhum site cadastrado";
+  }
+
+  if (count === 1) {
+    return "1 site cadastrado";
+  }
+
+  return `${count} sites cadastrados`;
+};
+
+const updateSettingsSummary = () => {
+  optionsElements.summaryDefaultInterval.textContent = formatMinuteLabel(
+    currentSettings.defaultIntervalInMinutes
+  );
+  optionsElements.summarySitesCount.textContent = formatSiteCount(
+    currentSettings.autoStartSites.length
+  );
 };
 
 const getStoredOptionsSettings = async () => {
@@ -79,7 +112,7 @@ const normalizeSiteOrigin = (inputValue) => {
   const url = new URL(urlValue);
 
   if (!["http:", "https:"].includes(url.protocol)) {
-    throw new Error("Use um endereco http ou https.");
+    throw new Error("Use um endereço http ou https.");
   }
 
   return url.origin;
@@ -109,18 +142,21 @@ const renderSites = () => {
     removeButton.dataset.removeIndex = String(index);
 
     origin.textContent = site.origin;
-    meta.textContent = `Intervalo: ${site.intervalInMinutes} minuto(s)`;
+    meta.textContent = `Atualiza a cada ${formatMinuteLabel(site.intervalInMinutes)}`;
     removeButton.textContent = "Remover";
 
     info.append(origin, meta);
     item.append(info, removeButton);
     optionsElements.sitesList.append(item);
   });
+
+  updateSettingsSummary();
 };
 
 const loadOptionsSettings = async () => {
   currentSettings = await getStoredOptionsSettings();
   optionsElements.defaultIntervalInput.value = currentSettings.defaultIntervalInMinutes;
+  updateSettingsSummary();
   renderSites();
 };
 
@@ -128,13 +164,17 @@ const saveDefaultInterval = async () => {
   const defaultInterval = Number(optionsElements.defaultIntervalInput.value);
 
   if (!Number.isFinite(defaultInterval) || defaultInterval < 1) {
-    updateOptionsStatus("Informe um intervalo padrao de pelo menos 1 minuto.");
+    updateOptionsStatus(
+      "Informe um intervalo padrão de pelo menos 1 minuto.",
+      "error"
+    );
     return;
   }
 
   currentSettings.defaultIntervalInMinutes = Math.floor(defaultInterval);
   await saveOptionsSettings();
-  updateOptionsStatus("Preferencias salvas.");
+  updateSettingsSummary();
+  updateOptionsStatus("Tempo padrão salvo.", "success");
 };
 
 const addAutoStartSite = async () => {
@@ -144,7 +184,8 @@ const addAutoStartSite = async () => {
 
     if (!hasPermission) {
       updateOptionsStatus(
-        "Permissao negada. O auto-inicio precisa acessar esse dominio."
+        "Permissão negada. Autorize este site para usar o início automático.",
+        "error"
       );
       return;
     }
@@ -167,9 +208,12 @@ const addAutoStartSite = async () => {
 
     optionsElements.siteOriginInput.value = "";
     optionsElements.siteIntervalInput.value = "";
-    updateOptionsStatus("Site automatico salvo.");
+    updateOptionsStatus("Site salvo para iniciar automaticamente.", "success");
   } catch (error) {
-    updateOptionsStatus(error.message || "Nao foi possivel adicionar o site.");
+    updateOptionsStatus(
+      error.message || "Não consegui adicionar o site.",
+      "error"
+    );
   }
 };
 
@@ -184,11 +228,18 @@ const removeAutoStartSite = async (index) => {
   }
 
   renderSites();
-  updateOptionsStatus("Site removido.");
+  updateOptionsStatus("Site removido.", "success");
 };
 
 const updateOptionsThemeButtonLabel = ({ isDarkTheme }) => {
-  optionsElements.themeToggleButton.textContent = isDarkTheme
+  const nextThemeLabel = isDarkTheme
+    ? "Mudar para o tema claro"
+    : "Mudar para o tema escuro";
+
+  optionsElements.themeToggleButton.setAttribute("aria-pressed", String(isDarkTheme));
+  optionsElements.themeToggleButton.setAttribute("aria-label", nextThemeLabel);
+  optionsElements.themeToggleButton.title = nextThemeLabel;
+  optionsElements.themeToggleLabel.textContent = isDarkTheme
     ? "Tema claro"
     : "Tema escuro";
 };
@@ -214,13 +265,16 @@ const loadOptionsVersion = () => {
 
 optionsElements.saveSettingsButton.addEventListener("click", () => {
   saveDefaultInterval().catch((error) => {
-    updateOptionsStatus(error.message || "Erro ao salvar preferencias.");
+    updateOptionsStatus(
+      error.message || "Erro ao salvar preferências.",
+      "error"
+    );
   });
 });
 
 optionsElements.addSiteButton.addEventListener("click", () => {
   addAutoStartSite().catch((error) => {
-    updateOptionsStatus(error.message || "Erro ao salvar site.");
+    updateOptionsStatus(error.message || "Erro ao salvar site.", "error");
   });
 });
 
@@ -232,20 +286,23 @@ optionsElements.sitesList.addEventListener("click", (event) => {
   }
 
   removeAutoStartSite(Number(removeButton.dataset.removeIndex)).catch((error) => {
-    updateOptionsStatus(error.message || "Erro ao remover site.");
+    updateOptionsStatus(error.message || "Erro ao remover site.", "error");
   });
 });
 
 optionsElements.themeToggleButton.addEventListener("click", () => {
   toggleOptionsTheme().catch((error) => {
-    updateOptionsStatus(error.message || "Erro ao alternar tema.");
+    updateOptionsStatus(error.message || "Erro ao alternar tema.", "error");
   });
 });
 
 loadOptionsVersion();
 loadOptionsTheme().catch((error) => {
-  updateOptionsStatus(error.message || "Erro ao carregar tema.");
+  updateOptionsStatus(error.message || "Erro ao carregar tema.", "error");
 });
 loadOptionsSettings().catch((error) => {
-  updateOptionsStatus(error.message || "Erro ao carregar configuracoes.");
+  updateOptionsStatus(
+    error.message || "Erro ao carregar configurações.",
+    "error"
+  );
 });

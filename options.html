@@ -1,69 +1,119 @@
 <!doctype html>
-<!-- RecarregaAi! V.1.5.3 -->
+<!-- RecarregaAi! V.1.5.4 -->
 <html lang="pt-BR" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Configuracoes do RecarregaAi!</title>
+    <title>Configurações do RecarregaAi!</title>
     <link rel="stylesheet" href="CSS/options.css" />
   </head>
   <body>
     <main class="options" aria-labelledby="options-title">
       <header class="options__header">
-        <img class="options__icon" src="assets/icons/icon128.png" alt="" />
+        <div class="brand">
+          <img class="brand__icon" src="assets/icons/icon128.png" alt="" />
 
-        <div class="options__heading">
-          <p id="extension-version" class="options__eyebrow">V.1.5.3</p>
-          <h1 id="options-title" class="options__title">
-            Configuracoes do RecarregaAi!
-          </h1>
-          <p class="options__subtitle">
-            Ajuste o timer padrao, sites automaticos e veja como as permissoes
-            sao usadas.
-          </p>
+          <div class="brand__copy">
+            <p id="extension-version" class="brand__version">V.1.5.4</p>
+            <h1 id="options-title" class="brand__title">
+              Configurações
+            </h1>
+            <p class="brand__subtitle">
+              Defina o tempo padrão, escolha sites de início automático e veja
+              como o RecarregaAi! usa permissões.
+            </p>
+          </div>
         </div>
 
-        <button id="theme-toggle-button" class="button button--ghost" type="button">
-          Tema claro
+        <button
+          id="theme-toggle-button"
+          class="theme-toggle"
+          type="button"
+          aria-label="Mudar para o tema claro"
+          aria-pressed="true"
+          title="Mudar para o tema claro"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true"></span>
+          <span id="theme-toggle-label" class="screen-reader-only">
+            Tema claro
+          </span>
         </button>
       </header>
 
-      <section class="panel" aria-labelledby="general-title">
+      <section class="summary-grid" aria-label="Resumo das configurações">
+        <article class="summary-card">
+          <span class="summary-card__icon" aria-hidden="true">01</span>
+          <div>
+            <strong>Tempo padrão</strong>
+            <span id="summary-default-interval">3 minutos</span>
+          </div>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-card__icon" aria-hidden="true">02</span>
+          <div>
+            <strong>Sites automáticos</strong>
+            <span id="summary-sites-count">Nenhum site cadastrado</span>
+          </div>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-card__icon" aria-hidden="true">03</span>
+          <div>
+            <strong>Controle local</strong>
+            <span>Configurações salvas no navegador.</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel panel--split" aria-labelledby="general-title">
         <div class="panel__heading">
-          <p class="panel__eyebrow">Preferencias</p>
-          <h2 id="general-title" class="panel__title">Timer padrao</h2>
+          <p class="panel__eyebrow">Preferências</p>
+          <h2 id="general-title" class="panel__title">Tempo padrão</h2>
+          <p class="panel__description">
+            Esse tempo é usado quando você cria uma atualização automática sem
+            informar um intervalo específico.
+          </p>
         </div>
 
-        <label class="field" for="default-interval-input">
-          <span class="field__label">Intervalo padrao em minutos</span>
-          <input
-            id="default-interval-input"
-            class="field__input"
-            type="number"
-            min="1"
-            step="1"
-            value="3"
-          />
-        </label>
+        <div class="settings-row">
+          <label class="field" for="default-interval-input">
+            <span class="field__label">Intervalo em minutos</span>
+            <input
+              id="default-interval-input"
+              class="field__input"
+              type="number"
+              min="1"
+              step="1"
+              value="3"
+            />
+          </label>
 
-        <button id="save-settings-button" class="button button--primary" type="button">
-          Salvar preferencias
-        </button>
+          <button
+            id="save-settings-button"
+            class="button button--primary"
+            type="button"
+          >
+            Salvar tempo padrão
+          </button>
+        </div>
       </section>
 
       <section class="panel" aria-labelledby="sites-title">
         <div class="panel__heading">
-          <p class="panel__eyebrow">Auto-inicio</p>
-          <h2 id="sites-title" class="panel__title">Sites favoritos</h2>
+          <p class="panel__eyebrow">Início automático</p>
+          <h2 id="sites-title" class="panel__title">
+            Sites que iniciam sozinhos
+          </h2>
           <p class="panel__description">
-            O RecarregaAi! pode iniciar um timer separado para cada guia que
-            carregar um site desta lista.
+            Quando uma página desses sites abrir, o RecarregaAi! liga uma
+            atualização separada para ela.
           </p>
         </div>
 
         <div class="site-form">
           <label class="field" for="site-origin-input">
-            <span class="field__label">Endereco do site</span>
+            <span class="field__label">Endereço do site</span>
             <input
               id="site-origin-input"
               class="field__input"
@@ -73,15 +123,18 @@
           </label>
 
           <label class="field" for="site-interval-input">
-            <span class="field__label">Minutos</span>
+            <span class="field__label">Tempo em minutos</span>
             <input
               id="site-interval-input"
               class="field__input"
               type="number"
               min="1"
               step="1"
-              placeholder="Padrao"
+              placeholder="Padrão"
             />
+            <span class="field__hint">
+              Deixe vazio para usar o tempo padrão.
+            </span>
           </label>
 
           <button id="add-site-button" class="button button--secondary" type="button">
@@ -90,44 +143,72 @@
         </div>
 
         <div id="sites-empty-state" class="empty-state">
-          Nenhum site automatico cadastrado.
+          <strong>Nenhum site automático cadastrado.</strong>
+          <span>
+            Adicione um endereço acima para o RecarregaAi! iniciar sozinho
+            quando esse site abrir.
+          </span>
         </div>
 
-        <ul id="sites-list" class="site-list" aria-label="Sites automaticos"></ul>
+        <ul id="sites-list" class="site-list" aria-label="Sites automáticos"></ul>
       </section>
 
       <section class="panel" aria-labelledby="permissions-title">
         <div class="panel__heading">
-          <p class="panel__eyebrow">Transparencia</p>
+          <p class="panel__eyebrow">Transparência</p>
           <h2 id="permissions-title" class="panel__title">
-            Por que a extensao pede permissoes?
+            Por que a extensão pede permissões?
           </h2>
+          <p class="panel__description">
+            A extensão usa apenas o necessário para atualizar a página escolhida
+            e salvar suas preferências localmente.
+          </p>
         </div>
 
         <div class="permissions-grid">
           <article class="permission-card">
-            <strong>Abas</strong>
-            <p>Identifica as guias escolhidas, abre guias ativas e recarrega cada uma.</p>
+            <span class="permission-card__icon" aria-hidden="true">A</span>
+            <strong>Página escolhida</strong>
+            <p>Identifica a página atual para limpar dados e atualizar no tempo definido.</p>
           </article>
 
           <article class="permission-card">
-            <strong>Limpeza de dados</strong>
-            <p>Remove cache, CacheStorage e service workers da origem carregada.</p>
+            <span class="permission-card__icon" aria-hidden="true">L</span>
+            <strong>Limpeza do site</strong>
+            <p>Remove dados antigos do endereço aberto para buscar conteúdo novo.</p>
           </article>
 
           <article class="permission-card">
-            <strong>Scripts</strong>
-            <p>Coleta as origens dos recursos usados pela pagina antes da limpeza.</p>
+            <span class="permission-card__icon" aria-hidden="true">S</span>
+            <strong>Sites autorizados</strong>
+            <p>Pede permissão somente para os sites adicionados ao início automático.</p>
           </article>
 
           <article class="permission-card">
-            <strong>Armazenamento</strong>
-            <p>Salva tema, timers ativos, sites favoritos e preferencias locais.</p>
+            <span class="permission-card__icon" aria-hidden="true">P</span>
+            <strong>Preferências locais</strong>
+            <p>Salva tema, tempo padrão e sites cadastrados no seu navegador.</p>
           </article>
         </div>
       </section>
 
       <p id="options-status" class="options__status" role="status"></p>
+
+      <footer class="options__footer">
+        <div class="footer-brand">
+          <img class="footer-brand__icon" src="assets/icons/icon48.png" alt="" />
+          <div>
+            <strong>RecarregaAi!</strong>
+            <span>Cache limpo. Página nova. Sem enrolação.</span>
+          </div>
+        </div>
+
+        <nav class="footer-links" aria-label="Links da extensão">
+          <a href="welcome.html">Boas-vindas</a>
+          <a href="privacy.html">Privacidade</a>
+          <a href="mailto:vinim0106@icloud.com">Suporte</a>
+        </nav>
+      </footer>
     </main>
 
     <script type="module" src="JS/options.js"></script>
