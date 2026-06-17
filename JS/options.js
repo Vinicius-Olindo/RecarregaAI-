@@ -1,4 +1,4 @@
-// RecarregaAi! 1.6.8
+// RecarregaAi! 1.7.2
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
@@ -56,10 +56,10 @@ const optionsTranslations = {
       "Adicione um endereço acima para o RecarregaAi! iniciar sozinho quando esse site abrir.",
     emptySitesTitle: "Nenhum site automático cadastrado.",
     footerFeedback: "Feedback",
+    footerDeveloper: "Desenvolvido por: a definir",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos os direitos reservados.",
-    footerPrivacy: "Política de privacidade",
-    footerProject: "Projeto",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos os direitos reservados.",
+    footerPrivacy: "Privacidade",
     formInvalidInterval: "Informe um intervalo padrão de pelo menos 1 minuto.",
     formInvalidOrigin: "Use um endereço http ou https.",
     formPermissionDenied:
@@ -140,10 +140,10 @@ const optionsTranslations = {
       "Add an address above so RecarregaAi! can start automatically when that site opens.",
     emptySitesTitle: "No automatic site added.",
     footerFeedback: "Feedback",
+    footerDeveloper: "Developed by: to be defined",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 1.6.8. All rights reserved.",
-    footerPrivacy: "Privacy policy",
-    footerProject: "Project",
+    footerLegal: "© RecarregaAi! 1.7.2. All rights reserved.",
+    footerPrivacy: "Privacy",
     formInvalidInterval: "Enter a default interval of at least 1 minute.",
     formInvalidOrigin: "Use an http or https address.",
     formPermissionDenied:
@@ -224,10 +224,10 @@ const optionsTranslations = {
       "Agrega una dirección arriba para que RecarregaAi! se inicie solo cuando ese sitio se abra.",
     emptySitesTitle: "No hay sitios automáticos registrados.",
     footerFeedback: "Feedback",
+    footerDeveloper: "Desarrollado por: por definir",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos los derechos reservados.",
-    footerPrivacy: "Política de privacidad",
-    footerProject: "Proyecto",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos los derechos reservados.",
+    footerPrivacy: "Privacidad",
     formInvalidInterval: "Ingresa un intervalo predeterminado de al menos 1 minuto.",
     formInvalidOrigin: "Usa una dirección http o https.",
     formPermissionDenied:
@@ -665,12 +665,12 @@ const applyOptionsLanguage = (language) => {
     "localPreferencesDescription"
   ]);
   setTexts(".privacy-footer__nav a", [
-    "footerPrivacy",
-    "footerFeedback",
     "footerHome",
-    "footerProject"
+    "footerPrivacy",
+    "footerFeedback"
   ]);
   setText(".privacy-footer__legal", "footerLegal");
+  setText(".privacy-footer__developer", "footerDeveloper");
   setText("#open-language-button .floating-action__label", "languageLabel");
   setText("#back-to-top-button .floating-action__label", "backToTop");
   setText("#language-dialog-title", "languageDialogTitle");

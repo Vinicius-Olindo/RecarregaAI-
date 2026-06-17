@@ -1,4 +1,4 @@
-// RecarregaAi! 1.6.8
+// RecarregaAi! 1.7.2
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
@@ -61,11 +61,11 @@ const welcomeTranslations = {
     finalBody:
       "Fixe o ícone da extensão, abra a guia desejada e escolha o tempo que combina com seu fluxo.",
     finalTitle: "Pronto para usar o RecarregaAi!",
+    footerDeveloper: "Desenvolvido por: a definir",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos os direitos reservados.",
-    footerPrivacy: "Política de privacidade",
-    footerProject: "Projeto",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos os direitos reservados.",
+    footerPrivacy: "Privacidade",
     heroDescription:
       "Use timers por guia, limpe o cache do site aberto e mantenha sistemas como Drive, painéis internos e páginas de trabalho sempre atualizados.",
     heroEyebrow: "Cache limpo. Guia no ritmo certo.",
@@ -161,11 +161,11 @@ const welcomeTranslations = {
     finalBody:
       "Pin the extension icon, open the desired tab and choose the time that matches your workflow.",
     finalTitle: "Ready to use RecarregaAi!",
+    footerDeveloper: "Developed by: to be defined",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 1.6.8. All rights reserved.",
-    footerPrivacy: "Privacy policy",
-    footerProject: "Project",
+    footerLegal: "© RecarregaAi! 1.7.2. All rights reserved.",
+    footerPrivacy: "Privacy",
     heroDescription:
       "Use timers by tab, clear the open site's cache and keep systems such as Drive, internal dashboards and work pages always updated.",
     heroEyebrow: "Clean cache. Tab on the right rhythm.",
@@ -260,11 +260,11 @@ const welcomeTranslations = {
     finalBody:
       "Fija el icono de la extensión, abre la pestaña deseada y elige el tiempo que combina con tu flujo.",
     finalTitle: "Listo para usar RecarregaAi!",
+    footerDeveloper: "Desarrollado por: por definir",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos los derechos reservados.",
-    footerPrivacy: "Política de privacidad",
-    footerProject: "Proyecto",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos los derechos reservados.",
+    footerPrivacy: "Privacidad",
     heroDescription:
       "Usa timers por pestaña, limpia la caché del sitio abierto y mantén sistemas como Drive, paneles internos y páginas de trabajo siempre actualizados.",
     heroEyebrow: "Caché limpia. Pestaña en el ritmo correcto.",
@@ -457,12 +457,12 @@ const updateWelcomeText = () => {
   setText(".final-cta__content p", "finalBody");
   setText(".final-cta [data-finish-welcome]", "startNow");
   setTexts(".privacy-footer__nav a", [
-    "footerPrivacy",
-    "footerFeedback",
     "footerHome",
-    "footerProject"
+    "footerPrivacy",
+    "footerFeedback"
   ]);
   setText(".privacy-footer__legal", "footerLegal");
+  setText(".privacy-footer__developer", "footerDeveloper");
   setText("#open-language-button .floating-action__label", "languageLabel");
   setText("#back-to-top-button .floating-action__label", "backToTop");
   setText("#language-dialog-title", "languageDialogTitle");

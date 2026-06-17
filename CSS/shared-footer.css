@@ -1,4 +1,4 @@
-/* RecarregaAi! 1.6.8 */
+/* RecarregaAi! 1.7.2 */
 
 .privacy-footer {
   padding: 28px clamp(22px, 5vw, 48px) 26px;
@@ -11,7 +11,8 @@
   display: grid;
   grid-template-areas:
     "brand nav social"
-    "brand legal social";
+    "brand legal social"
+    "brand developer social";
   grid-template-columns:
     minmax(80px, 1fr)
     minmax(360px, auto)
@@ -73,7 +74,8 @@
   outline-offset: 4px;
 }
 
-.privacy-footer__legal {
+.privacy-footer__legal,
+.privacy-footer__developer {
   margin: 0;
   color: var(--privacy-footer-muted, var(--color-muted, #5b6677));
   font-size: 0.9rem;
@@ -151,11 +153,18 @@
   stroke: #ffffff;
 }
 
-.privacy-footer__legal {
+.privacy-footer__legal,
+.privacy-footer__developer {
   grid-area: legal;
   justify-self: center;
   max-width: 540px;
   text-align: center;
+}
+
+.privacy-footer__developer {
+  grid-area: developer;
+  color: var(--privacy-footer-muted, var(--color-muted, #5b6677));
+  font-size: 0.86rem;
 }
 
 @media (max-width: 1080px) {
@@ -164,7 +173,8 @@
       "brand"
       "nav"
       "social"
-      "legal";
+      "legal"
+      "developer";
     grid-template-columns: 1fr;
     gap: 18px;
     justify-items: center;
@@ -178,7 +188,8 @@
 
   .privacy-footer__nav,
   .privacy-footer__social,
-  .privacy-footer__legal {
+  .privacy-footer__legal,
+  .privacy-footer__developer {
     min-width: 0;
   }
 
@@ -208,7 +219,7 @@
 @media (max-width: 560px) {
   .privacy-footer__nav {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px 18px;
     width: 100%;
   }

@@ -1,4 +1,4 @@
-/* RecarregaAi! 1.6.8 */
+/* RecarregaAi! 1.7.2 */
 
 :root {
   --color-page: #ffffff;
@@ -26,11 +26,16 @@
 }
 
 body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
   color: var(--color-text);
-  background: var(--color-page);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(45, 156, 255, 0.08), transparent 28rem),
+    radial-gradient(circle at 84% 42%, rgba(20, 121, 207, 0.06), transparent 24rem),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 58%, #ffffff 100%);
 }
 
 body.has-open-dialog {
@@ -50,9 +55,12 @@ textarea {
   justify-content: space-between;
   gap: 18px;
   min-height: 80px;
-  padding: 14px clamp(22px, 5vw, 58px);
+  padding:
+    14px
+    max(22px, calc((100vw - 1440px) / 2 + 36px));
   background: #ffffff;
   border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
 }
 
 .brand {
@@ -128,9 +136,10 @@ textarea {
 }
 
 .uninstall {
+  align-self: center;
   width: min(980px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 48px 0;
+  padding: clamp(42px, 6vh, 72px) 0;
 }
 
 .intro {
@@ -179,7 +188,7 @@ textarea {
 
 .reason-list {
   display: grid;
-  gap: 18px;
+  gap: 10px;
   padding: 0;
   margin: 0;
   border: 0;
@@ -189,12 +198,33 @@ textarea {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
+  padding: 12px 14px;
   color: #020617;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   line-height: 1.45;
+  background: #ffffff;
+  border: 1px solid #e8eef7;
+  border-radius: 10px;
   cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.reason-option:hover {
+  background: #f8fbff;
+  border-color: #d7e5f5;
+  transform: translateY(-1px);
+}
+
+.reason-option:has(input:checked) {
+  background: var(--color-primary-soft);
+  border-color: rgba(45, 156, 255, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(45, 156, 255, 0.08);
 }
 
 .reason-option input {
@@ -578,33 +608,39 @@ textarea {
 @media (min-width: 1120px) {
   .uninstall {
     display: grid;
-    grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1fr);
-    gap: clamp(46px, 5vw, 80px);
-    align-items: start;
-    width: min(1180px, calc(100% - 80px));
-    padding-block: 64px;
+    grid-template-columns: minmax(360px, 0.84fr) minmax(540px, 1fr);
+    gap: clamp(56px, 5.4vw, 94px);
+    align-items: center;
+    width: min(1220px, calc(100% - 88px));
+    padding-block: clamp(56px, 7vh, 88px);
   }
 
   .intro {
-    position: sticky;
-    top: 104px;
+    position: static;
+    justify-self: center;
+    width: min(560px, 100%);
     margin-bottom: 0;
   }
 
   .intro__title {
-    max-width: 520px;
+    max-width: 100%;
   }
 
   .intro p {
-    max-width: 500px;
+    max-width: 100%;
   }
 
   .feedback-form {
-    padding: 28px;
-    background: #ffffff;
+    justify-self: stretch;
+    max-width: 680px;
+    padding: clamp(28px, 3vw, 36px);
+    background: rgba(255, 255, 255, 0.92);
     border: 1px solid var(--color-border);
-    border-radius: 12px;
-    box-shadow: 0 20px 46px rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    box-shadow:
+      0 22px 54px rgba(15, 23, 42, 0.09),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    backdrop-filter: blur(10px);
   }
 
   .details {
@@ -614,7 +650,11 @@ textarea {
 
 @media (min-width: 1540px) {
   .uninstall {
-    width: min(1280px, calc(100% - 112px));
+    width: min(1320px, calc(100% - 128px));
+  }
+
+  .feedback-form {
+    max-width: 700px;
   }
 }
 

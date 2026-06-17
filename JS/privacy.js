@@ -1,4 +1,4 @@
-// RecarregaAi! 1.6.8
+// RecarregaAi! 1.7.2
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
@@ -20,10 +20,10 @@ const privacyTranslations = {
     contactChannelsLabel: "Canais de contato",
     documentTitle: "Política de Privacidade do RecarregaAi!",
     footerFeedback: "Feedback",
+    footerDeveloper: "Desenvolvido por: a definir",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 1.6.8. Política atualizada em 16/06/2026.",
-    footerPrivacy: "Política de privacidade",
-    footerProject: "Projeto",
+    footerLegal: "© RecarregaAi! 1.7.2. Política atualizada em 16/06/2026.",
+    footerPrivacy: "Privacidade",
     headerContact: "Contato",
     headerNavLabel: "Navegação da política",
     headerPermissions: "Permissões",
@@ -147,10 +147,10 @@ const privacyTranslations = {
     contactChannelsLabel: "Contact channels",
     documentTitle: "RecarregaAi! Privacy Policy",
     footerFeedback: "Feedback",
+    footerDeveloper: "Developed by: to be defined",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 1.6.8. Policy updated on 06/16/2026.",
-    footerPrivacy: "Privacy policy",
-    footerProject: "Project",
+    footerLegal: "© RecarregaAi! 1.7.2. Policy updated on 06/16/2026.",
+    footerPrivacy: "Privacy",
     headerContact: "Contact",
     headerNavLabel: "Policy navigation",
     headerPermissions: "Permissions",
@@ -273,10 +273,10 @@ const privacyTranslations = {
     contactChannelsLabel: "Canales de contacto",
     documentTitle: "Política de Privacidad de RecarregaAi!",
     footerFeedback: "Feedback",
+    footerDeveloper: "Desarrollado por: por definir",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.6.8. Política actualizada el 16/06/2026.",
-    footerPrivacy: "Política de privacidad",
-    footerProject: "Proyecto",
+    footerLegal: "© RecarregaAi! 1.7.2. Política actualizada el 16/06/2026.",
+    footerPrivacy: "Privacidad",
     headerContact: "Contacto",
     headerNavLabel: "Navegación de la política",
     headerPermissions: "Permisos",
@@ -590,12 +590,12 @@ const applyPrivacyLanguage = (language) => {
   ]);
 
   setTexts(".privacy-footer__nav a", [
-    "footerPrivacy",
-    "footerFeedback",
     "footerHome",
-    "footerProject"
+    "footerPrivacy",
+    "footerFeedback"
   ]);
   setText(".privacy-footer__legal", "footerLegal");
+  setText(".privacy-footer__developer", "footerDeveloper");
   setText("#open-language-button .floating-action__label", "languageLabel");
   setText("#back-to-top-button .floating-action__label", "backToTop");
   setText("#language-dialog-title", "languageDialogTitle");

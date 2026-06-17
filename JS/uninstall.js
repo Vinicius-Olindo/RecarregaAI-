@@ -1,11 +1,11 @@
-// RecarregaAi! 1.6.8
+// RecarregaAi! 1.7.2
 
 import { appConfig } from "./modules/config.js";
 import { initFloatingTools } from "./modules/floating-tools.js";
 
 const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
 const feedbackFallbackUrl = appConfig.feedbackFallbackUrl;
-const defaultVersionLabel = "1.6.8";
+const defaultVersionLabel = "1.7.2";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Não informou motivo";
 const languageStorageKey = "recarregaAiPageLanguage";
@@ -19,11 +19,11 @@ const translations = {
     commentPlaceholder: "Conte em poucas palavras o que poderíamos melhorar.",
     documentTitle: "Feedback do RecarregaAi!",
     emailLabel: "E-mail para contato",
+    footerDeveloper: "Desenvolvido por: a definir",
     footerFeedback: "Feedback",
-    footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos os direitos reservados.",
+    footerHome: "Início",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
-    footerProject: "Projeto",
     formSubmitError:
       "Não consegui confirmar o envio agora. Tente novamente em alguns instantes.",
     formSubmitFallbackSuccess:
@@ -47,7 +47,7 @@ const translations = {
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "1.6.8"
+    versionLabel: "1.7.2"
   },
   en: {
     backToTop: "Back to start",
@@ -56,11 +56,11 @@ const translations = {
     commentPlaceholder: "Tell us briefly what we could improve.",
     documentTitle: "RecarregaAi! Feedback",
     emailLabel: "Contact email",
+    footerDeveloper: "Developed by: to be defined",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 1.6.8. All rights reserved.",
+    footerLegal: "© RecarregaAi! 1.7.2. All rights reserved.",
     footerPrivacy: "Privacy",
-    footerProject: "Project",
     formSubmitError:
       "I could not confirm the send right now. Try again in a few moments.",
     formSubmitFallbackSuccess:
@@ -83,7 +83,7 @@ const translations = {
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "1.6.8"
+    versionLabel: "1.7.2"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -92,11 +92,11 @@ const translations = {
     commentPlaceholder: "Cuéntanos brevemente qué podríamos mejorar.",
     documentTitle: "Feedback de RecarregaAi!",
     emailLabel: "Email de contacto",
+    footerDeveloper: "Desarrollado por: por definir",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.6.8. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 1.7.2. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
-    footerProject: "Proyecto",
     formSubmitError:
       "No pude confirmar el envío ahora. Inténtalo de nuevo en unos momentos.",
     formSubmitFallbackSuccess:
@@ -119,7 +119,7 @@ const translations = {
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "1.6.8"
+    versionLabel: "1.7.2"
   }
 };
 

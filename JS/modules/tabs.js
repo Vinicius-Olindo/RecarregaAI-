@@ -1,4 +1,4 @@
-// RecarregaAi! 1.6.8
+// RecarregaAi! 1.7.2
 
 import {
   collectFrameOrigins,
