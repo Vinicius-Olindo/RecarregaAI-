@@ -1,4 +1,4 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.3
 
 export const oneSecondInMilliseconds = 1000;
 
@@ -21,6 +21,7 @@ export const runtimeMessageTypes = Object.freeze({
   openTimerTab: "RECARREGA_AI_OPEN_TIMER_TAB",
   pauseTimer: "RECARREGA_AI_PAUSE_TIMER",
   resumeTimer: "RECARREGA_AI_RESUME_TIMER",
+  mediaState: "RECARREGA_AI_MEDIA_STATE",
   startTimer: "RECARREGA_AI_START_TIMER",
   stopTimer: "RECARREGA_AI_STOP_TIMER",
   typingState: "RECARREGA_AI_TYPING_STATE"
@@ -28,6 +29,7 @@ export const runtimeMessageTypes = Object.freeze({
 
 export const pauseReasons = Object.freeze({
   manual: "manual",
+  media: "media",
   navigation: "navigation",
   typing: "typing"
 });

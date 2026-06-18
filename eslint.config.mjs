@@ -1,4 +1,4 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.1
 
 const browserGlobals = {
   chrome: "readonly",
@@ -11,6 +11,7 @@ const browserGlobals = {
   FormData: "readonly",
   HTMLElement: "readonly",
   navigator: "readonly",
+  MutationObserver: "readonly",
   performance: "readonly",
   localStorage: "readonly",
   setInterval: "readonly",

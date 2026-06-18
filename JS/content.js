@@ -1,9 +1,26 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.3
 
 (() => {
-  const watcherFlag = "__recarregaAiTypingWatcherLoaded";
-  const messageType = "RECARREGA_AI_TYPING_STATE";
+  const watcherFlag = "__recarregaAiPageSafetyWatcherLoaded";
+  const watcherVersion = 1;
+  const mediaMessageType = "RECARREGA_AI_MEDIA_STATE";
+  const pageMediaGuardMessageType = "RECARREGA_AI_PAGE_MEDIA_STATE";
+  const pageMediaGuardSource = "RECARREGA_AI_PAGE_MEDIA_GUARD";
+  const typingMessageType = "RECARREGA_AI_TYPING_STATE";
   const blurCheckDelay = 120;
+  const mediaSyncDelay = 120;
+  const mediaEvents = [
+    "abort",
+    "emptied",
+    "ended",
+    "loadeddata",
+    "pause",
+    "play",
+    "playing",
+    "stalled",
+    "suspend",
+    "waiting"
+  ];
   const editableInputTypes = new Set([
     "email",
     "number",
@@ -13,7 +30,7 @@
     "url"
   ]);
 
-  if (window[watcherFlag]) {
+  if (window[watcherFlag] === watcherVersion) {
     return;
   }
 
@@ -21,9 +38,13 @@
     return;
   }
 
-  window[watcherFlag] = true;
+  window[watcherFlag] = watcherVersion;
 
   let isTyping = false;
+  let isMediaActive = false;
+  let isPageMediaActive = false;
+  let mediaSyncTimerId = null;
+  const observedMediaElements = new WeakSet();
 
   const isEditableElement = (element) => {
     if (!(element instanceof HTMLElement)) {
@@ -57,6 +78,17 @@
     return isEditableElement(editableTarget) ? editableTarget : null;
   };
 
+  const sendRuntimeMessage = (type, payload) => {
+    chrome.runtime.sendMessage({
+      payload,
+      type
+    }, () => {
+      if (chrome.runtime.lastError) {
+        return;
+      }
+    });
+  };
+
   const sendTypingState = (nextIsTyping, { force = false } = {}) => {
     if (!force && isTyping === nextIsTyping) {
       return;
@@ -64,15 +96,8 @@
 
     isTyping = nextIsTyping;
 
-    chrome.runtime.sendMessage({
-      payload: {
-        isTyping: nextIsTyping
-      },
-      type: messageType
-    }, () => {
-      if (chrome.runtime.lastError) {
-        return;
-      }
+    sendRuntimeMessage(typingMessageType, {
+      isTyping: nextIsTyping
     });
   };
 
@@ -96,13 +121,115 @@
     }, blurCheckDelay);
   };
 
+  const getLiveStreamTracks = (element) => {
+    const stream = element.srcObject;
+
+    if (!stream || typeof stream.getTracks !== "function") {
+      return [];
+    }
+
+    return stream.getTracks().filter((track) => track.readyState === "live");
+  };
+
+  const hasActiveMediaElement = () => (
+    Array.from(document.querySelectorAll("audio, video")).some((element) => (
+      getLiveStreamTracks(element).length > 0
+        || (!element.paused && !element.ended && element.readyState > 0)
+    ))
+  );
+
+  const getCurrentMediaState = () => (
+    isPageMediaActive || hasActiveMediaElement()
+  );
+
+  const sendMediaState = (nextIsMediaActive, { force = false } = {}) => {
+    if (!force && isMediaActive === nextIsMediaActive) {
+      return;
+    }
+
+    isMediaActive = nextIsMediaActive;
+
+    sendRuntimeMessage(mediaMessageType, {
+      isMediaActive: nextIsMediaActive
+    });
+  };
+
+  const syncMediaState = ({ force = false } = {}) => {
+    sendMediaState(getCurrentMediaState(), {
+      force
+    });
+  };
+
+  const scheduleMediaSync = () => {
+    if (mediaSyncTimerId) {
+      window.clearTimeout(mediaSyncTimerId);
+    }
+
+    mediaSyncTimerId = window.setTimeout(() => {
+      mediaSyncTimerId = null;
+      syncMediaState();
+    }, mediaSyncDelay);
+  };
+
+  const observeMediaElement = (element) => {
+    if (observedMediaElements.has(element)) {
+      return;
+    }
+
+    observedMediaElements.add(element);
+
+    mediaEvents.forEach((eventName) => {
+      element.addEventListener(eventName, scheduleMediaSync, true);
+    });
+  };
+
+  const observeMediaElements = () => {
+    document.querySelectorAll("audio, video").forEach(observeMediaElement);
+  };
+
+  const handlePageMediaGuardMessage = (event) => {
+    if (
+      event.source !== window
+      || event.data?.source !== pageMediaGuardSource
+      || event.data?.type !== pageMediaGuardMessageType
+    ) {
+      return;
+    }
+
+    isPageMediaActive = Boolean(event.data.payload?.isMediaActive);
+    syncMediaState();
+  };
+
+  const startMediaObserver = () => {
+    if (typeof MutationObserver === "undefined") {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      observeMediaElements();
+      scheduleMediaSync();
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  };
+
   document.addEventListener("focusin", handleEditableActivity, true);
   document.addEventListener("keydown", handleEditableActivity, true);
   document.addEventListener("input", handleEditableActivity, true);
   document.addEventListener("compositionstart", handleEditableActivity, true);
   document.addEventListener("focusout", handleFocusOut, true);
+  document.addEventListener("visibilitychange", scheduleMediaSync, true);
+  window.addEventListener("message", handlePageMediaGuardMessage);
 
+  observeMediaElements();
+  startMediaObserver();
   syncCurrentFocus({
+    force: true
+  });
+  syncMediaState({
     force: true
   });
 })();

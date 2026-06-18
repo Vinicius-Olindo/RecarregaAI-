@@ -1,4 +1,4 @@
-/* RecarregaAi! 1.7.6 */
+/* RecarregaAi! 1.8.3 */
 
 :root {
   --color-background: #eef4fb;
@@ -367,6 +367,11 @@ input {
   box-shadow: 0 0 0 3px rgba(255, 173, 77, 0.08);
 }
 
+.timer-overview[data-state="media"] {
+  border-color: rgba(45, 156, 255, 0.54);
+  box-shadow: 0 0 0 3px rgba(45, 156, 255, 0.08);
+}
+
 .timer-overview__main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -420,6 +425,11 @@ input {
 .timer-overview[data-state="typing"] .timer-overview__countdown {
   color: var(--color-warning);
   background: rgba(255, 173, 77, 0.13);
+}
+
+.timer-overview[data-state="media"] .timer-overview__countdown {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
 }
 
 .timer-overview[data-state="paused"] .timer-overview__countdown,
@@ -492,6 +502,10 @@ input {
   border-color: rgba(255, 173, 77, 0.55);
 }
 
+.active-timers__item[data-state="media"] {
+  border-color: rgba(45, 156, 255, 0.46);
+}
+
 .active-timers__item[data-state="paused"] {
   border-color: var(--color-border-strong);
 }
@@ -541,6 +555,11 @@ input {
 .active-timers__item[data-state="typing"] .active-timers__countdown {
   color: var(--color-warning);
   background: rgba(255, 173, 77, 0.13);
+}
+
+.active-timers__item[data-state="media"] .active-timers__countdown {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
 }
 
 .active-timers__item[data-state="paused"] .active-timers__countdown {

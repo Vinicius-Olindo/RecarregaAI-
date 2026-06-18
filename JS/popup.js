@@ -1,4 +1,4 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.3
 
 import {
   formatCountdownTime,
@@ -226,6 +226,7 @@ const getTimerVisualState = (timerSettings) => {
   }
 
   const isPaused = Boolean(timerSettings.paused);
+  const isPausedByMedia = timerSettings.pauseReason === pauseReasons.media;
   const isPausedByTyping = timerSettings.pauseReason === pauseReasons.typing;
   const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
   const isWarning = !isPaused && remainingSeconds <= 10;
@@ -237,8 +238,18 @@ const getTimerVisualState = (timerSettings) => {
   }
 
   if (isPaused) {
-    state = isPausedByTyping ? "typing" : "paused";
-    countdownText = isPausedByTyping ? "Digitando" : "Pausado";
+    state = "paused";
+    countdownText = "Pausado";
+
+    if (isPausedByTyping) {
+      state = "typing";
+      countdownText = "Digitando";
+    }
+
+    if (isPausedByMedia) {
+      state = "media";
+      countdownText = "Mídia";
+    }
   }
 
   return {
@@ -375,6 +386,14 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
     if (timerSettings.pauseReason === pauseReasons.typing) {
       updateStatusMessage(
         "Você está digitando. A atualização pausou para proteger seu trabalho.",
+        "warning"
+      );
+      return timerSettings;
+    }
+
+    if (timerSettings.pauseReason === pauseReasons.media) {
+      updateStatusMessage(
+        "Áudio, vídeo ou gravação em uso. A atualização pausou para evitar perda.",
         "warning"
       );
       return timerSettings;

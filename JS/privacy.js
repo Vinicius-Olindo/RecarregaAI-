@@ -1,4 +1,4 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.3
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
@@ -30,7 +30,7 @@ const privacyTranslations = {
     footerFeedback: "Feedback",
     footerDeveloper: "Desenvolvido por:",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 1.7.6. Política atualizada em 16/06/2026.",
+    footerLegal: "© RecarregaAi! 1.8.3. Política atualizada em 16/06/2026.",
     footerPrivacy: "Privacidade",
     headerContact: "Contato",
     headerNavLabel: "Navegação da política",
@@ -106,7 +106,7 @@ const privacyTranslations = {
     sectionNotCollectedBody1:
       "A extensão não coleta senhas, textos digitados, mensagens, arquivos, dados bancários, dados de formulários ou conteúdo das páginas acessadas.",
     sectionNotCollectedBody2:
-      "A extensão pode detectar localmente quando o usuário está interagindo com campos editáveis para evitar recarregamentos durante a digitação. Essa detecção não lê, armazena ou envia o conteúdo digitado.",
+      "A extensão pode detectar localmente quando o usuário está interagindo com campos editáveis ou usando áudio, vídeo e gravação para evitar recarregamentos em momentos sensíveis. Essa detecção não lê, armazena ou envia conteúdo digitado, áudio ou vídeo.",
     sectionNotCollectedTitle: "2. Informações que a extensão não coleta",
     sectionPermissionsBody:
       "A extensão pode solicitar permissões necessárias para seu funcionamento.",
@@ -117,10 +117,10 @@ const privacyTranslations = {
       "O único envio externo previsto ocorre quando o usuário envia voluntariamente o formulário de feedback de desinstalação, processado pelo FormSubmit.",
     sectionSharingTitle: "6. Compartilhamento de dados",
     sectionTypingBody1:
-      "Quando um timer está ativo, o RecarregaAi! verifica localmente se há foco em campos como <code>input</code>, <code>textarea</code> ou áreas editáveis da página. Se houver digitação, o timer daquela guia pode ser pausado temporariamente para evitar perda de informações.",
+      "Quando um timer está ativo, o RecarregaAi! verifica localmente se há foco em campos como <code>input</code>, <code>textarea</code> ou áreas editáveis da página. Ele também pode identificar se há áudio, vídeo, gravação ou contexto de áudio em uso. Se houver atividade sensível, o timer daquela guia pode ser pausado temporariamente para evitar perda de informações.",
     sectionTypingBody2:
-      "Essa verificação identifica apenas o estado de interação com campos editáveis. Ela não acessa o texto digitado, não cria histórico de digitação e não envia esse estado para servidores externos.",
-    sectionTypingTitle: "3. Proteção de digitação",
+      "Essa verificação identifica apenas o estado de interação com campos editáveis ou mídia ativa. Ela não acessa o texto digitado, não grava áudio, não captura vídeo, não cria histórico de uso e não envia esse estado para servidores externos.",
+    sectionTypingTitle: "3. Proteção de digitação e mídia",
     permissionActiveTab:
       "Usada para executar ações na aba atual quando o usuário interage com a extensão.",
     permissionAlarms: "Usada para controlar timers automáticos.",
@@ -159,7 +159,7 @@ const privacyTranslations = {
     footerFeedback: "Feedback",
     footerDeveloper: "Developed by:",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 1.7.6. Policy updated on 06/16/2026.",
+    footerLegal: "© RecarregaAi! 1.8.3. Policy updated on 06/16/2026.",
     footerPrivacy: "Privacy",
     headerContact: "Contact",
     headerNavLabel: "Policy navigation",
@@ -235,7 +235,7 @@ const privacyTranslations = {
     sectionNotCollectedBody1:
       "The extension does not collect passwords, typed text, messages, files, banking data, form data or page content.",
     sectionNotCollectedBody2:
-      "The extension may locally detect when the user is interacting with editable fields to avoid reloads while typing. This detection does not read, store or send typed content.",
+      "The extension may locally detect when the user is interacting with editable fields or using audio, video and recording to avoid reloads during sensitive moments. This detection does not read, store or send typed content, audio or video.",
     sectionNotCollectedTitle: "2. Information the extension does not collect",
     sectionPermissionsBody:
       "The extension may request permissions required for its operation.",
@@ -246,10 +246,10 @@ const privacyTranslations = {
       "The only expected external submission happens when the user voluntarily sends the uninstall feedback form, processed by FormSubmit.",
     sectionSharingTitle: "6. Data sharing",
     sectionTypingBody1:
-      "When a timer is active, RecarregaAi! locally checks whether fields such as <code>input</code>, <code>textarea</code> or editable page areas have focus. If typing is detected, that tab's timer may be paused temporarily to avoid information loss.",
+      "When a timer is active, RecarregaAi! locally checks whether fields such as <code>input</code>, <code>textarea</code> or editable page areas have focus. It may also identify whether audio, video, recording or an audio context is in use. If sensitive activity is detected, that tab's timer may be paused temporarily to avoid information loss.",
     sectionTypingBody2:
-      "This check identifies only the interaction state with editable fields. It does not access typed text, create typing history or send this state to external servers.",
-    sectionTypingTitle: "3. Typing protection",
+      "This check identifies only the interaction state with editable fields or active media. It does not access typed text, record audio, capture video, create usage history or send this state to external servers.",
+    sectionTypingTitle: "3. Typing and media protection",
     permissionActiveTab:
       "Used to run actions on the current tab when the user interacts with the extension.",
     permissionAlarms: "Used to control automatic timers.",
@@ -287,7 +287,7 @@ const privacyTranslations = {
     footerFeedback: "Feedback",
     footerDeveloper: "Desarrollado por:",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 1.7.6. Política actualizada el 16/06/2026.",
+    footerLegal: "© RecarregaAi! 1.8.3. Política actualizada el 16/06/2026.",
     footerPrivacy: "Privacidad",
     headerContact: "Contacto",
     headerNavLabel: "Navegación de la política",
@@ -363,7 +363,7 @@ const privacyTranslations = {
     sectionNotCollectedBody1:
       "La extensión no recopila contraseñas, textos escritos, mensajes, archivos, datos bancarios, datos de formularios ni contenido de las páginas visitadas.",
     sectionNotCollectedBody2:
-      "La extensión puede detectar localmente cuando el usuario interactúa con campos editables para evitar recargas durante la escritura. Esta detección no lee, almacena ni envía el contenido escrito.",
+      "La extensión puede detectar localmente cuando el usuario interactúa con campos editables o usa audio, video y grabación para evitar recargas en momentos sensibles. Esta detección no lee, almacena ni envía contenido escrito, audio o video.",
     sectionNotCollectedTitle: "2. Información que la extensión no recopila",
     sectionPermissionsBody:
       "La extensión puede solicitar permisos necesarios para su funcionamiento.",
@@ -374,10 +374,10 @@ const privacyTranslations = {
       "El único envío externo previsto ocurre cuando el usuario envía voluntariamente el formulario de feedback de desinstalación, procesado por FormSubmit.",
     sectionSharingTitle: "6. Compartir datos",
     sectionTypingBody1:
-      "Cuando un timer está activo, RecarregaAi! verifica localmente si hay foco en campos como <code>input</code>, <code>textarea</code> o áreas editables de la página. Si hay escritura, el timer de esa pestaña puede pausarse temporalmente para evitar pérdida de información.",
+      "Cuando un timer está activo, RecarregaAi! verifica localmente si hay foco en campos como <code>input</code>, <code>textarea</code> o áreas editables de la página. También puede identificar si hay audio, video, grabación o contexto de audio en uso. Si hay actividad sensible, el timer de esa pestaña puede pausarse temporalmente para evitar pérdida de información.",
     sectionTypingBody2:
-      "Esta verificación identifica solo el estado de interacción con campos editables. No accede al texto escrito, no crea historial de escritura y no envía ese estado a servidores externos.",
-    sectionTypingTitle: "3. Protección de escritura",
+      "Esta verificación identifica solo el estado de interacción con campos editables o medios activos. No accede al texto escrito, no graba audio, no captura video, no crea historial de uso y no envía ese estado a servidores externos.",
+    sectionTypingTitle: "3. Protección de escritura y medios",
     permissionActiveTab:
       "Usada para ejecutar acciones en la pestaña actual cuando el usuario interactúa con la extensión.",
     permissionAlarms: "Usada para controlar timers automáticos.",

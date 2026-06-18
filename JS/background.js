@@ -1,4 +1,4 @@
-// RecarregaAi! 1.7.6
+// RecarregaAi! 1.8.3
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -41,6 +41,10 @@ import { collectLoadedOrigins } from "./modules/tabs.js";
 
 let badgeCountdownTimerId = null;
 const scheduledRefreshTabIds = new Set();
+const automaticPauseReasons = new Set([
+  pauseReasons.media,
+  pauseReasons.typing
+]);
 
 const configureUninstallFeedbackPage = async () => {
   try {
@@ -103,6 +107,50 @@ const isTabEditingText = async (tabId) => {
   }
 };
 
+const hasActiveMediaInFrame = () => {
+  const hasLiveStreamTrack = (element) => {
+    const stream = element.srcObject;
+
+    return Boolean(
+      stream
+        && typeof stream.getTracks === "function"
+        && stream.getTracks().some((track) => track.readyState === "live")
+    );
+  };
+
+  return Array.from(document.querySelectorAll("audio, video")).some((element) => (
+    hasLiveStreamTrack(element)
+      || (!element.paused && !element.ended && element.readyState > 0)
+  ));
+};
+
+const isTabUsingMedia = async (tabId) => {
+  if (typeof tabId !== "number") {
+    return false;
+  }
+
+  try {
+    const tab = await chrome.tabs.get(tabId);
+
+    if (tab?.audible) {
+      return true;
+    }
+
+    const frameResults = await chrome.scripting.executeScript({
+      target: {
+        tabId,
+        allFrames: true
+      },
+      func: hasActiveMediaInFrame
+    });
+
+    return frameResults.some((frameResult) => Boolean(frameResult.result));
+  } catch (error) {
+    console.warn("Nao foi possivel verificar midia ativa na guia:", error);
+    return false;
+  }
+};
+
 const injectTypingProtection = async (tabId) => {
   if (typeof tabId !== "number") {
     return;
@@ -117,7 +165,20 @@ const injectTypingProtection = async (tabId) => {
       files: ["JS/content.js"]
     });
   } catch (error) {
-    console.warn("Nao foi possivel ativar protecao de digitacao:", error);
+    console.warn("Nao foi possivel ativar protecoes da pagina:", error);
+  }
+
+  try {
+    await chrome.scripting.executeScript({
+      target: {
+        tabId,
+        allFrames: true
+      },
+      files: ["JS/page-media-guard.js"],
+      world: "MAIN"
+    });
+  } catch (error) {
+    console.warn("Nao foi possivel ativar protecao de midia:", error);
   }
 };
 
@@ -179,6 +240,7 @@ const updateTimerBadge = async (timerSettings) => {
 
   const badgeTarget = getBadgeTarget(timerSettings);
   const isPaused = Boolean(timerSettings.paused);
+  const isPausedByMedia = timerSettings.pauseReason === pauseReasons.media;
   const isPausedByTyping = timerSettings.pauseReason === pauseReasons.typing;
   const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
   let badgeColor = getBadgeColor(timerSettings.nextRunAt);
@@ -186,9 +248,21 @@ const updateTimerBadge = async (timerSettings) => {
   let countdownTime = formatCountdownTime(remainingSeconds);
 
   if (isPaused) {
-    badgeColor = isPausedByTyping ? "#ef7a1f" : "#667085";
-    badgeText = isPausedByTyping ? "DIG" : "II";
-    countdownTime = isPausedByTyping ? "digitando" : "pausado";
+    badgeColor = "#667085";
+    badgeText = "II";
+    countdownTime = "pausado";
+
+    if (isPausedByTyping) {
+      badgeColor = "#ef7a1f";
+      badgeText = "DIG";
+      countdownTime = "digitando";
+    }
+
+    if (isPausedByMedia) {
+      badgeColor = "#1f7aef";
+      badgeText = "AUD";
+      countdownTime = "midia ativa";
+    }
   }
 
   try {
@@ -373,13 +447,31 @@ const pauseTimer = async (tabId) => {
   return pausedTimerSettings;
 };
 
-const pauseTimerForTyping = async (timerSettings) => {
+const pauseTimerForAutomaticReason = async (timerSettings, pauseReason) => {
   if (!timerSettings?.enabled) {
     return timerSettings;
   }
 
   if (timerSettings.paused) {
+    if (
+      automaticPauseReasons.has(timerSettings.pauseReason)
+      && timerSettings.pauseReason !== pauseReason
+    ) {
+      const pausedTimerSettings = {
+        ...timerSettings,
+        pauseReason,
+        pausedAt: new Date().toISOString()
+      };
+
+      await upsertTimerSettings(pausedTimerSettings);
+      await clearTimerAlarm(timerSettings.tabId);
+      await updateTimerBadge(pausedTimerSettings);
+
+      return pausedTimerSettings;
+    }
+
     await updateTimerBadge(timerSettings);
+
     return timerSettings;
   }
 
@@ -387,7 +479,7 @@ const pauseTimerForTyping = async (timerSettings) => {
     ...timerSettings,
     paused: true,
     pausedAt: new Date().toISOString(),
-    pauseReason: pauseReasons.typing,
+    pauseReason,
     remainingSecondsWhenPaused: Math.max(
       1,
       getRemainingSeconds(timerSettings.nextRunAt)
@@ -400,6 +492,14 @@ const pauseTimerForTyping = async (timerSettings) => {
 
   return pausedTimerSettings;
 };
+
+const pauseTimerForTyping = async (timerSettings) => (
+  pauseTimerForAutomaticReason(timerSettings, pauseReasons.typing)
+);
+
+const pauseTimerForMedia = async (timerSettings) => (
+  pauseTimerForAutomaticReason(timerSettings, pauseReasons.media)
+);
 
 const pauseTimerForNavigation = async (timerSettings, tab) => {
   const pausedTimerSettings = {
@@ -691,6 +791,11 @@ const runScheduledRefresh = async (tabId) => {
       return;
     }
 
+    if (await isTabUsingMedia(timerSettings.tabId)) {
+      await pauseTimerForMedia(timerSettings);
+      return;
+    }
+
     try {
       const origins = await clearCacheAndReloadTab(timerSettings);
 
@@ -763,8 +868,26 @@ const resumeTimerAfterTyping = async (tabId) => {
     return getTimerSettingsByTabId(tabId);
   }
 
+  if (await isTabUsingMedia(tabId)) {
+    return pauseTimerForMedia(await getTimerSettingsByTabId(tabId));
+  }
+
   return resumeTimer(tabId, {
     expectedPauseReason: pauseReasons.typing
+  });
+};
+
+const resumeTimerAfterMedia = async (tabId) => {
+  if (await isTabUsingMedia(tabId)) {
+    return getTimerSettingsByTabId(tabId);
+  }
+
+  if (await isTabEditingText(tabId)) {
+    return pauseTimerForTyping(await getTimerSettingsByTabId(tabId));
+  }
+
+  return resumeTimer(tabId, {
+    expectedPauseReason: pauseReasons.media
   });
 };
 
@@ -785,6 +908,28 @@ const handleTypingState = async (payload, tabId) => {
 
   if (timerSettings.pauseReason === pauseReasons.typing) {
     return resumeTimerAfterTyping(tabId);
+  }
+
+  return timerSettings;
+};
+
+const handleMediaState = async (payload, tabId) => {
+  if (typeof tabId !== "number") {
+    return null;
+  }
+
+  const timerSettings = await getTimerSettingsByTabId(tabId);
+
+  if (!timerSettings?.enabled) {
+    return timerSettings;
+  }
+
+  if (payload?.isMediaActive) {
+    return pauseTimerForMedia(timerSettings);
+  }
+
+  if (timerSettings.pauseReason === pauseReasons.media) {
+    return resumeTimerAfterMedia(tabId);
   }
 
   return timerSettings;
@@ -830,6 +975,14 @@ const runtimeMessageHandlers = {
     return getTimerStateResponse(
       Number.isInteger(activeTabId) ? activeTabId : null
     );
+  },
+  [runtimeMessageTypes.mediaState]: async (message, sender) => {
+    const timerSettings = await handleMediaState(
+      message.payload,
+      sender.tab?.id
+    );
+
+    return createTimerSettingsResponse(timerSettings);
   },
   [runtimeMessageTypes.openTimerTab]: async (message, sender) => {
     const timerSettings = await openTimerTab(getMessageTabId(message, sender));
