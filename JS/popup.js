@@ -1,4 +1,4 @@
-// RecarregaAi! 2.0.0
+// RecarregaAi! 2.0.2
 
 import {
   formatCountdownTime,
@@ -9,14 +9,16 @@ import {
   runtimeMessageTypes
 } from "./modules/shared.js";
 import {
-  loadThemePreference,
-  toggleThemePreference
+  loadThemePreference
 } from "./modules/theme.js";
 import {
   clearCacheForOrigins,
   reloadTabIgnoringCache
 } from "./modules/cache.js";
+import { normalizeLanguage } from "./modules/language-dialog.js";
 import { collectLoadedOrigins } from "./modules/tabs.js";
+
+const popupLanguageStorageKey = "recarregaAiPageLanguage";
 
 const popupElements = {
   activeTimersCount: document.querySelector("#active-timers-count"),
@@ -37,18 +39,297 @@ const popupElements = {
   statusPanel: document.querySelector(".popup__status"),
   statusMessage: document.querySelector("#status-message"),
   stopTimerButton: document.querySelector("#stop-timer-button"),
-  themeToggleButton: document.querySelector("#theme-toggle-button"),
-  themeToggleLabel: document.querySelector("#theme-toggle-label"),
   timerOverview: document.querySelector("#timer-overview"),
   timerIntervalInputs: document.querySelectorAll("[name='timer-interval']")
 };
 
-const unsupportedPageMessage = "Esta página não permite esse tipo de limpeza.";
-const defaultReloadButtonText = "Limpar e atualizar";
-const defaultStartTimerButtonText = "Ligar atualização";
 const presetTimerIntervals = [3, 5, 10];
 
 let currentActiveTab = null;
+const activePopupLanguage = normalizeLanguage(
+  localStorage.getItem(popupLanguageStorageKey) || document.documentElement.lang
+);
+
+const popupTranslations = {
+  "pt-BR": {
+    activeCountPlural: "{count} páginas",
+    activeCountSingular: "1 página",
+    activePageOffStatus: "{count} atualizando. Esta página ainda está desligada.",
+    activeStatus: "Atualização ligada nesta página: a cada {interval}.",
+    activeTimerTitle: "Atualizações em andamento",
+    activatingTimer: "Ativando...",
+    autoLabel: "Automático",
+    chooseTime: "Escolha um tempo para começar.",
+    chooseTimeBelow: "Escolha um tempo abaixo para começar.",
+    cleaningPage: "Limpando dados antigos desta página...",
+    cleanupError: "Não consegui limpar esta página agora.",
+    cleanupSuccess: "Página limpa e atualizada.",
+    countdownBadge: "min:seg",
+    currentButton: "Atual",
+    currentPageLabel: "Página atual",
+    customIntervalOption: "Outro tempo",
+    customTimerLabel: "Outro tempo em minutos",
+    defaultStartButton: "Ligar atualização",
+    intervalLegend: "Escolha de quanto em quanto tempo a página será atualizada",
+    invalidInterval: "Informe pelo menos 1 minuto.",
+    loadingCleanup: "Limpando...",
+    manualHint: "Limpa dados antigos e atualiza esta página uma vez.",
+    manualLabel: "Manual",
+    mediaCountdown: "Mídia",
+    mediaPausedStatus:
+      "Áudio, vídeo ou gravação em uso. A atualização pausou para evitar perda.",
+    minutePlural: "{count} minutos",
+    minuteShort: "min",
+    minuteSingular: "1 minuto",
+    noActiveStatus: "Nenhuma página atualizando sozinha agora.",
+    openButton: "Abrir",
+    openControlledPage: "Abrir página",
+    openControlledPageError: "Não consegui abrir essa página.",
+    otherPagesLabel: "Outras páginas",
+    pageNotIdentified: "Página não identificada",
+    pausedCountdown: "Pausado",
+    pauseError: "Não consegui pausar agora.",
+    pausedStatus: "Atualização pausada.",
+    pauseTimer: "Pausar",
+    permissionNeeded: "Você precisa autorizar este site para ligar a atualização.",
+    prepareTimer: "Preparando atualização automática...",
+    readyStatus: "Pronto para limpar e atualizar a página aberta.",
+    recurringTitle: "Atualização recorrente",
+    refreshOffTitle: "Atualização desligada",
+    reloadOnceTitle: "Atualizar agora",
+    removeTimer: "Remover",
+    resumeError: "Não consegui retomar agora.",
+    resumeStatus: "Atualização retomada.",
+    resumeTimer: "Retomar",
+    settings: "Configurações",
+    startError: "Não consegui ligar a atualização automática agora.",
+    startedStatus: "Atualização ligada: a cada {interval}.",
+    statusLabel: "Status",
+    stopError: "Não consegui desligar agora.",
+    stopStatus: "Atualização automática desligada.",
+    stopTimer: "Desligar",
+    subtitle: "Atualize a página com dados novos.",
+    tabUnavailable: "Não consegui identificar a página aberta.",
+    timerNote:
+      "O contador no ícone pode variar um pouco quando este painel está fechado.",
+    timerTabFallback: "Página em atualização",
+    typingCountdown: "Digitando",
+    typingPausedStatus:
+      "Você está digitando. A atualização pausou para proteger seu trabalho.",
+    unsupportedPage: "Esta página não permite esse tipo de limpeza.",
+    updateNowButton: "Limpar e atualizar",
+    waitForPage: "Aguarde esta página aparecer no painel e tente de novo.",
+    workingCheck: "Verificando o que precisa ser limpo..."
+  },
+  en: {
+    activeCountPlural: "{count} pages",
+    activeCountSingular: "1 page",
+    activePageOffStatus: "{count} refreshing. This page is still off.",
+    activeStatus: "Refresh enabled on this page: every {interval}.",
+    activeTimerTitle: "Refreshes in progress",
+    activatingTimer: "Starting...",
+    autoLabel: "Automatic",
+    chooseTime: "Choose a time to start.",
+    chooseTimeBelow: "Choose a time below to start.",
+    cleaningPage: "Clearing old data from this page...",
+    cleanupError: "I could not clear this page right now.",
+    cleanupSuccess: "Page cleared and refreshed.",
+    countdownBadge: "min:sec",
+    currentButton: "Current",
+    currentPageLabel: "Current page",
+    customIntervalOption: "Custom time",
+    customTimerLabel: "Custom time in minutes",
+    defaultStartButton: "Start refresh",
+    intervalLegend: "Choose how often the page will be refreshed",
+    invalidInterval: "Enter at least 1 minute.",
+    loadingCleanup: "Clearing...",
+    manualHint: "Clears old data and refreshes this page once.",
+    manualLabel: "Manual",
+    mediaCountdown: "Media",
+    mediaPausedStatus:
+      "Audio, video or recording in use. Refresh paused to avoid loss.",
+    minutePlural: "{count} minutes",
+    minuteShort: "min",
+    minuteSingular: "1 minute",
+    noActiveStatus: "No page is refreshing automatically right now.",
+    openButton: "Open",
+    openControlledPage: "Open page",
+    openControlledPageError: "I could not open that page.",
+    otherPagesLabel: "Other pages",
+    pageNotIdentified: "Page not identified",
+    pausedCountdown: "Paused",
+    pauseError: "I could not pause right now.",
+    pausedStatus: "Refresh paused.",
+    pauseTimer: "Pause",
+    permissionNeeded: "You need to allow this site to start the refresh.",
+    prepareTimer: "Preparing automatic refresh...",
+    readyStatus: "Ready to clear and refresh the open page.",
+    recurringTitle: "Recurring refresh",
+    refreshOffTitle: "Refresh off",
+    reloadOnceTitle: "Refresh now",
+    removeTimer: "Remove",
+    resumeError: "I could not resume right now.",
+    resumeStatus: "Refresh resumed.",
+    resumeTimer: "Resume",
+    settings: "Settings",
+    startError: "I could not start automatic refresh right now.",
+    startedStatus: "Refresh started: every {interval}.",
+    statusLabel: "Status",
+    stopError: "I could not turn it off right now.",
+    stopStatus: "Automatic refresh turned off.",
+    stopTimer: "Turn off",
+    subtitle: "Refresh the page with fresh data.",
+    tabUnavailable: "I could not identify the open page.",
+    timerNote:
+      "The icon countdown may vary slightly while this panel is closed.",
+    timerTabFallback: "Page refreshing",
+    typingCountdown: "Typing",
+    typingPausedStatus:
+      "You are typing. Refresh paused to protect your work.",
+    unsupportedPage: "This page does not allow this type of cleanup.",
+    updateNowButton: "Clear and refresh",
+    waitForPage: "Wait for this page to appear in the panel and try again.",
+    workingCheck: "Checking what needs to be cleared..."
+  },
+  es: {
+    activeCountPlural: "{count} páginas",
+    activeCountSingular: "1 página",
+    activePageOffStatus: "{count} actualizándose. Esta página sigue apagada.",
+    activeStatus: "Actualización activa en esta página: cada {interval}.",
+    activeTimerTitle: "Actualizaciones en curso",
+    activatingTimer: "Activando...",
+    autoLabel: "Automático",
+    chooseTime: "Elige un tiempo para empezar.",
+    chooseTimeBelow: "Elige un tiempo abajo para empezar.",
+    cleaningPage: "Limpiando datos antiguos de esta página...",
+    cleanupError: "No pude limpiar esta página ahora.",
+    cleanupSuccess: "Página limpia y actualizada.",
+    countdownBadge: "min:seg",
+    currentButton: "Actual",
+    currentPageLabel: "Página actual",
+    customIntervalOption: "Otro tiempo",
+    customTimerLabel: "Otro tiempo en minutos",
+    defaultStartButton: "Activar actualización",
+    intervalLegend: "Elige cada cuánto tiempo se actualizará la página",
+    invalidInterval: "Ingresa al menos 1 minuto.",
+    loadingCleanup: "Limpiando...",
+    manualHint: "Limpia datos antiguos y actualiza esta página una vez.",
+    manualLabel: "Manual",
+    mediaCountdown: "Medios",
+    mediaPausedStatus:
+      "Audio, video o grabación en uso. La actualización se pausó para evitar pérdidas.",
+    minutePlural: "{count} minutos",
+    minuteShort: "min",
+    minuteSingular: "1 minuto",
+    noActiveStatus: "Ninguna página se está actualizando sola ahora.",
+    openButton: "Abrir",
+    openControlledPage: "Abrir página",
+    openControlledPageError: "No pude abrir esa página.",
+    otherPagesLabel: "Otras páginas",
+    pageNotIdentified: "Página no identificada",
+    pausedCountdown: "Pausado",
+    pauseError: "No pude pausar ahora.",
+    pausedStatus: "Actualización pausada.",
+    pauseTimer: "Pausar",
+    permissionNeeded: "Debes autorizar este sitio para activar la actualización.",
+    prepareTimer: "Preparando actualización automática...",
+    readyStatus: "Listo para limpiar y actualizar la página abierta.",
+    recurringTitle: "Actualización recurrente",
+    refreshOffTitle: "Actualización apagada",
+    reloadOnceTitle: "Actualizar ahora",
+    removeTimer: "Eliminar",
+    resumeError: "No pude retomar ahora.",
+    resumeStatus: "Actualización retomada.",
+    resumeTimer: "Retomar",
+    settings: "Configuración",
+    startError: "No pude activar la actualización automática ahora.",
+    startedStatus: "Actualización activa: cada {interval}.",
+    statusLabel: "Estado",
+    stopError: "No pude desactivar ahora.",
+    stopStatus: "Actualización automática desactivada.",
+    stopTimer: "Desactivar",
+    subtitle: "Actualiza la página con datos nuevos.",
+    tabUnavailable: "No pude identificar la página abierta.",
+    timerNote:
+      "El contador del ícono puede variar un poco cuando este panel está cerrado.",
+    timerTabFallback: "Página en actualización",
+    typingCountdown: "Escribiendo",
+    typingPausedStatus:
+      "Estás escribiendo. La actualización se pausó para proteger tu trabajo.",
+    unsupportedPage: "Esta página no permite este tipo de limpieza.",
+    updateNowButton: "Limpiar y actualizar",
+    waitForPage: "Espera a que esta página aparezca en el panel e inténtalo de nuevo.",
+    workingCheck: "Verificando qué se debe limpiar..."
+  }
+};
+
+const getPopupCopy = (key) => (
+  popupTranslations[activePopupLanguage]?.[key]
+  || popupTranslations["pt-BR"][key]
+  || key
+);
+
+const replacePopupTokens = (key, replacements) => (
+  Object.entries(replacements).reduce(
+    (text, [token, value]) => text.replace(`{${token}}`, value),
+    getPopupCopy(key)
+  )
+);
+
+const setPopupText = (selector, key) => {
+  const element = document.querySelector(selector);
+
+  if (element) {
+    element.textContent = getPopupCopy(key);
+  }
+};
+
+const setPopupTexts = (selector, keys) => {
+  document.querySelectorAll(selector).forEach((element, index) => {
+    const key = keys[index];
+
+    if (key) {
+      element.textContent = getPopupCopy(key);
+    }
+  });
+};
+
+const applyPopupLanguage = () => {
+  document.documentElement.lang = activePopupLanguage;
+
+  setPopupText(".popup__subtitle", "subtitle");
+  setPopupText(".popup__status .popup__label", "statusLabel");
+  setPopupText("#status-message", "readyStatus");
+  setPopupText(".timer-overview__copy .popup__label", "currentPageLabel");
+  setPopupText("#controlled-tab-title", "refreshOffTitle");
+  setPopupText("#controlled-tab-url", "chooseTimeBelow");
+  setPopupText(".timer-overview__note", "timerNote");
+  setPopupText("#open-controlled-tab-button", "openControlledPage");
+  setPopupText("#pause-timer-button", "pauseTimer");
+  setPopupText("#resume-timer-button", "resumeTimer");
+  setPopupText("#remove-timer-button", "removeTimer");
+  setPopupText("#quick-action-title", "manualLabel");
+  setPopupText(".quick-action__title", "reloadOnceTitle");
+  setPopupText(".quick-action .popup__hint", "manualHint");
+  setPopupText("#reload-page-button", "updateNowButton");
+  setPopupText(".popup__timer .popup__label", "autoLabel");
+  setPopupText("#timer-title", "recurringTitle");
+  setPopupText(".popup__timer .popup__badge", "countdownBadge");
+  setPopupText(".timer-options legend", "intervalLegend");
+  setPopupTexts(".timer-options__label", [
+    "minuteShort",
+    "minuteShort",
+    "minuteShort",
+    "customIntervalOption"
+  ]);
+  setPopupText(".custom-timer__label", "customTimerLabel");
+  setPopupText(".custom-timer__suffix", "minuteShort");
+  setPopupText("#start-timer-button", "defaultStartButton");
+  setPopupText("#stop-timer-button", "stopTimer");
+  setPopupText(".active-timers .popup__label", "otherPagesLabel");
+  setPopupText("#active-timers-title", "activeTimerTitle");
+  setPopupText("#open-options-button", "settings");
+};
 
 const updateStatusMessage = (message, status = "neutral") => {
   popupElements.statusMessage.textContent = message;
@@ -68,27 +349,8 @@ const loadExtensionVersion = () => {
     || `V.${manifest.version}`;
 };
 
-const updateThemeButtonLabel = ({ isDarkTheme }) => {
-  const nextThemeLabel = isDarkTheme
-    ? "Mudar para o tema claro"
-    : "Mudar para o tema escuro";
-
-  popupElements.themeToggleButton.setAttribute("aria-pressed", String(isDarkTheme));
-  popupElements.themeToggleButton.setAttribute("aria-label", nextThemeLabel);
-  popupElements.themeToggleButton.title = nextThemeLabel;
-  popupElements.themeToggleLabel.textContent = isDarkTheme ? "Claro" : "Escuro";
-};
-
 const loadTheme = async () => {
-  await loadThemePreference({
-    onChange: updateThemeButtonLabel
-  });
-};
-
-const toggleTheme = async () => {
-  await toggleThemePreference({
-    onChange: updateThemeButtonLabel
-  });
+  await loadThemePreference();
 };
 
 const sendRuntimeMessage = (message) => new Promise((resolve, reject) => {
@@ -129,45 +391,45 @@ const clearCacheAndReloadCurrentPage = async () => {
     updateButtonState(
       popupElements.reloadPageButton,
       true,
-      "Limpando...",
-      defaultReloadButtonText
+      getPopupCopy("loadingCleanup"),
+      getPopupCopy("updateNowButton")
     );
-    updateStatusMessage("Verificando o que precisa ser limpo...", "working");
+    updateStatusMessage(getPopupCopy("workingCheck"), "working");
 
     const activeTab = await getActiveTab();
 
     if (typeof activeTab?.id !== "number") {
-      updateStatusMessage("Não consegui identificar a página aberta.", "error");
+      updateStatusMessage(getPopupCopy("tabUnavailable"), "error");
       return;
     }
 
     const origin = getUrlOrigin(activeTab.url);
 
     if (!origin) {
-      updateStatusMessage(unsupportedPageMessage, "error");
+      updateStatusMessage(getPopupCopy("unsupportedPage"), "error");
       return;
     }
 
     const loadedOrigins = await collectLoadedOrigins(activeTab.id, [origin]);
 
     updateStatusMessage(
-      "Limpando dados antigos desta página...",
+      getPopupCopy("cleaningPage"),
       "working"
     );
 
     await clearCacheForOrigins(loadedOrigins);
     await reloadTabIgnoringCache(activeTab.id);
 
-    updateStatusMessage("Página limpa e atualizada.", "success");
+    updateStatusMessage(getPopupCopy("cleanupSuccess"), "success");
   } catch (error) {
     console.error("Erro ao limpar cache e recarregar:", error);
-    updateStatusMessage("Não consegui limpar esta página agora.", "error");
+    updateStatusMessage(getPopupCopy("cleanupError"), "error");
   } finally {
     updateButtonState(
       popupElements.reloadPageButton,
       false,
-      "Limpando...",
-      defaultReloadButtonText
+      getPopupCopy("loadingCleanup"),
+      getPopupCopy("updateNowButton")
     );
   }
 };
@@ -182,7 +444,7 @@ const getSelectedTimerInterval = () => {
   const customInterval = Number(popupElements.customTimerInput.value);
 
   if (!Number.isFinite(customInterval) || customInterval < 1) {
-    throw new Error("Informe pelo menos 1 minuto.");
+    throw new Error(getPopupCopy("invalidInterval"));
   }
 
   return Math.floor(customInterval);
@@ -190,10 +452,12 @@ const getSelectedTimerInterval = () => {
 
 const formatTimerInterval = (intervalInMinutes) => {
   if (intervalInMinutes === 1) {
-    return "1 minuto";
+    return getPopupCopy("minuteSingular");
   }
 
-  return `${intervalInMinutes} minutos`;
+  return replacePopupTokens("minutePlural", {
+    count: String(intervalInMinutes)
+  });
 };
 
 const getTimerState = async (activeTabId = null) => (
@@ -206,15 +470,17 @@ const getTimerState = async (activeTabId = null) => (
 );
 
 const getTimerTabLabel = (timerSettings) => (
-  timerSettings.tabTitle || timerSettings.mainOrigin || "Página em atualização"
+  timerSettings.tabTitle || timerSettings.mainOrigin || getPopupCopy("timerTabFallback")
 );
 
 const formatActiveTimerCount = (count) => {
   if (count === 1) {
-    return "1 página";
+    return getPopupCopy("activeCountSingular");
   }
 
-  return `${count} páginas`;
+  return replacePopupTokens("activeCountPlural", {
+    count: String(count)
+  });
 };
 
 const getTimerVisualState = (timerSettings) => {
@@ -239,16 +505,16 @@ const getTimerVisualState = (timerSettings) => {
 
   if (isPaused) {
     state = "paused";
-    countdownText = "Pausado";
+    countdownText = getPopupCopy("pausedCountdown");
 
     if (isPausedByTyping) {
       state = "typing";
-      countdownText = "Digitando";
+      countdownText = getPopupCopy("typingCountdown");
     }
 
     if (isPausedByMedia) {
       state = "media";
-      countdownText = "Mídia";
+      countdownText = getPopupCopy("mediaCountdown");
     }
   }
 
@@ -272,8 +538,8 @@ const updateTimerActionButtons = (timerSettings) => {
 const updateTimerOverview = (timerSettings) => {
   if (!timerSettings?.enabled) {
     popupElements.timerOverview.dataset.state = "empty";
-    popupElements.controlledTabTitle.textContent = "Atualização desligada";
-    popupElements.controlledTabUrl.textContent = "Escolha um tempo para começar.";
+    popupElements.controlledTabTitle.textContent = getPopupCopy("refreshOffTitle");
+    popupElements.controlledTabUrl.textContent = getPopupCopy("chooseTime");
     popupElements.popupCountdown.textContent = "--:--";
     updateTimerActionButtons(timerSettings);
     return;
@@ -285,7 +551,7 @@ const updateTimerOverview = (timerSettings) => {
   popupElements.controlledTabTitle.textContent = getTimerTabLabel(timerSettings);
   popupElements.controlledTabUrl.textContent = timerSettings.tabUrl
     || timerSettings.mainOrigin
-    || "Página não identificada";
+    || getPopupCopy("pageNotIdentified");
   popupElements.popupCountdown.textContent = timerVisualState.countdownText;
 
   updateTimerActionButtons(timerSettings);
@@ -315,9 +581,11 @@ const createActiveTimerItem = (timerSettings, activeTab) => {
   title.textContent = getTimerTabLabel(timerSettings);
   url.textContent = timerSettings.tabUrl
     || timerSettings.mainOrigin
-    || "Página não identificada";
+    || getPopupCopy("pageNotIdentified");
   countdown.textContent = timerVisualState.countdownText;
-  openButton.textContent = isCurrentTab ? "Atual" : "Abrir";
+  openButton.textContent = isCurrentTab
+    ? getPopupCopy("currentButton")
+    : getPopupCopy("openButton");
   openButton.disabled = isCurrentTab;
   openButton.dataset.openTimerTab = String(timerSettings.tabId);
 
@@ -369,14 +637,15 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
   if (!timerSettings?.enabled) {
     if (activeTimers.length > 0) {
       updateStatusMessage(
-        `${formatActiveTimerCount(activeTimers.length)} atualizando. `
-          + "Esta página ainda está desligada.",
+        replacePopupTokens("activePageOffStatus", {
+          count: formatActiveTimerCount(activeTimers.length)
+        }),
         "active"
       );
       return timerSettings;
     }
 
-    updateStatusMessage("Nenhuma página atualizando sozinha agora.", "neutral");
+    updateStatusMessage(getPopupCopy("noActiveStatus"), "neutral");
     return timerSettings;
   }
 
@@ -385,7 +654,7 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
   if (timerSettings.paused) {
     if (timerSettings.pauseReason === pauseReasons.typing) {
       updateStatusMessage(
-        "Você está digitando. A atualização pausou para proteger seu trabalho.",
+        getPopupCopy("typingPausedStatus"),
         "warning"
       );
       return timerSettings;
@@ -393,18 +662,20 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
 
     if (timerSettings.pauseReason === pauseReasons.media) {
       updateStatusMessage(
-        "Áudio, vídeo ou gravação em uso. A atualização pausou para evitar perda.",
+        getPopupCopy("mediaPausedStatus"),
         "warning"
       );
       return timerSettings;
     }
 
-    updateStatusMessage("Atualização pausada.", "warning");
+    updateStatusMessage(getPopupCopy("pausedStatus"), "warning");
     return timerSettings;
   }
 
   updateStatusMessage(
-    `Atualização ligada nesta página: a cada ${timerIntervalText}.`,
+    replacePopupTokens("activeStatus", {
+      interval: timerIntervalText
+    }),
     "active"
   );
 
@@ -455,16 +726,16 @@ const startTimer = async () => {
     updateButtonState(
       popupElements.startTimerButton,
       true,
-      "Ativando...",
-      defaultStartTimerButtonText
+      getPopupCopy("activatingTimer"),
+      getPopupCopy("defaultStartButton")
     );
-    updateStatusMessage("Preparando atualização automática...", "working");
+    updateStatusMessage(getPopupCopy("prepareTimer"), "working");
 
     const activeTab = currentActiveTab;
 
     if (typeof activeTab?.id !== "number") {
       updateStatusMessage(
-        "Aguarde esta página aparecer no painel e tente de novo.",
+        getPopupCopy("waitForPage"),
         "error"
       );
       return;
@@ -473,7 +744,7 @@ const startTimer = async () => {
     const origin = getUrlOrigin(activeTab.url);
 
     if (!origin) {
-      updateStatusMessage(unsupportedPageMessage, "error");
+      updateStatusMessage(getPopupCopy("unsupportedPage"), "error");
       return;
     }
 
@@ -481,7 +752,7 @@ const startTimer = async () => {
 
     if (!hasPermission) {
       updateStatusMessage(
-        "Você precisa autorizar este site para ligar a atualização.",
+        getPopupCopy("permissionNeeded"),
         "error"
       );
       return;
@@ -504,22 +775,24 @@ const startTimer = async () => {
     });
 
     updateStatusMessage(
-      `Atualização ligada: a cada ${formatTimerInterval(intervalInMinutes)}.`,
+      replacePopupTokens("startedStatus", {
+        interval: formatTimerInterval(intervalInMinutes)
+      }),
       "active"
     );
     await refreshTimerState();
   } catch (error) {
     console.error("Erro ao ativar timer:", error);
     updateStatusMessage(
-      error.message || "Não consegui ligar a atualização automática agora.",
+      error.message || getPopupCopy("startError"),
       "error"
     );
   } finally {
     updateButtonState(
       popupElements.startTimerButton,
       false,
-      "Ativando...",
-      defaultStartTimerButtonText
+      getPopupCopy("activatingTimer"),
+      getPopupCopy("defaultStartButton")
     );
   }
 };
@@ -528,7 +801,7 @@ const getActiveTabIdForTimerAction = async () => {
   const activeTab = await getActiveTab();
 
   if (typeof activeTab?.id !== "number") {
-    throw new Error("Não consegui identificar a página aberta.");
+    throw new Error(getPopupCopy("tabUnavailable"));
   }
 
   return activeTab.id;
@@ -546,10 +819,10 @@ const stopTimer = async () => {
     });
 
     await refreshTimerState();
-    updateStatusMessage("Atualização automática desligada.", "warning");
+    updateStatusMessage(getPopupCopy("stopStatus"), "warning");
   } catch (error) {
     console.error("Erro ao parar timer:", error);
-    updateStatusMessage("Não consegui desligar agora.", "error");
+    updateStatusMessage(getPopupCopy("stopError"), "error");
   }
 };
 
@@ -564,11 +837,11 @@ const pauseTimer = async () => {
       type: runtimeMessageTypes.pauseTimer
     });
 
-    updateStatusMessage("Atualização pausada.", "warning");
+    updateStatusMessage(getPopupCopy("pausedStatus"), "warning");
     await refreshTimerState();
   } catch (error) {
     console.error("Erro ao pausar timer:", error);
-    updateStatusMessage("Não consegui pausar agora.", "error");
+    updateStatusMessage(getPopupCopy("pauseError"), "error");
   }
 };
 
@@ -583,11 +856,11 @@ const resumeTimer = async () => {
       type: runtimeMessageTypes.resumeTimer
     });
 
-    updateStatusMessage("Atualização retomada.", "active");
+    updateStatusMessage(getPopupCopy("resumeStatus"), "active");
     await refreshTimerState();
   } catch (error) {
     console.error("Erro ao retomar timer:", error);
-    updateStatusMessage("Não consegui retomar agora.", "error");
+    updateStatusMessage(getPopupCopy("resumeError"), "error");
   }
 };
 
@@ -601,7 +874,7 @@ const openControlledTab = async (tabId) => {
     });
   } catch (error) {
     console.error("Erro ao abrir página controlada:", error);
-    updateStatusMessage("Não consegui abrir essa página.", "error");
+    updateStatusMessage(getPopupCopy("openControlledPageError"), "error");
   }
 };
 
@@ -627,16 +900,12 @@ popupElements.resumeTimerButton.addEventListener("click", resumeTimer);
 popupElements.startTimerButton.addEventListener("click", startTimer);
 popupElements.stopTimerButton.addEventListener("click", stopTimer);
 popupElements.activeTimersList.addEventListener("click", handleActiveTimersListClick);
-popupElements.themeToggleButton.addEventListener("click", () => {
-  toggleTheme().catch((error) => {
-    console.error("Erro ao alternar tema:", error);
-  });
-});
 
 popupElements.timerIntervalInputs.forEach((timerInput) => {
   timerInput.addEventListener("change", syncCustomTimerInputState);
 });
 
+applyPopupLanguage();
 syncCustomTimerInputState();
 loadExtensionVersion();
 loadTheme().catch((error) => {

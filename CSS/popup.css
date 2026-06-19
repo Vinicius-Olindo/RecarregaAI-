@@ -1,4 +1,4 @@
-/* RecarregaAi! 2.0.0 */
+/* RecarregaAi! 2.0.2 */
 
 :root {
   --color-background: #eef4fb;
@@ -173,78 +173,6 @@ input {
   align-items: center;
   gap: 8px;
   min-width: 0;
-}
-
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 auto;
-  padding: 0;
-  color: var(--color-text);
-  background: var(--color-surface-soft);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
-}
-
-.theme-toggle:hover {
-  background: var(--color-hover-soft);
-  border-color: var(--color-border-strong);
-  transform: translateY(-1px);
-}
-
-.theme-toggle:focus-visible {
-  outline: 3px solid rgba(23, 105, 224, 0.24);
-  outline-offset: 2px;
-}
-
-.theme-toggle__icon {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  flex: 0 0 auto;
-  color: #f5a524;
-  background: currentColor;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 4px rgba(245, 165, 36, 0.18),
-    0 0 16px rgba(245, 165, 36, 0.2);
-}
-
-.theme-toggle__icon::after {
-  position: absolute;
-  inset: -5px;
-  border: 1px solid rgba(245, 165, 36, 0.26);
-  border-radius: inherit;
-  content: "";
-}
-
-:root[data-theme="dark"] .theme-toggle__icon {
-  color: #d8e8ff;
-  background: transparent;
-  box-shadow:
-    inset -5px -4px 0 0 currentColor,
-    0 0 18px rgba(45, 156, 255, 0.24);
-}
-
-:root[data-theme="dark"] .theme-toggle__icon::after {
-  inset: 2px 0 0 8px;
-  width: 4px;
-  height: 4px;
-  background: currentColor;
-  border: 0;
-  box-shadow:
-    7px 2px 0 -1px currentColor,
-    -2px 8px 0 -1px currentColor;
 }
 
 .popup__title {

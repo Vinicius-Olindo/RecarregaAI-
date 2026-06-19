@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-Versao atual: **1.8.1**.
+Versao atual: **2.0.2**.
 
 Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
 dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
@@ -206,8 +206,9 @@ No primeiro envio, o FormSubmit pode pedir confirmacao no email de destino.
 
 ## Tema
 
-O popup abre em tema escuro por padrao. Use o botao `Claro` ou `Escuro` no topo
-para alternar entre os temas. A escolha fica salva no navegador
+O tema claro e escuro fica centralizado na pagina de configuracoes e nas paginas
+com ferramentas flutuantes. O popup apenas acompanha a preferencia salva no
+navegador.
 
 ## Observacoes
 
