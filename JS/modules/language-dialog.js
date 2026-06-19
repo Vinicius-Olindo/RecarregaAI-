@@ -1,7 +1,16 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 export const defaultLanguage = "pt-BR";
-export const supportedLanguages = ["pt-BR", "en", "es"];
+export const supportedLanguages = [
+  "pt-BR",
+  "en",
+  "es",
+  "fr",
+  "de",
+  "it",
+  "id",
+  "tr"
+];
 
 const getElement = (selector, root = document) => root.querySelector(selector);
 

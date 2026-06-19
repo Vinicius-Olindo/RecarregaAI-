@@ -1,10 +1,12 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 import {
   formatCountdownTime,
   getPermissionPatternForOrigin,
   getRemainingSeconds,
   getUrlOrigin,
+  mediaKinds,
+  normalizeMediaKind,
   pauseReasons,
   runtimeMessageTypes
 } from "./modules/shared.js";
@@ -16,6 +18,7 @@ import {
   reloadTabIgnoringCache
 } from "./modules/cache.js";
 import { normalizeLanguage } from "./modules/language-dialog.js";
+import { extendPageTranslations } from "./modules/extended-translations.js";
 import { collectLoadedOrigins } from "./modules/tabs.js";
 
 const popupLanguageStorageKey = "recarregaAiPageLanguage";
@@ -40,17 +43,22 @@ const popupElements = {
   statusMessage: document.querySelector("#status-message"),
   stopTimerButton: document.querySelector("#stop-timer-button"),
   timerOverview: document.querySelector("#timer-overview"),
+  timerProtectionDetail: document.querySelector("#timer-protection-detail"),
+  timerProtectionStatus: document.querySelector("#timer-protection-status"),
+  timerProtectionTitle: document.querySelector("#timer-protection-title"),
   timerIntervalInputs: document.querySelectorAll("[name='timer-interval']")
 };
 
 const presetTimerIntervals = [3, 5, 10];
 
 let currentActiveTab = null;
+let automaticResumeNoticeUntil = 0;
+let lastObservedTimerState = null;
 const activePopupLanguage = normalizeLanguage(
   localStorage.getItem(popupLanguageStorageKey) || document.documentElement.lang
 );
 
-const popupTranslations = {
+const popupTranslations = extendPageTranslations({
   "pt-BR": {
     activeCountPlural: "{count} páginas",
     activeCountSingular: "1 página",
@@ -58,7 +66,15 @@ const popupTranslations = {
     activeStatus: "Atualização ligada nesta página: a cada {interval}.",
     activeTimerTitle: "Atualizações em andamento",
     activatingTimer: "Ativando...",
+    audioCountdown: "Áudio",
+    audioPausedStatus:
+      "Áudio em reprodução. A atualização pausou e será retomada quando o áudio parar.",
+    audioPauseDetail:
+      "Retoma automaticamente quando o áudio terminar ou for pausado.",
+    audioPauseTitle: "Pausado por áudio",
     autoLabel: "Automático",
+    automaticResumeStatus:
+      "Atividade encerrada. A atualização foi retomada.",
     chooseTime: "Escolha um tempo para começar.",
     chooseTimeBelow: "Escolha um tempo abaixo para começar.",
     cleaningPage: "Limpando dados antigos desta página...",
@@ -77,7 +93,10 @@ const popupTranslations = {
     manualLabel: "Manual",
     mediaCountdown: "Mídia",
     mediaPausedStatus:
-      "Áudio, vídeo ou gravação em uso. A atualização pausou para evitar perda.",
+      "Mídia em uso. A atualização pausou e será retomada quando a atividade terminar.",
+    mediaPauseDetail:
+      "Retoma automaticamente quando a atividade de mídia terminar.",
+    mediaPauseTitle: "Pausado por mídia",
     minutePlural: "{count} minutos",
     minuteShort: "min",
     minuteSingular: "1 minuto",
@@ -95,12 +114,23 @@ const popupTranslations = {
     prepareTimer: "Preparando atualização automática...",
     readyStatus: "Pronto para limpar e atualizar a página aberta.",
     recurringTitle: "Atualização recorrente",
+    recordingCountdown: "Gravando",
+    recordingPausedStatus:
+      "Gravação em andamento. A atualização pausou e será retomada quando a gravação terminar.",
+    recordingPauseDetail:
+      "Retoma automaticamente quando a gravação terminar.",
+    recordingPauseTitle: "Pausado por gravação",
     refreshOffTitle: "Atualização desligada",
     reloadOnceTitle: "Atualizar agora",
     removeTimer: "Remover",
     resumeError: "Não consegui retomar agora.",
     resumeStatus: "Atualização retomada.",
     resumeTimer: "Retomar",
+    safetyPauseDetail:
+      "A atividade terminou. Retoma em {seconds}s para evitar uma atualização imediata.",
+    safetyPausedStatus:
+      "Mídia encerrada. A atualização será retomada em {seconds}s.",
+    safetyPauseTitle: "Pausa de segurança após mídia",
     settings: "Configurações",
     startError: "Não consegui ligar a atualização automática agora.",
     startedStatus: "Atualização ligada: a cada {interval}.",
@@ -114,10 +144,19 @@ const popupTranslations = {
       "O contador no ícone pode variar um pouco quando este painel está fechado.",
     timerTabFallback: "Página em atualização",
     typingCountdown: "Digitando",
+    typingPauseDetail:
+      "Retoma automaticamente quando você sair do campo de texto.",
     typingPausedStatus:
-      "Você está digitando. A atualização pausou para proteger seu trabalho.",
+      "Você está digitando. A atualização pausou e será retomada ao sair do campo de texto.",
+    typingPauseTitle: "Pausado por digitação",
     unsupportedPage: "Esta página não permite esse tipo de limpeza.",
     updateNowButton: "Limpar e atualizar",
+    videoCountdown: "Vídeo",
+    videoPausedStatus:
+      "Vídeo em reprodução. A atualização pausou e será retomada quando o vídeo parar.",
+    videoPauseDetail:
+      "Retoma automaticamente quando o vídeo terminar ou for pausado.",
+    videoPauseTitle: "Pausado por vídeo",
     waitForPage: "Aguarde esta página aparecer no painel e tente de novo.",
     workingCheck: "Verificando o que precisa ser limpo..."
   },
@@ -128,7 +167,14 @@ const popupTranslations = {
     activeStatus: "Refresh enabled on this page: every {interval}.",
     activeTimerTitle: "Refreshes in progress",
     activatingTimer: "Starting...",
+    audioCountdown: "Audio",
+    audioPausedStatus:
+      "Audio is playing. Refresh paused and will resume when the audio stops.",
+    audioPauseDetail:
+      "Resumes automatically when the audio ends or is paused.",
+    audioPauseTitle: "Paused for audio",
     autoLabel: "Automatic",
+    automaticResumeStatus: "Activity ended. Refresh has resumed.",
     chooseTime: "Choose a time to start.",
     chooseTimeBelow: "Choose a time below to start.",
     cleaningPage: "Clearing old data from this page...",
@@ -147,7 +193,10 @@ const popupTranslations = {
     manualLabel: "Manual",
     mediaCountdown: "Media",
     mediaPausedStatus:
-      "Audio, video or recording in use. Refresh paused to avoid loss.",
+      "Media is in use. Refresh paused and will resume when the activity ends.",
+    mediaPauseDetail:
+      "Resumes automatically when the media activity ends.",
+    mediaPauseTitle: "Paused for media",
     minutePlural: "{count} minutes",
     minuteShort: "min",
     minuteSingular: "1 minute",
@@ -165,12 +214,23 @@ const popupTranslations = {
     prepareTimer: "Preparing automatic refresh...",
     readyStatus: "Ready to clear and refresh the open page.",
     recurringTitle: "Recurring refresh",
+    recordingCountdown: "Recording",
+    recordingPausedStatus:
+      "Recording is in progress. Refresh paused and will resume when recording ends.",
+    recordingPauseDetail:
+      "Resumes automatically when recording ends.",
+    recordingPauseTitle: "Paused for recording",
     refreshOffTitle: "Refresh off",
     reloadOnceTitle: "Refresh now",
     removeTimer: "Remove",
     resumeError: "I could not resume right now.",
     resumeStatus: "Refresh resumed.",
     resumeTimer: "Resume",
+    safetyPauseDetail:
+      "The activity ended. Resumes in {seconds}s to avoid an immediate refresh.",
+    safetyPausedStatus:
+      "Media ended. Refresh will resume in {seconds}s.",
+    safetyPauseTitle: "Safety pause after media",
     settings: "Settings",
     startError: "I could not start automatic refresh right now.",
     startedStatus: "Refresh started: every {interval}.",
@@ -184,10 +244,19 @@ const popupTranslations = {
       "The icon countdown may vary slightly while this panel is closed.",
     timerTabFallback: "Page refreshing",
     typingCountdown: "Typing",
+    typingPauseDetail:
+      "Resumes automatically when you leave the text field.",
     typingPausedStatus:
-      "You are typing. Refresh paused to protect your work.",
+      "You are typing. Refresh paused and will resume when you leave the text field.",
+    typingPauseTitle: "Paused for typing",
     unsupportedPage: "This page does not allow this type of cleanup.",
     updateNowButton: "Clear and refresh",
+    videoCountdown: "Video",
+    videoPausedStatus:
+      "Video is playing. Refresh paused and will resume when the video stops.",
+    videoPauseDetail:
+      "Resumes automatically when the video ends or is paused.",
+    videoPauseTitle: "Paused for video",
     waitForPage: "Wait for this page to appear in the panel and try again.",
     workingCheck: "Checking what needs to be cleared..."
   },
@@ -198,7 +267,15 @@ const popupTranslations = {
     activeStatus: "Actualización activa en esta página: cada {interval}.",
     activeTimerTitle: "Actualizaciones en curso",
     activatingTimer: "Activando...",
+    audioCountdown: "Audio",
+    audioPausedStatus:
+      "Hay audio en reproducción. La actualización se pausó y se reanudará cuando el audio se detenga.",
+    audioPauseDetail:
+      "Se reanuda automáticamente cuando el audio termina o se pausa.",
+    audioPauseTitle: "Pausado por audio",
     autoLabel: "Automático",
+    automaticResumeStatus:
+      "La actividad terminó. La actualización se reanudó.",
     chooseTime: "Elige un tiempo para empezar.",
     chooseTimeBelow: "Elige un tiempo abajo para empezar.",
     cleaningPage: "Limpiando datos antiguos de esta página...",
@@ -217,7 +294,10 @@ const popupTranslations = {
     manualLabel: "Manual",
     mediaCountdown: "Medios",
     mediaPausedStatus:
-      "Audio, video o grabación en uso. La actualización se pausó para evitar pérdidas.",
+      "Hay medios en uso. La actualización se pausó y se reanudará cuando termine la actividad.",
+    mediaPauseDetail:
+      "Se reanuda automáticamente cuando termina la actividad multimedia.",
+    mediaPauseTitle: "Pausado por medios",
     minutePlural: "{count} minutos",
     minuteShort: "min",
     minuteSingular: "1 minuto",
@@ -235,12 +315,23 @@ const popupTranslations = {
     prepareTimer: "Preparando actualización automática...",
     readyStatus: "Listo para limpiar y actualizar la página abierta.",
     recurringTitle: "Actualización recurrente",
+    recordingCountdown: "Grabando",
+    recordingPausedStatus:
+      "Hay una grabación en curso. La actualización se pausó y se reanudará cuando termine.",
+    recordingPauseDetail:
+      "Se reanuda automáticamente cuando termina la grabación.",
+    recordingPauseTitle: "Pausado por grabación",
     refreshOffTitle: "Actualización apagada",
     reloadOnceTitle: "Actualizar ahora",
     removeTimer: "Eliminar",
     resumeError: "No pude retomar ahora.",
     resumeStatus: "Actualización retomada.",
     resumeTimer: "Retomar",
+    safetyPauseDetail:
+      "La actividad terminó. Se reanuda en {seconds}s para evitar una actualización inmediata.",
+    safetyPausedStatus:
+      "Los medios terminaron. La actualización se reanudará en {seconds}s.",
+    safetyPauseTitle: "Pausa de seguridad después de medios",
     settings: "Configuración",
     startError: "No pude activar la actualización automática ahora.",
     startedStatus: "Actualización activa: cada {interval}.",
@@ -254,14 +345,23 @@ const popupTranslations = {
       "El contador del ícono puede variar un poco cuando este panel está cerrado.",
     timerTabFallback: "Página en actualización",
     typingCountdown: "Escribiendo",
+    typingPauseDetail:
+      "Se reanuda automáticamente cuando sales del campo de texto.",
     typingPausedStatus:
-      "Estás escribiendo. La actualización se pausó para proteger tu trabajo.",
+      "Estás escribiendo. La actualización se pausó y se reanudará cuando salgas del campo de texto.",
+    typingPauseTitle: "Pausado por escritura",
     unsupportedPage: "Esta página no permite este tipo de limpieza.",
     updateNowButton: "Limpiar y actualizar",
+    videoCountdown: "Video",
+    videoPausedStatus:
+      "Hay un video en reproducción. La actualización se pausó y se reanudará cuando el video se detenga.",
+    videoPauseDetail:
+      "Se reanuda automáticamente cuando el video termina o se pausa.",
+    videoPauseTitle: "Pausado por video",
     waitForPage: "Espera a que esta página aparezca en el panel e inténtalo de nuevo.",
     workingCheck: "Verificando qué se debe limpiar..."
   }
-};
+}, "popup");
 
 const getPopupCopy = (key) => (
   popupTranslations[activePopupLanguage]?.[key]
@@ -483,6 +583,78 @@ const formatActiveTimerCount = (count) => {
   });
 };
 
+const mediaPauseCopyKeys = Object.freeze({
+  [mediaKinds.audio]: {
+    countdownKey: "audioCountdown",
+    detailKey: "audioPauseDetail",
+    statusKey: "audioPausedStatus",
+    titleKey: "audioPauseTitle"
+  },
+  [mediaKinds.generic]: {
+    countdownKey: "mediaCountdown",
+    detailKey: "mediaPauseDetail",
+    statusKey: "mediaPausedStatus",
+    titleKey: "mediaPauseTitle"
+  },
+  [mediaKinds.recording]: {
+    countdownKey: "recordingCountdown",
+    detailKey: "recordingPauseDetail",
+    statusKey: "recordingPausedStatus",
+    titleKey: "recordingPauseTitle"
+  },
+  [mediaKinds.video]: {
+    countdownKey: "videoCountdown",
+    detailKey: "videoPauseDetail",
+    statusKey: "videoPausedStatus",
+    titleKey: "videoPauseTitle"
+  }
+});
+
+const getAutomaticPausePresentation = (timerSettings) => {
+  if (!timerSettings?.paused) {
+    return null;
+  }
+
+  if (timerSettings.pauseReason === pauseReasons.typing) {
+    return {
+      countdownKey: "typingCountdown",
+      detailKey: "typingPauseDetail",
+      reason: pauseReasons.typing,
+      state: "typing",
+      statusKey: "typingPausedStatus",
+      titleKey: "typingPauseTitle"
+    };
+  }
+
+  if (timerSettings.pauseReason !== pauseReasons.media) {
+    return null;
+  }
+
+  const mediaKind = normalizeMediaKind(timerSettings.pauseDetail);
+  const safetySeconds = getRemainingSeconds(timerSettings.resumeScheduledAt);
+
+  if (safetySeconds > 0) {
+    return {
+      countdownText: `${safetySeconds}s`,
+      detailKey: "safetyPauseDetail",
+      reason: mediaKind,
+      replacements: {
+        seconds: String(safetySeconds)
+      },
+      state: "safety",
+      statusKey: "safetyPausedStatus",
+      statusTone: "success",
+      titleKey: "safetyPauseTitle"
+    };
+  }
+
+  return {
+    ...mediaPauseCopyKeys[mediaKind],
+    reason: mediaKind,
+    state: "media"
+  };
+};
+
 const getTimerVisualState = (timerSettings) => {
   if (!timerSettings?.enabled) {
     return {
@@ -492,8 +664,9 @@ const getTimerVisualState = (timerSettings) => {
   }
 
   const isPaused = Boolean(timerSettings.paused);
-  const isPausedByMedia = timerSettings.pauseReason === pauseReasons.media;
-  const isPausedByTyping = timerSettings.pauseReason === pauseReasons.typing;
+  const automaticPausePresentation = getAutomaticPausePresentation(
+    timerSettings
+  );
   const remainingSeconds = getRemainingSeconds(timerSettings.nextRunAt);
   const isWarning = !isPaused && remainingSeconds <= 10;
   let countdownText = formatCountdownTime(remainingSeconds);
@@ -507,14 +680,10 @@ const getTimerVisualState = (timerSettings) => {
     state = "paused";
     countdownText = getPopupCopy("pausedCountdown");
 
-    if (isPausedByTyping) {
-      state = "typing";
-      countdownText = getPopupCopy("typingCountdown");
-    }
-
-    if (isPausedByMedia) {
-      state = "media";
-      countdownText = getPopupCopy("mediaCountdown");
+    if (automaticPausePresentation) {
+      state = automaticPausePresentation.state;
+      countdownText = automaticPausePresentation.countdownText
+        || getPopupCopy(automaticPausePresentation.countdownKey);
     }
   }
 
@@ -535,12 +704,46 @@ const updateTimerActionButtons = (timerSettings) => {
   popupElements.stopTimerButton.disabled = !hasTimer;
 };
 
+const getPausePresentationCopy = (presentation, keyName) => {
+  const copyKey = presentation[keyName];
+
+  if (!presentation.replacements) {
+    return getPopupCopy(copyKey);
+  }
+
+  return replacePopupTokens(copyKey, presentation.replacements);
+};
+
+const updateTimerProtectionStatus = (timerSettings) => {
+  const presentation = getAutomaticPausePresentation(timerSettings);
+
+  popupElements.timerProtectionStatus.hidden = !presentation;
+
+  if (!presentation) {
+    delete popupElements.timerProtectionStatus.dataset.reason;
+    delete popupElements.timerProtectionStatus.dataset.phase;
+    return;
+  }
+
+  popupElements.timerProtectionStatus.dataset.reason = presentation.reason;
+  popupElements.timerProtectionStatus.dataset.phase = presentation.state;
+  popupElements.timerProtectionTitle.textContent = getPausePresentationCopy(
+    presentation,
+    "titleKey"
+  );
+  popupElements.timerProtectionDetail.textContent = getPausePresentationCopy(
+    presentation,
+    "detailKey"
+  );
+};
+
 const updateTimerOverview = (timerSettings) => {
   if (!timerSettings?.enabled) {
     popupElements.timerOverview.dataset.state = "empty";
     popupElements.controlledTabTitle.textContent = getPopupCopy("refreshOffTitle");
     popupElements.controlledTabUrl.textContent = getPopupCopy("chooseTime");
     popupElements.popupCountdown.textContent = "--:--";
+    updateTimerProtectionStatus(timerSettings);
     updateTimerActionButtons(timerSettings);
     return;
   }
@@ -554,6 +757,7 @@ const updateTimerOverview = (timerSettings) => {
     || getPopupCopy("pageNotIdentified");
   popupElements.popupCountdown.textContent = timerVisualState.countdownText;
 
+  updateTimerProtectionStatus(timerSettings);
   updateTimerActionButtons(timerSettings);
 };
 
@@ -618,6 +822,92 @@ const updateActiveTimersList = (activeTimers, activeTab) => {
   });
 };
 
+const createObservedTimerState = (timerSettings) => (
+  timerSettings?.enabled
+    ? {
+      pauseReason: timerSettings.pauseReason,
+      paused: Boolean(timerSettings.paused),
+      tabId: timerSettings.tabId
+    }
+    : null
+);
+
+const hasAutomaticallyResumed = (timerSettings, previousTimerState) => (
+  Boolean(
+    timerSettings?.enabled
+    && previousTimerState?.tabId === timerSettings.tabId
+    && previousTimerState.paused
+    && [pauseReasons.media, pauseReasons.typing].includes(
+      previousTimerState.pauseReason
+    )
+    && !timerSettings.paused
+  )
+);
+
+const updateInactiveTimerStatus = (activeTimers) => {
+  if (activeTimers.length === 0) {
+    updateStatusMessage(getPopupCopy("noActiveStatus"), "neutral");
+    return;
+  }
+
+  updateStatusMessage(
+    replacePopupTokens("activePageOffStatus", {
+      count: formatActiveTimerCount(activeTimers.length)
+    }),
+    "active"
+  );
+};
+
+const updateEnabledTimerStatus = (
+  timerSettings,
+  showAutomaticResumeNotice
+) => {
+  const automaticPausePresentation = getAutomaticPausePresentation(
+    timerSettings
+  );
+
+  if (automaticPausePresentation) {
+    updateStatusMessage(
+      getPausePresentationCopy(
+        automaticPausePresentation,
+        "statusKey"
+      ),
+      automaticPausePresentation.statusTone || "warning"
+    );
+    return;
+  }
+
+  if (timerSettings.paused) {
+    updateStatusMessage(getPopupCopy("pausedStatus"), "warning");
+    return;
+  }
+
+  if (showAutomaticResumeNotice) {
+    updateStatusMessage(getPopupCopy("automaticResumeStatus"), "active");
+    return;
+  }
+
+  updateStatusMessage(
+    replacePopupTokens("activeStatus", {
+      interval: formatTimerInterval(timerSettings.intervalInMinutes)
+    }),
+    "active"
+  );
+};
+
+const updateCurrentTimerStatus = (
+  timerSettings,
+  activeTimers,
+  showAutomaticResumeNotice
+) => {
+  if (!timerSettings?.enabled) {
+    updateInactiveTimerStatus(activeTimers);
+    return;
+  }
+
+  updateEnabledTimerStatus(timerSettings, showAutomaticResumeNotice);
+};
+
 const refreshTimerState = async ({ updateStatus = false } = {}) => {
   const activeTab = await getActiveTab();
 
@@ -626,6 +916,19 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
   const response = await getTimerState(activeTab?.id);
   const timerSettings = response.timerSettings;
   const activeTimers = response.activeTimers || [];
+  const previousTimerState = lastObservedTimerState;
+  const didAutomaticallyResume = hasAutomaticallyResumed(
+    timerSettings,
+    previousTimerState
+  );
+
+  if (didAutomaticallyResume) {
+    automaticResumeNoticeUntil = Date.now() + 4000;
+  }
+
+  const showAutomaticResumeNotice = Date.now() < automaticResumeNoticeUntil;
+
+  lastObservedTimerState = createObservedTimerState(timerSettings);
 
   updateTimerOverview(timerSettings);
   updateActiveTimersList(activeTimers, activeTab);
@@ -634,49 +937,10 @@ const refreshTimerState = async ({ updateStatus = false } = {}) => {
     return timerSettings;
   }
 
-  if (!timerSettings?.enabled) {
-    if (activeTimers.length > 0) {
-      updateStatusMessage(
-        replacePopupTokens("activePageOffStatus", {
-          count: formatActiveTimerCount(activeTimers.length)
-        }),
-        "active"
-      );
-      return timerSettings;
-    }
-
-    updateStatusMessage(getPopupCopy("noActiveStatus"), "neutral");
-    return timerSettings;
-  }
-
-  const timerIntervalText = formatTimerInterval(timerSettings.intervalInMinutes);
-
-  if (timerSettings.paused) {
-    if (timerSettings.pauseReason === pauseReasons.typing) {
-      updateStatusMessage(
-        getPopupCopy("typingPausedStatus"),
-        "warning"
-      );
-      return timerSettings;
-    }
-
-    if (timerSettings.pauseReason === pauseReasons.media) {
-      updateStatusMessage(
-        getPopupCopy("mediaPausedStatus"),
-        "warning"
-      );
-      return timerSettings;
-    }
-
-    updateStatusMessage(getPopupCopy("pausedStatus"), "warning");
-    return timerSettings;
-  }
-
-  updateStatusMessage(
-    replacePopupTokens("activeStatus", {
-      interval: timerIntervalText
-    }),
-    "active"
+  updateCurrentTimerStatus(
+    timerSettings,
+    activeTimers,
+    showAutomaticResumeNotice
   );
 
   return timerSettings;
@@ -916,7 +1180,9 @@ loadTimerState().catch((error) => {
 });
 
 setInterval(() => {
-  refreshTimerState().catch((error) => {
+  refreshTimerState({
+    updateStatus: true
+  }).catch((error) => {
     console.error("Erro ao atualizar estado do timer:", error);
   });
 }, 1000);

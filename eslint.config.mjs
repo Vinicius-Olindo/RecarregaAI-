@@ -1,4 +1,4 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 const browserGlobals = {
   chrome: "readonly",

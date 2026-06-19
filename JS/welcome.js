@@ -1,18 +1,20 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
   loadThemePreference,
   toggleThemePreference
 } from "./modules/theme.js";
+import { extendPageTranslations } from "./modules/extended-translations.js";
+import { supportedLanguages } from "./modules/language-dialog.js";
 
 const welcomeLanguageStorageKey = "recarregaAiPageLanguage";
 const legacyWelcomeLanguageStorageKey = "recarregaAiWelcomeLanguage";
 const defaultWelcomeLanguage = "pt-BR";
 
-const supportedWelcomeLanguages = ["pt-BR", "en", "es"];
+const supportedWelcomeLanguages = supportedLanguages;
 
-const welcomeTranslations = {
+const welcomeTranslations = extendPageTranslations({
   "pt-BR": {
     applications: "Aplicações",
     autoStart: "Auto-início",
@@ -64,7 +66,7 @@ const welcomeTranslations = {
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.0.2. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.0.6. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     heroDescription:
       "Use timers por guia, limpe o cache do site aberto e mantenha sistemas como Drive, painéis internos e páginas de trabalho sempre atualizados.",
@@ -164,7 +166,7 @@ const welcomeTranslations = {
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.0.2. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.0.6. All rights reserved.",
     footerPrivacy: "Privacy",
     heroDescription:
       "Use timers by tab, clear the open site's cache and keep systems such as Drive, internal dashboards and work pages always updated.",
@@ -263,7 +265,7 @@ const welcomeTranslations = {
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.0.2. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.0.6. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     heroDescription:
       "Usa timers por pestaña, limpia la caché del sitio abierto y mantén sistemas como Drive, paneles internos y páginas de trabajo siempre actualizados.",
@@ -312,7 +314,7 @@ const welcomeTranslations = {
     useCasesTitle: "Dónde ayuda RecarregaAi!",
     viewFeatures: "Ver funcionalidades"
   }
-};
+}, "welcome");
 
 const welcomeElements = {
   closeLanguageButton: document.querySelector("#close-language-button"),

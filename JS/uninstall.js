@@ -1,6 +1,10 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 import { appConfig } from "./modules/config.js";
+import {
+  extendPageTranslations,
+  extendReasonTranslationMap
+} from "./modules/extended-translations.js";
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
   loadThemePreference,
@@ -9,13 +13,13 @@ import {
 
 const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
 const feedbackFallbackUrl = appConfig.feedbackFallbackUrl;
-const defaultVersionLabel = "2.0.2";
+const defaultVersionLabel = "2.0.6";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Não informou motivo";
 const languageStorageKey = "recarregaAiPageLanguage";
 const legacyLanguageStorageKey = "recarregaAiUninstallLanguage";
 
-const translations = {
+const translations = extendPageTranslations({
   "pt-BR": {
     backToTop: "Voltar ao início",
     closeDialog: "Fechar",
@@ -26,7 +30,7 @@ const translations = {
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.0.2. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.0.6. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     formSubmitError:
       "Não consegui confirmar o envio agora. Tente novamente em alguns instantes.",
@@ -53,7 +57,7 @@ const translations = {
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.0.2"
+    versionLabel: "2.0.6"
   },
   en: {
     backToTop: "Back to start",
@@ -65,7 +69,7 @@ const translations = {
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.0.2. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.0.6. All rights reserved.",
     footerPrivacy: "Privacy",
     formSubmitError:
       "I could not confirm the send right now. Try again in a few moments.",
@@ -91,7 +95,7 @@ const translations = {
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "2.0.2"
+    versionLabel: "2.0.6"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -103,7 +107,7 @@ const translations = {
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.0.2. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.0.6. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     formSubmitError:
       "No pude confirmar el envío ahora. Inténtalo de nuevo en unos momentos.",
@@ -129,11 +133,11 @@ const translations = {
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.0.2"
+    versionLabel: "2.0.6"
   }
-};
+}, "uninstall");
 
-const reasonTranslations = {
+const reasonTranslations = extendReasonTranslationMap({
   workflow: {
     "pt-BR": {
       label: "Fluxo de trabalho",
@@ -236,7 +240,7 @@ const reasonTranslations = {
       text: "Otro motivo"
     }
   }
-};
+});
 
 const uninstallElements = {
   closeLanguageButton: document.querySelector("#close-language-button"),

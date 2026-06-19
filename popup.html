@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- RecarregaAi! 2.0.2 -->
+<!-- RecarregaAi! 2.0.6 -->
 <html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
@@ -18,7 +18,7 @@
         <div class="popup__heading">
           <div class="popup__title-row">
             <h1 id="popup-title" class="popup__title">RecarregaAi!</h1>
-            <span id="extension-version" class="popup__version">2.0.2</span>
+            <span id="extension-version" class="popup__version">2.0.6</span>
           </div>
 
           <p class="popup__subtitle">
@@ -53,6 +53,28 @@
           <span id="popup-countdown" class="timer-overview__countdown">
             --:--
           </span>
+        </div>
+
+        <div
+          id="timer-protection-status"
+          class="timer-overview__protection"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <span
+            class="timer-overview__protection-indicator"
+            aria-hidden="true"
+          ></span>
+
+          <div class="timer-overview__protection-copy">
+            <strong id="timer-protection-title">
+              Pausado para proteger sua atividade
+            </strong>
+            <span id="timer-protection-detail">
+              O timer será retomado automaticamente.
+            </span>
+          </div>
         </div>
 
         <p class="timer-overview__note">

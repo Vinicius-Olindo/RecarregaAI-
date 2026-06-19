@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- RecarregaAi! 2.0.2 -->
+<!-- RecarregaAi! 2.0.6 -->
 <html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
@@ -22,7 +22,7 @@
         />
         <span>
           <strong>RecarregaAi!</strong>
-          <small>2.0.2</small>
+          <small>2.0.6</small>
         </span>
       </a>
 
@@ -40,11 +40,12 @@
         <div class="hero__content">
           <p class="eyebrow">Política de Privacidade</p>
           <h1 id="privacy-title">Transparência para usar sem surpresa.</h1>
-          <p class="policy-meta">Última atualização: 16/06/2026</p>
+          <p class="policy-meta">Última atualização: 19/06/2026</p>
           <p>
             O RecarregaAi! é uma extensão para navegador criada para limpar
-            cache da página atual, recarregar abas e permitir o uso de timers
-            automáticos de atualização.
+            dados temporários do site atual, recarregar abas, executar timers
+            automáticos e proteger atividades de digitação e mídia contra
+            recarregamentos inesperados.
           </p>
         </div>
 
@@ -69,8 +70,8 @@
           <span class="summary-grid__icon">01</span>
           <h2>Processamento local</h2>
           <p>
-            Origens, timers, tema e preferências ficam no navegador do usuário
-            para executar as funções principais.
+            Origens necessárias à limpeza, timers, tema, idioma e preferências
+            ficam no navegador do usuário para executar as funções principais.
           </p>
         </article>
 
@@ -114,20 +115,23 @@
           <section class="policy-section" aria-labelledby="data-title">
             <h2 id="data-title">1. Informações processadas pela extensão</h2>
             <p>
-              Para funcionar corretamente, a extensão pode processar localmente
-              a origem da página atual e de alguns recursos carregados pela
-              página. Esse processamento é usado para limpar cache, CacheStorage
-              e service workers relacionados ao site atual.
+              Para funcionar corretamente, a extensão processa localmente o
+              endereço e a origem da página atual e de alguns recursos carregados
+              por ela. Esses dados são usados para identificar o site, limpar
+              cache, CacheStorage e service workers relacionados e recarregar a
+              guia.
             </p>
             <p>
-              A extensão também pode salvar localmente configurações como tema
-              escolhido, intervalo padrão de timer, sites configurados para
-              auto-início e estado dos timers ativos.
+              A extensão também pode salvar localmente o tema, o idioma, o
+              intervalo padrão, os sites configurados para auto-início e, para
+              as guias com timers ativos, endereço, título, estado, próxima
+              execução e último resultado do timer.
             </p>
             <p>
-              Essas informações são armazenadas localmente no navegador do
-              usuário usando <code>chrome.storage.local</code> e não são
-              enviadas para servidores externos pela extensão.
+              Essas informações ficam no navegador por meio de
+              <code>chrome.storage.local</code> e, para a preferência de idioma
+              das páginas, do armazenamento local do próprio navegador. A
+              extensão não envia essas informações para servidores externos.
             </p>
           </section>
 
@@ -137,14 +141,16 @@
             </h2>
             <p>
               A extensão não coleta senhas, textos digitados, mensagens,
-              arquivos, dados bancários, dados de formulários ou conteúdo das
-              páginas acessadas.
+              arquivos, dados bancários, dados de formulários, gravações de
+              áudio ou vídeo, conteúdo textual das páginas nem cria um histórico
+              geral de navegação ou um perfil de uso do usuário.
             </p>
             <p>
               A extensão pode detectar localmente quando o usuário está
-              interagindo com campos editáveis para evitar recarregamentos
-              durante a digitação. Essa detecção não lê, armazena ou envia o
-              conteúdo digitado.
+              interagindo com campos editáveis ou usando áudio, vídeo e gravação
+              para evitar recarregamentos em momentos sensíveis. Essa detecção
+              não lê, armazena ou envia o conteúdo digitado, reproduzido ou
+              gravado.
             </p>
           </section>
 
@@ -153,43 +159,49 @@
             <p>
               Quando um timer está ativo, o RecarregaAi! verifica localmente se
               há foco em campos como <code>input</code>, <code>textarea</code>
-              ou áreas editáveis da página. Se houver digitação, o timer
-              daquela guia pode ser pausado temporariamente para evitar perda de
-              informações.
+              ou áreas editáveis da página. Ele também pode identificar se há
+              áudio, vídeo, gravação, fluxo de mídia ou contexto de áudio em uso.
+              Se houver atividade sensível, o timer daquela guia pode ser
+              pausado temporariamente e retomado depois que a atividade terminar.
             </p>
             <p>
-              Essa verificação identifica apenas o estado de interação com
-              campos editáveis. Ela não acessa o texto digitado, não cria
-              histórico de digitação e não envia esse estado para servidores
-              externos.
+              Essa verificação recebe apenas o estado de interação com campos
+              editáveis ou mídia ativa. Ela não acessa o texto digitado, não
+              grava áudio, não captura vídeo, não cria histórico de atividade e
+              não envia esse estado para servidores externos.
             </p>
           </section>
 
           <section class="policy-section" aria-labelledby="local-storage-title">
             <h2 id="local-storage-title">4. Armazenamento local</h2>
             <p>
-              As preferências da extensão são salvas no armazenamento local do
-              navegador para manter a experiência funcionando entre sessões.
+              As preferências e os estados necessários ao funcionamento da
+              extensão são salvos no armazenamento local do navegador para
+              manter a experiência entre sessões.
             </p>
             <ul class="policy-list">
               <li>Tema escolhido.</li>
-              <li>Intervalo padrão do timer.</li>
-              <li>Sites configurados para auto-início.</li>
-              <li>Estado dos timers ativos por guia.</li>
+              <li>Idioma escolhido para as páginas da extensão.</li>
+              <li>Intervalo padrão dos timers.</li>
+              <li>Sites e intervalos configurados para auto-início.</li>
+              <li>Estado dos timers ativos e dados da guia associada.</li>
               <li>Último resultado de execução do timer.</li>
             </ul>
             <p>
-              Essas informações permanecem no navegador do usuário e são usadas
-              apenas para executar ou melhorar as funcionalidades principais da
-              extensão.
+              Ao exportar configurações, a extensão cria localmente um arquivo
+              JSON com tema, idioma, intervalo padrão e sites de auto-início.
+              Timers ativos não entram no arquivo. Na importação, apenas o
+              arquivo escolhido pelo usuário é lido localmente; ele não é
+              enviado a servidores.
             </p>
           </section>
 
           <section class="policy-section" aria-labelledby="feedback-title">
             <h2 id="feedback-title">5. Feedback de desinstalação</h2>
             <p>
-              Ao desinstalar a extensão, o usuário pode optar por enviar um
-              feedback. Esse envio é opcional.
+              Após a desinstalação, a página de feedback pode ser aberta
+              automaticamente, mas nenhuma resposta é enviada sem uma ação do
+              usuário. O envio é opcional.
             </p>
             <p>
               Caso enviado, o formulário pode incluir motivo da desinstalação,
@@ -207,7 +219,8 @@
             <h2 id="sharing-title">6. Compartilhamento de dados</h2>
             <p>
               A extensão não vende dados do usuário, não compartilha dados para
-              publicidade e não utiliza informações para rastreamento.
+              publicidade e não utiliza analytics de terceiros nem informações
+              para rastreamento.
             </p>
             <p>
               O único envio externo previsto ocorre quando o usuário envia
@@ -232,51 +245,57 @@
           <section class="policy-section" aria-labelledby="permissions-title">
             <h2 id="permissions-title">8. Permissões utilizadas</h2>
             <p>
-              A extensão pode solicitar permissões necessárias para seu
-              funcionamento.
+              A extensão solicita somente as permissões necessárias para suas
+              funcionalidades principais.
             </p>
             <dl class="permission-list">
               <div>
                 <dt>browsingData</dt>
                 <dd>
-                  Usada para limpar cache, CacheStorage e service workers
-                  relacionados à página.
+                  Usada para limpar cache, CacheStorage e service workers das
+                  origens relacionadas à página atual ou autorizada.
                 </dd>
               </div>
               <div>
                 <dt>storage</dt>
-                <dd>Usada para salvar configurações locais da extensão.</dd>
+                <dd>
+                  Usada para salvar preferências, timers e resultados localmente.
+                </dd>
               </div>
               <div>
                 <dt>tabs</dt>
                 <dd>
-                  Usada para identificar a aba atual e atualizar informações do
-                  timer.
+                  Usada para identificar a guia, associar timers, acessar o
+                  endereço e o título necessários ao controle e recarregar a
+                  guia programada.
                 </dd>
               </div>
               <div>
                 <dt>activeTab</dt>
                 <dd>
-                  Usada para executar ações na aba atual quando o usuário
+                  Usada para executar ações na guia atual quando o usuário
                   interage com a extensão.
                 </dd>
               </div>
               <div>
                 <dt>scripting</dt>
                 <dd>
-                  Usada para executar verificações locais necessárias na página
-                  atual.
+                  Usada para executar na página as verificações locais de
+                  digitação e mídia e identificar origens necessárias à limpeza.
                 </dd>
               </div>
               <div>
                 <dt>alarms</dt>
-                <dd>Usada para controlar timers automáticos.</dd>
+                <dd>
+                  Usada para programar e controlar os timers automáticos no
+                  navegador.
+                </dd>
               </div>
               <div>
                 <dt>optional_host_permissions</dt>
                 <dd>
-                  Usada para solicitar permissão por domínio somente quando
-                  necessário.
+                  Usada para solicitar permissão por domínio quando o usuário
+                  inicia um timer, adiciona ou importa um site automático.
                 </dd>
               </div>
             </dl>
@@ -285,21 +304,25 @@
           <section class="policy-section" aria-labelledby="control-title">
             <h2 id="control-title">9. Controle do usuário</h2>
             <p>
-              O usuário pode remover a extensão a qualquer momento pelas
+              O usuário pode alterar tema, idioma, timers, sites automáticos e
+              permissões a qualquer momento nas páginas da extensão ou nas
               configurações do navegador.
             </p>
             <p>
-              Ao remover a extensão, as configurações locais associadas a ela
-              são removidas pelo Chrome.
+              A exportação e a importação de configurações só acontecem por ação
+              do usuário. O arquivo JSON exportado pode ser examinado e excluído
+              pelo próprio usuário, e o arquivo importado é escolhido manualmente.
             </p>
             <p>
-              O usuário também pode revogar permissões concedidas a sites nas
-              configurações do navegador.
+              O usuário pode revogar permissões concedidas a sites ou remover a
+              extensão. Ao removê-la, o Chrome exclui os dados associados ao
+              armazenamento local da extensão.
             </p>
             <p>
-              Caso tenha enviado feedback e deseje solicitar remoção ou
-              esclarecimento, o usuário pode entrar em contato pelo canal
-              oficial informado nesta política.
+              Arquivos exportados permanecem no local escolhido pelo usuário e
+              devem ser excluídos manualmente. Caso tenha enviado feedback e
+              deseje solicitar remoção ou esclarecimento, poderá usar o canal
+              oficial informado nesta política quando ele estiver definido.
             </p>
           </section>
 
@@ -369,7 +392,7 @@
         </nav>
 
         <p class="privacy-footer__legal">
-          © RecarregaAi! 2.0.2. Política atualizada em 16/06/2026.
+          © RecarregaAi! 2.0.6. Política atualizada em 19/06/2026.
         </p>
 
         <p class="privacy-footer__developer">

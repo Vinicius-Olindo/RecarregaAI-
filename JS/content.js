@@ -1,11 +1,11 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 (() => {
   const watcherFlag = "__recarregaAiPageSafetyWatcherLoaded";
-  const watcherVersion = 2;
+  const watcherVersion = 3;
   const mediaMessageType = "RECARREGA_AI_MEDIA_STATE";
   const pageMediaGuardMessageType = "RECARREGA_AI_PAGE_MEDIA_STATE";
-  const pageMediaGuardSource = "RECARREGA_AI_PAGE_MEDIA_GUARD_V2";
+  const pageMediaGuardSource = "RECARREGA_AI_PAGE_MEDIA_GUARD_V3";
   const typingMessageType = "RECARREGA_AI_TYPING_STATE";
   const blurCheckDelay = 120;
   const mediaSyncDelay = 120;
@@ -42,7 +42,8 @@
 
   let isTyping = false;
   let isMediaActive = false;
-  let isPageMediaActive = false;
+  let activeMediaKind = null;
+  let pageMediaKind = null;
   let mediaSyncTimerId = null;
   const observedMediaElements = new WeakSet();
 
@@ -147,30 +148,46 @@
     }, blurCheckDelay);
   };
 
-  const hasActiveMediaElement = () => (
-    Array.from(document.querySelectorAll("audio, video")).some((element) => (
+  const getActiveMediaElementKind = () => {
+    const activeMediaElements = Array.from(
+      document.querySelectorAll("audio, video")
+    ).filter((element) => (
       !element.paused && !element.ended && element.readyState > 0
-    ))
+    ));
+
+    if (activeMediaElements.some((element) => element.tagName === "VIDEO")) {
+      return "video";
+    }
+
+    return activeMediaElements.length > 0 ? "audio" : null;
+  };
+
+  const getCurrentMediaKind = () => (
+    pageMediaKind || getActiveMediaElementKind()
   );
 
-  const getCurrentMediaState = () => (
-    isPageMediaActive || hasActiveMediaElement()
-  );
+  const sendMediaState = (nextMediaKind, { force = false } = {}) => {
+    const nextIsMediaActive = Boolean(nextMediaKind);
 
-  const sendMediaState = (nextIsMediaActive, { force = false } = {}) => {
-    if (!force && isMediaActive === nextIsMediaActive) {
+    if (
+      !force
+      && isMediaActive === nextIsMediaActive
+      && activeMediaKind === nextMediaKind
+    ) {
       return;
     }
 
     isMediaActive = nextIsMediaActive;
+    activeMediaKind = nextMediaKind;
 
     sendRuntimeMessage(mediaMessageType, {
-      isMediaActive: nextIsMediaActive
+      isMediaActive: nextIsMediaActive,
+      mediaKind: nextMediaKind
     });
   };
 
   const syncMediaState = ({ force = false } = {}) => {
-    sendMediaState(getCurrentMediaState(), {
+    sendMediaState(getCurrentMediaKind(), {
       force
     });
   };
@@ -211,7 +228,9 @@
       return;
     }
 
-    isPageMediaActive = Boolean(event.data.payload?.isMediaActive);
+    pageMediaKind = event.data.payload?.isMediaActive
+      ? event.data.payload.mediaKind || "recording"
+      : null;
     syncMediaState();
   };
 

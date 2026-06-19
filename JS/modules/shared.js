@@ -1,6 +1,7 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 export const oneSecondInMilliseconds = 1000;
+export const mediaResumeSafetySeconds = 3;
 
 export const storageKeys = Object.freeze({
   appSettings: "recarregaAiSettings",
@@ -33,6 +34,19 @@ export const pauseReasons = Object.freeze({
   navigation: "navigation",
   typing: "typing"
 });
+
+export const mediaKinds = Object.freeze({
+  audio: "audio",
+  generic: "media",
+  recording: "recording",
+  video: "video"
+});
+
+const supportedMediaKinds = new Set(Object.values(mediaKinds));
+
+export const normalizeMediaKind = (mediaKind) => (
+  supportedMediaKinds.has(mediaKind) ? mediaKind : mediaKinds.generic
+);
 
 export const themeModes = Object.freeze({
   dark: "dark",

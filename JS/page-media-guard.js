@@ -1,10 +1,11 @@
-// RecarregaAi! 2.0.2
+// RecarregaAi! 2.0.6
 
 (() => {
   const guardFlag = "__recarregaAiMainWorldMediaGuardLoaded";
-  const guardVersion = 2;
+  const guardVersion = 3;
   const mediaStateType = "RECARREGA_AI_PAGE_MEDIA_STATE";
-  const source = "RECARREGA_AI_PAGE_MEDIA_GUARD_V2";
+  const sharedStateKey = "__recarregaAiMainWorldMediaState";
+  const source = "RECARREGA_AI_PAGE_MEDIA_GUARD_V3";
 
   if (window[guardFlag] === guardVersion) {
     return;
@@ -19,9 +20,15 @@
   );
 
   const postMediaState = () => {
+    const isRecording = hasRecordingMediaRecorder();
+
+    window[sharedStateKey] = {
+      isRecording
+    };
     window.postMessage({
       payload: {
-        isMediaActive: hasRecordingMediaRecorder()
+        isMediaActive: isRecording,
+        mediaKind: isRecording ? "recording" : null
       },
       source,
       type: mediaStateType
