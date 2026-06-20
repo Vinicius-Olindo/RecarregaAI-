@@ -1,4 +1,4 @@
-# RecarregaAi! 2.1.6
+# RecarregaAi! 2.1.9
 
 # Script legado para Windows. O empacotamento principal usa Node:
 # npm run zip
@@ -55,18 +55,20 @@ try {
             continue
         }
 
-        Get-ChildItem -LiteralPath $item.FullName -Recurse -File | ForEach-Object {
-            $relativePath = $_.FullName.Substring($root.Path.Length)
-            $relativePath = $relativePath.TrimStart([char[]]@("\", "/"))
-            $relativePath = $relativePath.Replace("\", "/")
+        Get-ChildItem -LiteralPath $item.FullName -Recurse -File |
+            Where-Object { $_.Name -ne ".gitkeep" } |
+            ForEach-Object {
+                $relativePath = $_.FullName.Substring($root.Path.Length)
+                $relativePath = $relativePath.TrimStart([char[]]@("\", "/"))
+                $relativePath = $relativePath.Replace("\", "/")
 
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-                $archive,
-                $_.FullName,
-                $relativePath,
-                [System.IO.Compression.CompressionLevel]::Optimal
-            ) | Out-Null
-        }
+                [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                    $archive,
+                    $_.FullName,
+                    $relativePath,
+                    [System.IO.Compression.CompressionLevel]::Optimal
+                ) | Out-Null
+            }
     }
 } finally {
     $archive.Dispose()

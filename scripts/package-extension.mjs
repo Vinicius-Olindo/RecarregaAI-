@@ -1,4 +1,4 @@
-// RecarregaAi! 2.1.6
+// RecarregaAi! 2.1.9
 
 import {
   existsSync,
@@ -62,7 +62,13 @@ const getDosDateTime = (date) => {
   };
 };
 
+const shouldIgnoreFile = (pathValue) => pathValue.endsWith(".gitkeep");
+
 const collectFiles = (pathValue) => {
+  if (shouldIgnoreFile(pathValue)) {
+    return [];
+  }
+
   const absolutePath = join(root, pathValue);
   const stats = statSync(absolutePath);
 

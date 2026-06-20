@@ -1,4 +1,4 @@
-// RecarregaAi! 2.1.6
+// RecarregaAi! 2.1.9
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import { extendPageTranslations } from "./modules/extended-translations.js";
@@ -34,7 +34,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desenvolvido por:",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.1.6. Política atualizada em 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.1.9. Política atualizada em 19/06/2026.",
     footerPrivacy: "Privacidade",
     headerContact: "Contato",
     headerNavLabel: "Navegação da política",
@@ -67,7 +67,7 @@ const privacyTranslations = extendPageTranslations({
     themeToDark: "Tema escuro",
     themeToLight: "Tema claro",
     sectionContactBody:
-      "Para dúvidas sobre privacidade, solicitações sobre feedback enviado ou esclarecimentos sobre dados processados pela extensão, use o e-mail onlibytedigital@gmail.com.",
+      "Para dúvidas sobre privacidade, solicitações sobre feedback enviado ou esclarecimentos sobre dados processados pela extensão, use o e-mail olinbytedigital@gmail.com.",
     sectionContactTitle: "10. Contato",
     sectionControlBody1:
       "O usuário pode alterar tema, idioma, timers, sites automáticos e permissões a qualquer momento nas páginas da extensão ou nas configurações do navegador.",
@@ -76,7 +76,7 @@ const privacyTranslations = extendPageTranslations({
     sectionControlBody3:
       "O usuário pode revogar permissões concedidas a sites ou remover a extensão. Ao removê-la, o Chrome exclui os dados associados ao armazenamento local da extensão.",
     sectionControlBody4:
-      "Arquivos exportados permanecem no local escolhido pelo usuário e devem ser excluídos manualmente. Para solicitar remoção ou esclarecimento sobre um feedback enviado, use o e-mail onlibytedigital@gmail.com.",
+      "Arquivos exportados permanecem no local escolhido pelo usuário e devem ser excluídos manualmente. Para solicitar remoção ou esclarecimento sobre um feedback enviado, use o e-mail olinbytedigital@gmail.com.",
     sectionControlTitle: "9. Controle do usuário",
     sectionDataBody1:
       "Para funcionar corretamente, a extensão processa localmente o endereço e a origem da página atual e de alguns recursos carregados por ela. Esses dados são usados para identificar o site, limpar cache, CacheStorage e service workers relacionados e recarregar a guia.",
@@ -168,7 +168,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Developed by:",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.1.6. Policy updated on 06/19/2026.",
+    footerLegal: "© RecarregaAi! 2.1.9. Policy updated on 06/19/2026.",
     footerPrivacy: "Privacy",
     headerContact: "Contact",
     headerNavLabel: "Policy navigation",
@@ -201,7 +201,7 @@ const privacyTranslations = extendPageTranslations({
     themeToDark: "Dark theme",
     themeToLight: "Light theme",
     sectionContactBody:
-      "For privacy questions, requests about submitted feedback or clarifications about data processed by the extension, email onlibytedigital@gmail.com.",
+      "For privacy questions, requests about submitted feedback or clarifications about data processed by the extension, email olinbytedigital@gmail.com.",
     sectionContactTitle: "10. Contact",
     sectionControlBody1:
       "The user can change the theme, language, timers, automatic sites and permissions at any time through extension pages or browser settings.",
@@ -210,7 +210,7 @@ const privacyTranslations = extendPageTranslations({
     sectionControlBody3:
       "The user can revoke permissions granted to sites or remove the extension. When it is removed, Chrome deletes data associated with the extension's local storage.",
     sectionControlBody4:
-      "Exported files remain in the location selected by the user and must be deleted manually. To request removal or clarification about submitted feedback, email onlibytedigital@gmail.com.",
+      "Exported files remain in the location selected by the user and must be deleted manually. To request removal or clarification about submitted feedback, email olinbytedigital@gmail.com.",
     sectionControlTitle: "9. User control",
     sectionDataBody1:
       "To work properly, the extension locally processes the address and origin of the current page and some resources loaded by it. This data is used to identify the site, clear related cache, CacheStorage and service workers, and reload the tab.",
@@ -302,7 +302,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desarrollado por:",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.1.6. Política actualizada el 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.1.9. Política actualizada el 19/06/2026.",
     footerPrivacy: "Privacidad",
     headerContact: "Contacto",
     headerNavLabel: "Navegación de la política",
@@ -335,7 +335,7 @@ const privacyTranslations = extendPageTranslations({
     themeToDark: "Tema oscuro",
     themeToLight: "Tema claro",
     sectionContactBody:
-      "Para dudas sobre privacidad, solicitudes sobre feedback enviado o aclaraciones sobre datos procesados por la extensión, usa el correo onlibytedigital@gmail.com.",
+      "Para dudas sobre privacidad, solicitudes sobre feedback enviado o aclaraciones sobre datos procesados por la extensión, usa el correo olinbytedigital@gmail.com.",
     sectionContactTitle: "10. Contacto",
     sectionControlBody1:
       "El usuario puede cambiar el tema, el idioma, los timers, los sitios automáticos y los permisos en cualquier momento desde las páginas de la extensión o la configuración del navegador.",
@@ -344,7 +344,7 @@ const privacyTranslations = extendPageTranslations({
     sectionControlBody3:
       "El usuario puede revocar permisos concedidos a sitios o eliminar la extensión. Al eliminarla, Chrome borra los datos asociados al almacenamiento local de la extensión.",
     sectionControlBody4:
-      "Los archivos exportados permanecen en la ubicación elegida por el usuario y deben eliminarse manualmente. Para solicitar la eliminación o una aclaración sobre feedback enviado, usa el correo onlibytedigital@gmail.com.",
+      "Los archivos exportados permanecen en la ubicación elegida por el usuario y deben eliminarse manualmente. Para solicitar la eliminación o una aclaración sobre feedback enviado, usa el correo olinbytedigital@gmail.com.",
     sectionControlTitle: "9. Control del usuario",
     sectionDataBody1:
       "Para funcionar correctamente, la extensión procesa localmente la dirección y el origen de la página actual y de algunos recursos cargados por ella. Estos datos se usan para identificar el sitio, limpiar caché, CacheStorage y service workers relacionados y recargar la pestaña.",

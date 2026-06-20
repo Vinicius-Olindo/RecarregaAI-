@@ -1,245 +1,287 @@
 # RecarregaAi!
 
-Versao atual: **2.1.6**.
+**Versão atual: 2.1.9**
 
-Extensao para Google Chrome que limpa o cache do site aberto, tenta limpar o cache
-dos recursos carregados pela pagina e recarrega a aba atual. Tambem permite ativar
-um timer para repetir esse processo automaticamente.
+Extensão para Google Chrome que limpa dados antigos do site aberto, recarrega a
+página sem depender do cache anterior e permite automatizar esse processo com
+um timer independente para cada guia.
 
-## Estrutura
+O projeto usa Manifest V3, solicita acesso aos sites somente quando necessário
+e mantém configurações, timers e histórico de ações no próprio navegador.
 
-```text
-RecarregaAI-/
-|-- manifest.json
-|-- options.html
-|-- privacy.html
-|-- popup.html
-|-- uninstall.html
-|-- welcome.html
-|-- CSS/
-|   |-- options.css
-|   |-- privacy.css
-|   |-- popup.css
-|   |-- shared-floating-tools.css
-|   |-- shared-footer.css
-|   |-- shared-language-dialog.css
-|   |-- uninstall.css
-|   `-- welcome.css
-|-- JS/
-|   |-- background.js
-|   |-- content.js
-|   |-- page-media-guard.js
-|   |-- options.js
-|   |-- popup.js
-|   |-- privacy.js
-|   |-- uninstall.js
-|   |-- welcome.js
-|   `-- modules/
-|       |-- cache.js
-|       |-- config.js
-|       |-- history.js
-|       |-- shared.js
-|       |-- storage.js
-|       |-- tabs.js
-|       `-- theme.js
-`-- assets/
-    |-- icons/
-    |   |-- icon16.png
-    |   |-- icon32.png
-    |   |-- icon48.png
-    |   |-- icon128.png
-    |   `-- recarregaai.svg
-    `-- images/
+## Funcionalidades
+
+- Limpeza manual de cache com recarregamento imediato da página atual.
+- Timers prontos de 3, 5 e 10 minutos.
+- Intervalo personalizado em minutos.
+- Vários timers funcionando ao mesmo tempo, um para cada guia.
+- Contagem regressiva no ícone da extensão.
+- Pausa e retomada manual diretamente pelo popup.
+- Pausa automática durante digitação, reprodução de áudio ou vídeo e gravações.
+- Proteção contra recarregamento após a guia sair do domínio original.
+- Sites automáticos que iniciam um timer quando são abertos.
+- Histórico local das 100 ações mais recentes, com filtros e limpeza manual.
+- Importação e exportação das preferências em arquivo JSON.
+- Tema claro e escuro.
+- Interface em português, inglês, espanhol, francês, alemão, italiano,
+  indonésio e turco.
+- Página de boas-vindas, política de privacidade e formulário de feedback de
+  desinstalação.
+
+## Como funciona
+
+### Limpeza manual
+
+Ao selecionar `Limpar e recarregar`, a extensão:
+
+1. Identifica a guia atual e as origens HTTP ou HTTPS carregadas por ela.
+2. Remove cache do navegador, CacheStorage e service workers dessas origens.
+3. Recarrega a guia ignorando o cache anterior.
+4. Registra localmente o resultado da ação.
+
+Cookies, sessões, senhas salvas e histórico de navegação não são removidos.
+
+Páginas internas do Chrome, a Chrome Web Store e outros endereços protegidos
+pelo navegador não permitem esse tipo de operação.
+
+### Timer por guia
+
+Cada guia pode manter seu próprio intervalo. Drive, sistemas internos, painéis
+e outras páginas podem ser atualizados ao mesmo tempo, sem que um timer
+substitua o outro.
+
+Para iniciar:
+
+1. Abra a página desejada.
+2. Abra o popup do RecarregaAi!.
+3. Escolha um intervalo pronto ou informe um tempo personalizado.
+4. Selecione `Ativar atualização`.
+
+O popup permite pausar, retomar, remover e abrir cada guia controlada. O badge
+do ícone exibe uma contagem como `3:00`, `2:59` e `2:58`.
+
+No Manifest V3, o service worker pode ser suspenso pelo Chrome. Por isso, a
+contagem no ícone deve ser entendida como um indicador aproximado quando o
+popup está fechado. O vencimento do timer é controlado por `chrome.alarms` e o
+popup aberto atualiza a interface com maior frequência.
+
+### Pausas de segurança
+
+O timer da guia é pausado automaticamente quando a extensão detecta:
+
+- digitação em campos de texto, áreas de texto ou editores da página;
+- reprodução de áudio ou vídeo;
+- gravação ativa com `MediaRecorder`;
+- navegação para fora do domínio em que o timer foi iniciado.
+
+A contagem continua quando a atividade termina. Campos de senha não são
+monitorados pela proteção de digitação.
+
+### Sites automáticos
+
+Na página de configurações, o usuário pode cadastrar sites que devem iniciar
+um timer quando forem abertos. Cada endereço pode usar o intervalo padrão ou um
+tempo próprio.
+
+A extensão solicita permissão apenas para o domínio cadastrado. Endereços
+duplicados são recusados e podem ser removidos a qualquer momento.
+
+## Configurações
+
+A página `options.html` reúne:
+
+- intervalo padrão;
+- cadastro e remoção de sites automáticos;
+- importação e exportação de configurações;
+- histórico local com filtros por tipo de ação;
+- explicação das permissões utilizadas;
+- seleção de idioma e tema.
+
+O arquivo exportado inclui intervalo padrão, sites automáticos, tema e idioma.
+Timers ativos e histórico não entram no backup porque pertencem à instalação
+atual do navegador.
+
+## Instalação para desenvolvimento
+
+### Carregar a pasta no Chrome
+
+1. Clone ou baixe este repositório.
+2. Abra `chrome://extensions/`.
+3. Ative o `Modo do desenvolvedor`.
+4. Selecione `Carregar sem compactação`.
+5. Escolha a pasta raiz do projeto.
+
+Ao instalar pela primeira vez, o Chrome abre `welcome.html` automaticamente.
+
+### Preparar o ambiente de qualidade
+
+O Node.js é necessário apenas para validação e empacotamento. Use uma versão
+compatível com o ESLint 9.
+
+```powershell
+npm ci --ignore-scripts
+npm run check
 ```
 
-## Como testar no Chrome
+Depois de alterar a extensão, abra `chrome://extensions/` e selecione
+`Recarregar` no card do RecarregaAi!.
 
-1. Abra `chrome://extensions/`.
-2. Ative o modo de desenvolvedor.
-3. Clique em `Carregar sem compactacao`.
-4. Selecione a pasta raiz deste projeto.
+## Permissões
 
-Ao instalar a extensao pela primeira vez, o Chrome abre automaticamente
-`welcome.html` com as instrucoes iniciais.
+O manifesto não possui `host_permissions` obrigatórias. Os acessos a sites
+ficam em `optional_host_permissions` e são solicitados por domínio durante uma
+ação iniciada pelo usuário.
 
-A pagina de boas-vindas tem estrutura de tela inicial do produto: hero com CTA,
-faixa de beneficios, cards de recursos, casos de uso em acordeao, FAQ e chamada
-final para comecar.
-
-Ao desinstalar, o Chrome abre a pagina de feedback configurada no background.
-Como a extensao ja foi removida nesse momento, a URL precisa ser `http` ou
-`https`.
-
-## Funcionamento
-
-Ao clicar no botao da extensao, o RecarregaAi!:
-
-1. Identifica a aba aberta.
-2. Coleta as origens dos recursos carregados pela pagina, como scripts, estilos,
-   imagens, fetches e iframes acessiveis.
-3. Limpa o cache dessas origens, incluindo cache do navegador, CacheStorage e service workers.
-4. Recarrega a pagina ignorando o cache.
-
-## Timer
-
-O timer permite repetir a limpeza e o recarregamento automaticamente na aba
-selecionada. Cada guia pode ter seu proprio timer.
-
-Se voce tiver varias guias abertas, clique em `Ativar timer` nas guias que deseja
-monitorar. O Drive pode ficar com um timer, outro sistema pode ficar com outro,
-e cada contador aparece somente na guia correspondente.
-
-Opcoes disponiveis:
-
-- 3 minutos.
-- 5 minutos.
-- 10 minutos.
-- Personalizado, em minutos.
-
-Para usar:
-
-1. Abra a pagina que deseja manter recarregando.
-2. Abra o RecarregaAi!.
-3. Escolha o tempo.
-4. Clique em `Ativar timer`.
-
-Para encerrar o agendamento da guia atual, clique em `Parar timer`.
-
-Tambem e possivel pausar e retomar o timer da guia atual. Quando existem timers
-em outras guias, o popup mostra uma lista compacta para abrir cada uma.
-
-Quando existe um campo de texto ativo em uma guia monitorada, como input,
-textarea ou editor da propria pagina, apenas o timer daquela guia pausa
-automaticamente. Ao sair do campo, a contagem continua do ponto em que parou.
-
-Enquanto o timer estiver ativo, o icone da extensao mostra a contagem regressiva
-no badge, como `3:00`, `2:59`, `2:58` e assim por diante. Ao parar o timer, o
-badge e removido.
-
-O badge do icone deve ser tratado como indicador aproximado quando o popup esta
-fechado. No Manifest V3, o service worker pode dormir e o `chrome.alarms` nao e
-um cronometro exato de segundo. Com o popup aberto, a interface atualiza a
-contagem com mais frequencia.
-
-O badge aparece somente nas guias que possuem timer ativo. Nas outras guias, o
-icone fica sem contador.
-
-## Configuracoes
-
-A pagina `options.html` permite:
-
-- Definir o intervalo padrao do timer.
-- Cadastrar sites para auto-inicio.
-- Remover sites cadastrados.
-- Consultar e limpar o historico local de acoes.
-- Ver uma explicacao clara das permissoes usadas pela extensao.
-
-O auto-inicio cria um timer separado para cada guia carregada com um site
-favorito, desde que aquela guia ainda nao tenha timer ativo.
-
-O historico mantem localmente apenas as 100 acoes mais recentes. Ele registra
-limpezas manuais, atualizacoes automaticas e mudancas dos timers, guardando
-somente tipo, horario, dominio, intervalo e resultado. URLs completas, conteudo
-das paginas e texto digitado nao sao armazenados. O historico pode ser filtrado
-ou apagado na pagina de configuracoes e nao entra no arquivo de backup.
-
-Ao ativar um timer manual ou cadastrar um site de auto-inicio, a permissao do
-dominio e solicitada durante a acao do usuario. Isso deixa o timer mais
-confiavel apos reiniciar o Chrome.
+| Permissão | Finalidade |
+| --- | --- |
+| `activeTab` | Autorizar a ação na guia escolhida após a interação do usuário. |
+| `alarms` | Agendar os próximos recarregamentos mesmo quando o service worker é suspenso. |
+| `browsingData` | Remover cache, CacheStorage e service workers das origens identificadas. |
+| `scripting` | Coletar origens e ativar as proteções de digitação e mídia na página controlada. |
+| `storage` | Salvar preferências, timers e histórico local no navegador. |
+| `tabs` | Identificar, recarregar, acompanhar e abrir as guias controladas. |
+| `http://*/*` e `https://*/*` | Permissões opcionais solicitadas somente para os sites autorizados pelo usuário. |
 
 ## Privacidade
 
-A pagina `privacy.html` resume como a extensao lida com dados:
+- O RecarregaAi! não vende dados.
+- O conteúdo das páginas e os textos digitados não são armazenados.
+- Configurações, timers e histórico permanecem no armazenamento local do
+  Chrome.
+- O histórico guarda somente tipo de ação, horário, domínio, intervalo,
+  resultado e um detalhe técnico limitado.
+- O histórico mantém no máximo 100 entradas e pode ser apagado pelo usuário.
+- O feedback de desinstalação é opcional e utiliza o FormSubmit.
+- Comentário e e-mail no formulário também são opcionais.
 
-- Nao vende dados.
-- Nao coleta conteudo das paginas.
-- Salva configuracoes localmente no Chrome.
-- Mantem localmente um historico limitado das acoes da extensao.
-- Usa permissoes opcionais apenas para dominios escolhidos pelo usuario.
-- Feedback de desinstalacao e opcional e enviado via FormSubmit.
-- Email de contato no feedback tambem e opcional.
+A política completa está em `privacy.html` e pode ser publicada pelo GitHub
+Pages junto com as demais páginas públicas.
 
-## Feedback de desinstalacao
+## Feedback de desinstalação
 
-A pagina `uninstall.html` foi pensada para ser simples e objetiva: o usuario le
-um texto curto, escolhe um motivo em uma lista de opcoes e envia o feedback na
-propria pagina. Comentario e email continuam opcionais, mas ficam em uma area
-recolhida para nao alongar o fluxo.
-
-Tambem possui acoes flutuantes compactas para idioma e voltar ao inicio. Os
-nomes aparecem no hover ou foco, e o idioma abre uma janela com os idiomas
-disponiveis: Portugues (BR), English, Espanol, Francais, Deutsch, Italiano,
-Bahasa Indonesia e Turkce.
-
-O topo da pagina possui um botao `Adicionar ao Chrome`, pensado para apontar
-para a pagina publica da extensao quando ela estiver publicada.
-
-O envio automatico vai direto para o email do projeto por FormSubmit, sem abrir
-GitHub, tela intermediaria ou outro formulario. O envio usa AJAX e so informa
-sucesso depois da confirmacao do servico. A protecao antispam do FormSubmit fica
-ativa, e a pagina limita o tamanho dos campos e o intervalo entre envios.
-
-O background configura a URL de desinstalacao com:
+O Chrome abre o endereço abaixo depois que a extensão é removida:
 
 ```text
 https://vinicius-olindo.github.io/RecarregaAI-/uninstall.html
 ```
 
-Esse link deve permanecer fixo, sem parametros no final e sem troca por CDN,
-GitHub issue, RawGitHack ou outro servico intermediario.
-
-Essa URL precisa estar publicada pelo GitHub Pages. Sem essa publicacao, o
-Chrome abre `404` depois da desinstalacao.
-
-No repositorio, ative:
+Esse endereço deve permanecer fixo e publicado em:
 
 ```text
 Settings > Pages > Deploy from a branch > main > /root
 ```
 
-Servicos com etapa intermediaria foram evitados porque exibem uma confirmacao
-antes de abrir HTML. CDN cru tambem nao serve porque pode mostrar o codigo da
-pagina em vez da interface.
+O formulário envia os dados diretamente para o endpoint configurado em
+`JS/modules/config.js`. A proteção antispam do FormSubmit permanece ativa, e o
+cliente limita o tamanho dos campos e o intervalo entre envios.
 
-O formulario envia para:
+## Estrutura do projeto
 
 ```text
-https://formsubmit.co/ajax/onlibytedigital@gmail.com
+RecarregaAI-/
+|-- manifest.json
+|-- popup.html
+|-- options.html
+|-- welcome.html
+|-- privacy.html
+|-- uninstall.html
+|-- CSS/
+|   |-- popup.css
+|   |-- options.css
+|   |-- welcome.css
+|   |-- privacy.css
+|   |-- uninstall.css
+|   `-- shared-*.css
+|-- JS/
+|   |-- background.js
+|   |-- content.js
+|   |-- page-media-guard.js
+|   |-- popup.js
+|   |-- options.js
+|   |-- welcome.js
+|   |-- privacy.js
+|   |-- uninstall.js
+|   `-- modules/
+|       |-- cache.js
+|       |-- config.js
+|       |-- extended-translations.js
+|       |-- floating-tools.js
+|       |-- history.js
+|       |-- language-dialog.js
+|       |-- public-page-security.js
+|       |-- shared.js
+|       |-- storage.js
+|       |-- tabs.js
+|       `-- theme.js
+|-- assets/
+|   |-- icons/
+|   `-- images/
+|-- scripts/
+|   |-- check-js.mjs
+|   |-- check-manifest.mjs
+|   |-- package-extension.mjs
+|   `-- package-extension.ps1
+|-- eslint.config.mjs
+|-- package.json
+`-- package-lock.json
 ```
 
-No primeiro envio, o FormSubmit pode pedir confirmacao no email de destino.
+Os arquivos HTML permanecem na raiz. Estilos ficam em `CSS/`, scripts em `JS/`
+e comportamentos compartilhados em `JS/modules/`.
 
-## Engenharia e qualidade
+## Qualidade
 
-- As permissoes de site ficam em `optional_host_permissions`.
-- O auto-inicio pede permissao apenas para o dominio cadastrado pelo usuario.
-- O service worker usa modulos ES em `JS/modules/`.
-- O `setInterval` atualiza a UI/badge; o reload fica com `chrome.alarms`.
-- O timer fica preso ao dominio original e pausa se a aba sair dele.
-- Campos de senha nao entram na protecao de digitacao.
-- URLs e endpoints fixos ficam em `JS/modules/config.js`.
-- Tema claro/escuro fica centralizado em `JS/modules/theme.js`.
-- Timers ficam em chaves individuais no storage, como `recarregaAiTimer:123`.
-- O historico local usa uma fila de gravacao e mantem no maximo 100 acoes.
-- Use `npm run check` para validar scripts, manifest e lint quando instalado.
-- Use `npm run lint` para rodar ESLint apos `npm install`.
-- Use `npm run zip` para gerar o pacote em `dist/recarregaai.zip`.
-- O `npm run zip` usa Node e funciona melhor fora do Windows.
-- O `npm run zip:ps` mantem o empacotamento antigo em PowerShell.
+Instale as dependências antes de usar os comandos deste projeto:
 
-## Tema
+```powershell
+npm ci --ignore-scripts
+```
 
-O tema claro e escuro fica centralizado na pagina de configuracoes e nas paginas
-com ferramentas flutuantes. O popup apenas acompanha a preferencia salva no
-navegador.
+| Comando | Resultado |
+| --- | --- |
+| `npm run check` | Valida a sintaxe JavaScript, o manifesto e o ESLint. |
+| `npm run check:js` | Verifica os arquivos JavaScript do pacote. |
+| `npm run check:manifest` | Valida estrutura, arquivos e permissões do manifesto. |
+| `npm run lint` | Executa o ESLint sem aceitar avisos. |
+| `npm audit` | Verifica vulnerabilidades conhecidas nas dependências. |
 
-## Observacoes
+## Empacotamento
 
-- O projeto usa Manifest V3.
-- Os arquivos de estilo ficam em `CSS/`.
-- Os arquivos JavaScript ficam em `JS/`.
-- A tela inicial da extensao fica em `popup.html`.
-- A pagina de configuracoes fica em `options.html`.
-- A cada alteracao da extensao, incremente a versao.
-- Quando a ultima casa chegar em `9`, suba a casa anterior.
+O pacote oficial é gerado com Node.js:
+
+```powershell
+npm run zip
+```
+
+O comando executa todas as validações e cria:
+
+```text
+dist/recarregaai.zip
+```
+
+No Windows, o empacotador legado também está disponível:
+
+```powershell
+npm run zip:ps
+```
+
+Os dois processos incluem somente os arquivos necessários para a extensão e
+ignoram marcadores como `.gitkeep`. A pasta `dist/`, documentação, dependências
+de desenvolvimento e scripts de build não entram no ZIP.
+
+O arquivo `dist/recarregaai.zip` é o artefato destinado ao envio para a Chrome
+Web Store.
+
+## Versionamento
+
+- A versão usa apenas números, sem o prefixo `V`.
+- Cada card ou alteração concluída gera uma nova versão.
+- A versão deve permanecer sincronizada em todos os arquivos do projeto.
+- Quando a última casa chegar a `9`, a casa anterior é incrementada.
 - Exemplo: depois de `2.1.9`, use `2.2.0`.
+
+## Contato
+
+- Empresa: Olinbyte Digital
+- E-mail: [olinbytedigital@gmail.com](mailto:olinbytedigital@gmail.com)
+- Instagram: [@olinbytedigital](https://www.instagram.com/olinbytedigital/)

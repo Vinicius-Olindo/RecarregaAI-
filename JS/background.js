@@ -1,4 +1,4 @@
-// RecarregaAi! 2.1.6
+// RecarregaAi! 2.1.9
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -50,6 +50,8 @@ import {
 import { collectLoadedOrigins } from "./modules/tabs.js";
 
 let badgeCountdownTimerId = null;
+let badgeCountdownRestartQueue = Promise.resolve();
+const autoStartTimerTabIds = new Set();
 const scheduledRefreshTabIds = new Set();
 const automaticPauseReasons = new Set([
   pauseReasons.media,
@@ -508,7 +510,7 @@ const handleBadgeCountdownTick = async () => {
   await updateAllTimerBadges(refreshedTimerSettingsList);
 };
 
-const startBadgeCountdown = async () => {
+const restartBadgeCountdown = async () => {
   stopBadgeCountdown();
 
   const timerSettingsList = await getAllTimerSettings();
@@ -527,6 +529,16 @@ const startBadgeCountdown = async () => {
       console.error("Erro ao atualizar badges do RecarregaAi:", error);
     });
   }, oneSecondInMilliseconds);
+};
+
+const startBadgeCountdown = () => {
+  const restartPromise = badgeCountdownRestartQueue
+    .catch(() => undefined)
+    .then(restartBadgeCountdown);
+
+  badgeCountdownRestartQueue = restartPromise;
+
+  return restartPromise;
 };
 
 const startStoredBadgeCountdown = async () => {
@@ -902,7 +914,7 @@ const hasAutoStartPermission = async (origin) => (
   })
 );
 
-const autoStartTimerForTab = async (tabId, tab) => {
+const runAutoStartTimerForTab = async (tabId, tab) => {
   if (!tab?.url) {
     return;
   }
@@ -942,6 +954,20 @@ const autoStartTimerForTab = async (tabId, tab) => {
     tabUrl: tab.url,
     windowId: tab.windowId
   });
+};
+
+const autoStartTimerForTab = async (tabId, tab) => {
+  if (autoStartTimerTabIds.has(tabId)) {
+    return;
+  }
+
+  autoStartTimerTabIds.add(tabId);
+
+  try {
+    await runAutoStartTimerForTab(tabId, tab);
+  } finally {
+    autoStartTimerTabIds.delete(tabId);
+  }
 };
 
 const updateTimerAfterTabLoad = async (tabId, tab, timerSettings) => {
@@ -1508,7 +1534,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   const tabId = getTabIdFromTimerAlarmName(alarm.name);
 
   if (typeof tabId === "number") {
-    runScheduledRefresh(tabId);
+    runScheduledRefresh(tabId).catch((error) => {
+      console.error("Erro ao executar reload agendado do RecarregaAi:", error);
+    });
   }
 });
 
