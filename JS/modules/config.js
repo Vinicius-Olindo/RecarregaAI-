@@ -1,6 +1,7 @@
-// RecarregaAi! 2.1.9
+// RecarregaAi! 2.2.1
 
 export const appConfig = Object.freeze({
+  chromeWebStoreUrl: "",
   feedbackSubmitUrl: "https://formsubmit.co/ajax/olinbytedigital@gmail.com",
   supportEmail: "olinbytedigital@gmail.com",
   uninstallFeedbackPageUrl:

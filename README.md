@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-**Versão atual: 2.1.9**
+**Versão atual: 2.2.1**
 
 Extensão para Google Chrome que limpa dados antigos do site aberto, recarrega a
 página sem depender do cache anterior e permite automatizar esse processo com
@@ -139,7 +139,6 @@ ação iniciada pelo usuário.
 | `browsingData` | Remover cache, CacheStorage e service workers das origens identificadas. |
 | `scripting` | Coletar origens e ativar as proteções de digitação e mídia na página controlada. |
 | `storage` | Salvar preferências, timers e histórico local no navegador. |
-| `tabs` | Identificar, recarregar, acompanhar e abrir as guias controladas. |
 | `http://*/*` e `https://*/*` | Permissões opcionais solicitadas somente para os sites autorizados pelo usuário. |
 
 ## Privacidade
@@ -179,6 +178,7 @@ cliente limita o tamanho dos campos e o intervalo entre envios.
 
 ```text
 RecarregaAI-/
+|-- index.html
 |-- manifest.json
 |-- popup.html
 |-- options.html
@@ -229,6 +229,10 @@ RecarregaAI-/
 Os arquivos HTML permanecem na raiz. Estilos ficam em `CSS/`, scripts em `JS/`
 e comportamentos compartilhados em `JS/modules/`.
 
+No GitHub Pages, `index.html` direciona a raiz do projeto para `welcome.html`.
+O arquivo `.nojekyll` mantém a publicação como um site estático, sem transformar
+o README em página inicial.
+
 ## Qualidade
 
 Instale as dependências antes de usar os comandos deste projeto:
@@ -272,13 +276,18 @@ de desenvolvimento e scripts de build não entram no ZIP.
 O arquivo `dist/recarregaai.zip` é o artefato destinado ao envio para a Chrome
 Web Store.
 
+Depois que o painel da Chrome Web Store gerar a URL específica da extensão,
+preencha `chromeWebStoreUrl` em `JS/modules/config.js`. Enquanto esse campo
+estiver vazio, os botões `Adicionar ao Chrome` permanecem ocultos para não
+direcionar o usuário a uma página genérica.
+
 ## Versionamento
 
 - A versão usa apenas números, sem o prefixo `V`.
 - Cada card ou alteração concluída gera uma nova versão.
 - A versão deve permanecer sincronizada em todos os arquivos do projeto.
 - Quando a última casa chegar a `9`, a casa anterior é incrementada.
-- Exemplo: depois de `2.1.9`, use `2.2.0`.
+- Exemplo: depois de `2.2.1`, use `2.2.1`.
 
 ## Contato
 

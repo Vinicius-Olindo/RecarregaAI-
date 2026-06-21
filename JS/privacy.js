@@ -1,4 +1,4 @@
-// RecarregaAi! 2.1.9
+// RecarregaAi! 2.2.1
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import { extendPageTranslations } from "./modules/extended-translations.js";
@@ -34,7 +34,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desenvolvido por:",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.1.9. Política atualizada em 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.2.1. Política atualizada em 19/06/2026.",
     footerPrivacy: "Privacidade",
     headerContact: "Contato",
     headerNavLabel: "Navegação da política",
@@ -140,8 +140,6 @@ const privacyTranslations = extendPageTranslations({
       "Usada para executar na página as verificações locais de digitação e mídia e identificar origens necessárias à limpeza.",
     permissionStorage:
       "Usada para salvar preferências, timers e resultados localmente.",
-    permissionTabs:
-      "Usada para identificar a guia, associar timers, acessar o endereço e o título necessários ao controle e recarregar a guia programada.",
     summaryFeedbackBody:
       "O único envio externo previsto acontece se o usuário decidir enviar o formulário de feedback de desinstalação.",
     summaryFeedbackTitle: "Feedback opcional",
@@ -168,7 +166,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Developed by:",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.1.9. Policy updated on 06/19/2026.",
+    footerLegal: "© RecarregaAi! 2.2.1. Policy updated on 06/19/2026.",
     footerPrivacy: "Privacy",
     headerContact: "Contact",
     headerNavLabel: "Policy navigation",
@@ -274,8 +272,6 @@ const privacyTranslations = extendPageTranslations({
       "Used to run local typing and media checks on the page and identify origins required for cleanup.",
     permissionStorage:
       "Used to save preferences, timers and results locally.",
-    permissionTabs:
-      "Used to identify the tab, associate timers, access the address and title required for control, and reload the scheduled tab.",
     summaryFeedbackBody:
       "The only expected external submission happens if the user chooses to send the uninstall feedback form.",
     summaryFeedbackTitle: "Optional feedback",
@@ -302,7 +298,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desarrollado por:",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.1.9. Política actualizada el 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.2.1. Política actualizada el 19/06/2026.",
     footerPrivacy: "Privacidad",
     headerContact: "Contacto",
     headerNavLabel: "Navegación de la política",
@@ -408,8 +404,6 @@ const privacyTranslations = extendPageTranslations({
       "Usada para ejecutar en la página las verificaciones locales de escritura y medios e identificar los orígenes necesarios para la limpieza.",
     permissionStorage:
       "Usada para guardar preferencias, timers y resultados localmente.",
-    permissionTabs:
-      "Usada para identificar la pestaña, asociar timers, acceder a la dirección y al título necesarios para el control y recargar la pestaña programada.",
     summaryFeedbackBody:
       "El único envío externo previsto ocurre si el usuario decide enviar el formulario de feedback de desinstalación.",
     summaryFeedbackTitle: "Feedback opcional",
@@ -683,7 +677,6 @@ const applyPrivacyLanguage = (language) => {
   setTexts(".permission-list dd", [
     "permissionBrowsingData",
     "permissionStorage",
-    "permissionTabs",
     "permissionActiveTab",
     "permissionScripting",
     "permissionAlarms",

@@ -1,4 +1,4 @@
-// RecarregaAi! 2.1.9
+// RecarregaAi! 2.2.1
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -15,7 +15,7 @@ import { enforceTopLevelPublicPage } from "./modules/public-page-security.js";
 enforceTopLevelPublicPage();
 
 const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
-const defaultVersionLabel = "2.1.9";
+const defaultVersionLabel = "2.2.1";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Não informou motivo";
 const feedbackCooldownInMilliseconds = 60 * 1000;
@@ -36,7 +36,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.1.9. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.1. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     formSubmitError:
       "Não consegui confirmar o envio agora. Tente novamente em alguns instantes.",
@@ -65,7 +65,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.1.9"
+    versionLabel: "2.2.1"
   },
   en: {
     backToTop: "Back to start",
@@ -77,7 +77,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.1.9. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.2.1. All rights reserved.",
     footerPrivacy: "Privacy",
     formSubmitError:
       "I could not confirm the send right now. Try again in a few moments.",
@@ -105,7 +105,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "2.1.9"
+    versionLabel: "2.2.1"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -117,7 +117,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.1.9. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.1. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     formSubmitError:
       "No pude confirmar el envío ahora. Inténtalo de nuevo en unos momentos.",
@@ -145,7 +145,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.1.9"
+    versionLabel: "2.2.1"
   }
 }, "uninstall");
 
@@ -255,6 +255,7 @@ const reasonTranslations = extendReasonTranslationMap({
 });
 
 const uninstallElements = {
+  chromeWebStoreLink: document.querySelector("[data-chrome-web-store-link]"),
   closeLanguageButton: document.querySelector("#close-language-button"),
   contactEmail: document.querySelector("#contact-email"),
   extensionVersion: document.querySelector("#extension-version"),
@@ -280,6 +281,15 @@ const uninstallElements = {
 
 let isSendingFeedback = false;
 let activeLanguage = defaultLanguage;
+
+const configureChromeWebStoreLink = () => {
+  if (!uninstallElements.chromeWebStoreLink || !appConfig.chromeWebStoreUrl) {
+    return;
+  }
+
+  uninstallElements.chromeWebStoreLink.href = appConfig.chromeWebStoreUrl;
+  uninstallElements.chromeWebStoreLink.hidden = false;
+};
 
 const getVersionLabel = () => defaultVersionLabel;
 
@@ -644,6 +654,7 @@ window.addEventListener("keydown", (event) => {
 });
 
 initializePage();
+configureChromeWebStoreLink();
 initFloatingTools();
 loadUninstallTheme().catch((error) => {
   console.error("Erro ao carregar tema da desinstalação:", error);

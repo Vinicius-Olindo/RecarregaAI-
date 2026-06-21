@@ -1,5 +1,6 @@
-// RecarregaAi! 2.1.9
+// RecarregaAi! 2.2.1
 
+import { appConfig } from "./modules/config.js";
 import { initFloatingTools } from "./modules/floating-tools.js";
 import {
   loadThemePreference,
@@ -69,7 +70,7 @@ const welcomeTranslations = extendPageTranslations({
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.1.9. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.1. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     heroDescription:
       "Use timers por guia, limpe o cache do site aberto e mantenha sistemas como Drive, painéis internos e páginas de trabalho sempre atualizados.",
@@ -169,7 +170,7 @@ const welcomeTranslations = extendPageTranslations({
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.1.9. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.2.1. All rights reserved.",
     footerPrivacy: "Privacy",
     heroDescription:
       "Use timers by tab, clear the open site's cache and keep systems such as Drive, internal dashboards and work pages always updated.",
@@ -268,7 +269,7 @@ const welcomeTranslations = extendPageTranslations({
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.1.9. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.1. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     heroDescription:
       "Usa timers por pestaña, limpia la caché del sitio abierto y mantén sistemas como Drive, paneles internos y páginas de trabajo siempre actualizados.",
@@ -320,6 +321,7 @@ const welcomeTranslations = extendPageTranslations({
 }, "welcome");
 
 const welcomeElements = {
+  chromeWebStoreLink: document.querySelector("[data-chrome-web-store-link]"),
   closeLanguageButton: document.querySelector("#close-language-button"),
   finishButtons: document.querySelectorAll("[data-finish-welcome]"),
   languageBackdrop: document.querySelector("[data-close-language]"),
@@ -331,6 +333,15 @@ const welcomeElements = {
 };
 
 let activeWelcomeLanguage = defaultWelcomeLanguage;
+
+const configureChromeWebStoreLink = () => {
+  if (!welcomeElements.chromeWebStoreLink || !appConfig.chromeWebStoreUrl) {
+    return;
+  }
+
+  welcomeElements.chromeWebStoreLink.href = appConfig.chromeWebStoreUrl;
+  welcomeElements.chromeWebStoreLink.hidden = false;
+};
 
 const getWelcomeCopy = (key) => (
   welcomeTranslations[activeWelcomeLanguage]?.[key]
@@ -651,4 +662,5 @@ Promise.all([
   console.error("Erro ao carregar boas-vindas:", error);
 });
 
+configureChromeWebStoreLink();
 initFloatingTools();
