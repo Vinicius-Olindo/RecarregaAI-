@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.9
+// RecarregaAi! 2.3.1
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -15,7 +15,7 @@ import { enforceTopLevelPublicPage } from "./modules/public-page-security.js";
 enforceTopLevelPublicPage();
 
 const feedbackBackendUrl = appConfig.feedbackBackendUrl;
-const defaultVersionLabel = "2.2.9";
+const defaultVersionLabel = "2.3.1";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Não informou motivo";
 const feedbackCooldownInMilliseconds = 60 * 1000;
@@ -24,10 +24,12 @@ const feedbackLastSubmitAtKey = "recarregaAiFeedbackLastSubmitAt";
 const feedbackMessageMaxLength = 1200;
 const feedbackEmailMaxLength = 254;
 const feedbackResponseSource = "recarregaai-feedback";
-const feedbackResponseOrigins = new Set([
-  "https://script.google.com",
-  "https://script.googleusercontent.com"
+const feedbackResponseHostnames = new Set([
+  "script.google.com",
+  "script.googleusercontent.com"
 ]);
+const feedbackResponseHostnamePattern =
+  /^[a-z0-9-]+-script\.googleusercontent\.com$/;
 const languageStorageKey = "recarregaAiPageLanguage";
 const legacyLanguageStorageKey = "recarregaAiUninstallLanguage";
 
@@ -42,7 +44,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.2.9. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.3.1. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
     feedbackNotConfigured:
       "O serviço de feedback ainda não foi configurado.",
@@ -71,7 +73,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.2.9"
+    versionLabel: "2.3.1"
   },
   en: {
     backToTop: "Back to start",
@@ -83,7 +85,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.2.9. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.3.1. All rights reserved.",
     footerPrivacy: "Privacy",
     feedbackNotConfigured:
       "The feedback service has not been configured yet.",
@@ -111,7 +113,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "2.2.9"
+    versionLabel: "2.3.1"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -123,7 +125,7 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.2.9. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.3.1. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
     feedbackNotConfigured:
       "El servicio de feedback todavía no está configurado.",
@@ -151,7 +153,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.2.9"
+    versionLabel: "2.3.1"
   }
 }, "uninstall");
 
@@ -318,6 +320,23 @@ const getConfiguredFeedbackBackendUrl = () => {
   }
 };
 
+const isTrustedFeedbackResponseOrigin = (origin) => {
+  try {
+    const responseUrl = new URL(origin);
+    const isGoogleusercontentScriptHost = feedbackResponseHostnamePattern.test(
+      responseUrl.hostname
+    );
+
+    return responseUrl.protocol === "https:"
+      && (
+        feedbackResponseHostnames.has(responseUrl.hostname)
+        || isGoogleusercontentScriptHost
+      );
+  } catch {
+    return false;
+  }
+};
+
 const hasConfiguredFeedbackBackend = () => Boolean(
   getConfiguredFeedbackBackendUrl()
 );
@@ -438,6 +457,7 @@ const buildFeedbackPayload = () => {
     idioma: activeLanguage,
     motivo: getSelectedReason(),
     navegador: navigator.userAgent,
+    responseOrigin: window.location.origin,
     submissionId: crypto.randomUUID(),
     versao: getVersionLabel(),
     website: ""
@@ -487,7 +507,7 @@ const submitFeedbackToBackend = (feedbackPayload) => new Promise((
   };
 
   const handleFeedbackResponse = (event) => {
-    const isExpectedResponse = feedbackResponseOrigins.has(event.origin)
+    const isExpectedResponse = isTrustedFeedbackResponseOrigin(event.origin)
       && event.data?.source === feedbackResponseSource
       && event.data?.submissionId === feedbackPayload.submissionId;
 

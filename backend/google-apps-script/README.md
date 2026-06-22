@@ -1,4 +1,4 @@
-# Backend de feedback - RecarregaAi! 2.2.9
+# Backend de feedback - RecarregaAi! 2.3.1
 
 Este endpoint envia o feedback diretamente para
 `olinbytedigital@gmail.com` usando o Google Apps Script. O navegador publica o
@@ -29,4 +29,5 @@ trocar a URL publica configurada no projeto.
 - bloqueio de envios duplicados;
 - escape do HTML do e-mail;
 - resposta assinada com o identificador unico da submissao;
-- confirmacao enviada apenas para a origem oficial do GitHub Pages.
+- confirmacao enviada apenas para a origem oficial do GitHub Pages ou para
+  uma origem valida da extensao (`chrome-extension://`).

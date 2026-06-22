@@ -1,31 +1,48 @@
-// RecarregaAi! 2.2.9
+// RecarregaAi! 2.3.1
 
 const FEEDBACK_RECIPIENT = "olinbytedigital@gmail.com";
 const FEEDBACK_PAGE_ORIGIN = "https://vinicius-olindo.github.io";
 const FEEDBACK_RESPONSE_SOURCE = "recarregaai-feedback";
+const EXTENSION_ORIGIN_PATTERN = /^chrome-extension:\/\/[a-p]{32}$/;
 const MAX_SUBMISSIONS_PER_MINUTE = 20;
 
 function doPost(event) {
   const parameters = event && event.parameter ? event.parameter : {};
   const submissionId = cleanText_(parameters.submissionId, 100);
+  const responseOrigin = getResponseOrigin_(parameters.responseOrigin);
 
   try {
     validateSubmission_(parameters, submissionId);
 
     if (cleanText_(parameters.website, 200)) {
-      return createResponse_(true, submissionId, "Feedback recebido.");
+      return createResponse_(
+        true,
+        submissionId,
+        "Feedback recebido.",
+        responseOrigin
+      );
     }
 
     const submissionState = reserveSubmission_(submissionId);
 
     if (submissionState === "duplicate") {
-      return createResponse_(true, submissionId, "Feedback ja recebido.");
+      return createResponse_(
+        true,
+        submissionId,
+        "Feedback ja recebido.",
+        responseOrigin
+      );
     }
 
     sendFeedbackEmail_(parameters);
     confirmSubmission_(submissionId);
 
-    return createResponse_(true, submissionId, "Feedback enviado.");
+    return createResponse_(
+      true,
+      submissionId,
+      "Feedback enviado.",
+      responseOrigin
+    );
   } catch (error) {
     releaseSubmission_(submissionId);
     console.error("Falha ao processar feedback:", error);
@@ -33,9 +50,20 @@ function doPost(event) {
     return createResponse_(
       false,
       submissionId,
-      "Nao foi possivel enviar o feedback."
+      "Nao foi possivel enviar o feedback.",
+      responseOrigin
     );
   }
+}
+
+function getResponseOrigin_(requestedOrigin) {
+  const origin = cleanText_(requestedOrigin, 200);
+
+  if (origin === FEEDBACK_PAGE_ORIGIN || EXTENSION_ORIGIN_PATTERN.test(origin)) {
+    return origin;
+  }
+
+  return FEEDBACK_PAGE_ORIGIN;
 }
 
 function validateSubmission_(parameters, submissionId) {
@@ -162,14 +190,14 @@ function createHtmlBody_(feedback) {
     + `<table style="border-collapse:collapse">${rows}</table>`;
 }
 
-function createResponse_(success, submissionId, message) {
+function createResponse_(success, submissionId, message, responseOrigin) {
   const payload = JSON.stringify({
     message,
     source: FEEDBACK_RESPONSE_SOURCE,
     submissionId,
     success
   }).replace(/</g, "\\u003c");
-  const targetOrigin = JSON.stringify(FEEDBACK_PAGE_ORIGIN);
+  const targetOrigin = JSON.stringify(responseOrigin || FEEDBACK_PAGE_ORIGIN);
   const html = `<!doctype html><meta charset="UTF-8">`
     + `<script>window.top.postMessage(${payload},${targetOrigin});</script>`;
 
