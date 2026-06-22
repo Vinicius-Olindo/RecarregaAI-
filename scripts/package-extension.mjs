@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.7
+// RecarregaAi! 2.2.8
 
 import {
   existsSync,
@@ -27,6 +27,32 @@ const includePaths = [
   "uninstall.html",
   "welcome.html"
 ];
+
+const validateFeedbackBackend = () => {
+  const configSource = readFileSync(
+    join(root, "JS", "modules", "config.js"),
+    "utf8"
+  );
+  const configuredUrl = configSource.match(
+    /feedbackBackendUrl:\s*"([^"]*)"/
+  )?.[1];
+
+  if (!configuredUrl) {
+    throw new Error(
+      "Configure feedbackBackendUrl antes de gerar o pacote de publicacao."
+    );
+  }
+
+  const backendUrl = new URL(configuredUrl);
+  const isValidAppsScriptUrl = backendUrl.protocol === "https:"
+    && backendUrl.hostname === "script.google.com"
+    && backendUrl.pathname.startsWith("/macros/s/")
+    && backendUrl.pathname.endsWith("/exec");
+
+  if (!isValidAppsScriptUrl) {
+    throw new Error("feedbackBackendUrl nao e uma URL valida do Apps Script.");
+  }
+};
 
 const crcTable = Array.from({ length: 256 }, (_, tableIndex) => {
   let value = tableIndex;
@@ -168,6 +194,12 @@ const createEndRecord = ({
   return record;
 };
 
+if (existsSync(zipPath)) {
+  rmSync(zipPath);
+}
+
+validateFeedbackBackend();
+
 const files = includePaths
   .flatMap(collectFiles)
   .sort((firstPath, secondPath) => firstPath.localeCompare(secondPath));
@@ -219,10 +251,6 @@ const endRecord = createEndRecord({
 mkdirSync(dirname(zipPath), {
   recursive: true
 });
-
-if (existsSync(zipPath)) {
-  rmSync(zipPath);
-}
 
 writeFileSync(zipPath, Buffer.concat([
   ...localParts,

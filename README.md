@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-**Versão atual: 2.2.7**
+**Versão atual: 2.2.8**
 
 Extensão para Google Chrome que limpa dados antigos do site aberto, recarrega a
 página sem depender do cache anterior e permite automatizar esse processo com
@@ -150,7 +150,8 @@ ação iniciada pelo usuário.
 - O histórico guarda somente tipo de ação, horário, domínio, intervalo,
   resultado e um detalhe técnico limitado.
 - O histórico mantém no máximo 100 entradas e pode ser apagado pelo usuário.
-- O feedback de desinstalação é opcional e utiliza o FormSubmit.
+- O feedback de desinstalação é opcional e usa um endpoint próprio implantado
+  no Google Apps Script.
 - Comentário e e-mail no formulário também são opcionais.
 
 A política completa está em `privacy.html` e pode ser publicada pelo GitHub
@@ -170,19 +171,19 @@ Esse endereço deve permanecer fixo e publicado em:
 Settings > Pages > Deploy from a branch > main > /root
 ```
 
-O formulário envia os dados diretamente para o endpoint configurado em
-`JS/modules/config.js`. A proteção antispam do FormSubmit permanece ativa, e o
-cliente limita o tamanho dos campos e o intervalo entre envios.
+O formulário envia os dados para o endpoint configurado em
+`JS/modules/config.js`. Esse endpoint é publicado no Google Apps Script da
+Olinbyte Digital e usa `MailApp.sendEmail` para entregar a mensagem diretamente
+em `olinbytedigital@gmail.com`.
 
-O envio usa AJAX como fluxo principal. Se o navegador bloquear a confirmação,
-uma segunda tentativa é feita silenciosamente, sem abrir páginas externas. O
-sucesso só aparece quando o serviço retorna ao endereço de confirmação esperado;
-a página permanece aberta para permitir a conferência do resultado.
+O envio acontece em um iframe invisível, sem abrir páginas externas. A interface
+só mostra sucesso depois de receber a confirmação assinada pelo identificador
+único daquela submissão. O backend limita campos, impede duplicidade, aplica
+limite por minuto e escapa o conteúdo usado no e-mail.
 
-Ao configurar um novo e-mail de destino, o primeiro envio faz o FormSubmit
-encaminhar uma mensagem de ativação para esse endereço. O responsável deve
-abrir o link recebido e enviar o formulário novamente; sem essa confirmação, o
-serviço aceita a requisição HTTP, mas não entrega o feedback.
+As instruções de implantação estão em
+`backend/google-apps-script/README.md`. O empacotamento é bloqueado enquanto
+`feedbackBackendUrl` não contiver uma URL pública válida terminada em `/exec`.
 
 ## Estrutura do projeto
 

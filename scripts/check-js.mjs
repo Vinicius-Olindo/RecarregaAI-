@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.7
+// RecarregaAi! 2.2.8
 
 import { spawnSync } from "node:child_process";
 import { readdirSync } from "node:fs";

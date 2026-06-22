@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.7
+// RecarregaAi! 2.2.8
 
 import { appConfig } from "./modules/config.js";
 import {
@@ -14,14 +14,20 @@ import { enforceTopLevelPublicPage } from "./modules/public-page-security.js";
 
 enforceTopLevelPublicPage();
 
-const feedbackSubmitUrl = appConfig.feedbackSubmitUrl;
-const defaultVersionLabel = "2.2.7";
+const feedbackBackendUrl = appConfig.feedbackBackendUrl;
+const defaultVersionLabel = "2.2.8";
 const defaultLanguage = "pt-BR";
 const defaultReason = "Não informou motivo";
 const feedbackCooldownInMilliseconds = 60 * 1000;
+const feedbackResponseTimeoutInMilliseconds = 20 * 1000;
 const feedbackLastSubmitAtKey = "recarregaAiFeedbackLastSubmitAt";
 const feedbackMessageMaxLength = 1200;
 const feedbackEmailMaxLength = 254;
+const feedbackResponseSource = "recarregaai-feedback";
+const feedbackResponseOrigins = new Set([
+  "https://script.google.com",
+  "https://script.googleusercontent.com"
+]);
 const languageStorageKey = "recarregaAiPageLanguage";
 const legacyLanguageStorageKey = "recarregaAiUninstallLanguage";
 
@@ -36,8 +42,10 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desenvolvido por:",
     footerFeedback: "Feedback",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.2.7. Todos os direitos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.8. Todos os direitos reservados.",
     footerPrivacy: "Privacidade",
+    feedbackNotConfigured:
+      "O serviço de feedback ainda não foi configurado.",
     formSubmitError:
       "Não consegui confirmar o envio agora. Tente novamente em alguns instantes.",
     formSubmitLoading: "Enviando feedback...",
@@ -63,7 +71,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecione um motivo antes de enviar.",
     selectedPrefix: "Selecionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.2.7"
+    versionLabel: "2.2.8"
   },
   en: {
     backToTop: "Back to start",
@@ -75,8 +83,10 @@ const translations = extendPageTranslations({
     footerDeveloper: "Developed by:",
     footerFeedback: "Feedback",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.2.7. All rights reserved.",
+    footerLegal: "© RecarregaAi! 2.2.8. All rights reserved.",
     footerPrivacy: "Privacy",
+    feedbackNotConfigured:
+      "The feedback service has not been configured yet.",
     formSubmitError:
       "I could not confirm the send right now. Try again in a few moments.",
     formSubmitLoading: "Sending feedback...",
@@ -101,7 +111,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Select a reason before sending.",
     selectedPrefix: "Selected: ",
     sendButton: "Send feedback",
-    versionLabel: "2.2.7"
+    versionLabel: "2.2.8"
   },
   es: {
     backToTop: "Volver al inicio",
@@ -113,8 +123,10 @@ const translations = extendPageTranslations({
     footerDeveloper: "Desarrollado por:",
     footerFeedback: "Feedback",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.2.7. Todos los derechos reservados.",
+    footerLegal: "© RecarregaAi! 2.2.8. Todos los derechos reservados.",
     footerPrivacy: "Privacidad",
+    feedbackNotConfigured:
+      "El servicio de feedback todavía no está configurado.",
     formSubmitError:
       "No pude confirmar el envío ahora. Inténtalo de nuevo en unos momentos.",
     formSubmitLoading: "Enviando feedback...",
@@ -139,7 +151,7 @@ const translations = extendPageTranslations({
     reasonRequired: "Selecciona un motivo antes de enviar.",
     selectedPrefix: "Seleccionado: ",
     sendButton: "Enviar feedback",
-    versionLabel: "2.2.7"
+    versionLabel: "2.2.8"
   }
 }, "uninstall");
 
@@ -255,6 +267,7 @@ const uninstallElements = {
   extensionVersion: document.querySelector("#extension-version"),
   feedbackBrowserInput: document.querySelector("#feedback-browser-input"),
   feedbackDateInput: document.querySelector("#feedback-date-input"),
+  feedbackDeliveryFrame: document.querySelector("#feedback-delivery-frame"),
   feedbackForm: document.querySelector("#feedback-form"),
   feedbackLanguageInput: document.querySelector("#feedback-language-input"),
   feedbackMessage: document.querySelector("#feedback-message"),
@@ -287,7 +300,27 @@ const configureChromeWebStoreLink = () => {
 
 const getVersionLabel = () => defaultVersionLabel;
 
-const getCopy = (key) => translations[activeLanguage][key];
+const getCopy = (key) => (
+  translations[activeLanguage][key] || translations[defaultLanguage][key]
+);
+
+const getConfiguredFeedbackBackendUrl = () => {
+  try {
+    const backendUrl = new URL(feedbackBackendUrl);
+    const isGoogleAppsScriptUrl = backendUrl.protocol === "https:"
+      && backendUrl.hostname === "script.google.com"
+      && backendUrl.pathname.startsWith("/macros/s/")
+      && backendUrl.pathname.endsWith("/exec");
+
+    return isGoogleAppsScriptUrl ? backendUrl.href : "";
+  } catch {
+    return "";
+  }
+};
+
+const hasConfiguredFeedbackBackend = () => Boolean(
+  getConfiguredFeedbackBackendUrl()
+);
 
 const updateUninstallThemeButtonLabel = ({ isDarkTheme }) => {
   const nextThemeLabel = isDarkTheme
@@ -361,7 +394,8 @@ const updateSelectedReasonFeedback = () => {
 
 const syncReasonSelection = () => {
   uninstallElements.feedbackReasonInput.value = getSelectedReason();
-  uninstallElements.sendFeedbackButton.disabled = !hasSelectedReason();
+  uninstallElements.sendFeedbackButton.disabled = !hasSelectedReason()
+    || !hasConfiguredFeedbackBackend();
   updateSelectedReasonFeedback();
 };
 
@@ -376,7 +410,7 @@ const setFeedbackControlsDisabled = (isDisabled) => {
     button.disabled = isDisabled;
   });
   uninstallElements.sendFeedbackButton.disabled =
-    isDisabled || !hasSelectedReason();
+    isDisabled || !hasSelectedReason() || !hasConfiguredFeedbackBackend();
 };
 
 const prepareHiddenFields = () => {
@@ -396,24 +430,18 @@ const buildFeedbackPayload = () => {
     0,
     feedbackEmailMaxLength
   );
-  const emailLabel = contactEmail || "Não informado";
-  const payload = {
-    _subject: "Feedback RecarregaAi!",
-    _template: "table",
-    Comentario: message,
-    Data: new Date().toISOString(),
-    "Email para contato": emailLabel,
-    Idioma: activeLanguage,
-    Motivo: getSelectedReason(),
-    Navegador: navigator.userAgent,
-    Versão: getVersionLabel()
+
+  return {
+    comentario: message,
+    data: new Date().toISOString(),
+    email: contactEmail,
+    idioma: activeLanguage,
+    motivo: getSelectedReason(),
+    navegador: navigator.userAgent,
+    submissionId: crypto.randomUUID(),
+    versao: getVersionLabel(),
+    website: ""
   };
-
-  if (contactEmail) {
-    payload.email = contactEmail;
-  }
-
-  return payload;
 };
 
 const clearOptionalFields = () => {
@@ -421,65 +449,77 @@ const clearOptionalFields = () => {
   uninstallElements.contactEmail.value = "";
 };
 
-const createEncodedPayload = (payload) => {
-  const encodedPayload = new URLSearchParams();
+const createFeedbackTransportForm = (feedbackPayload) => {
+  const transportForm = document.createElement("form");
 
-  Object.entries(payload).forEach(([key, value]) => {
-    encodedPayload.append(key, value);
+  transportForm.action = getConfiguredFeedbackBackendUrl();
+  transportForm.hidden = true;
+  transportForm.method = "POST";
+  transportForm.target = uninstallElements.feedbackDeliveryFrame.name;
+
+  Object.entries(feedbackPayload).forEach(([name, value]) => {
+    const input = document.createElement("input");
+
+    input.name = name;
+    input.type = "hidden";
+    input.value = value;
+    transportForm.append(input);
   });
 
-  return encodedPayload;
+  return transportForm;
 };
 
-const validateFormSubmitResponse = async (response) => {
-  let responsePayload;
+const submitFeedbackToBackend = (feedbackPayload) => new Promise((
+  resolve,
+  reject
+) => {
+  if (!hasConfiguredFeedbackBackend()) {
+    reject(new Error("Serviço de feedback não configurado."));
+    return;
+  }
+
+  const transportForm = createFeedbackTransportForm(feedbackPayload);
+
+  const cleanup = () => {
+    window.clearTimeout(timeoutId);
+    window.removeEventListener("message", handleFeedbackResponse);
+    transportForm.remove();
+  };
+
+  const handleFeedbackResponse = (event) => {
+    const isExpectedResponse = feedbackResponseOrigins.has(event.origin)
+      && event.data?.source === feedbackResponseSource
+      && event.data?.submissionId === feedbackPayload.submissionId;
+
+    if (!isExpectedResponse) {
+      return;
+    }
+
+    cleanup();
+
+    if (event.data.success === true) {
+      resolve();
+      return;
+    }
+
+    reject(new Error(event.data.message || "O envio do feedback falhou."));
+  };
+
+  window.addEventListener("message", handleFeedbackResponse);
+  document.body.append(transportForm);
+
+  const timeoutId = window.setTimeout(() => {
+    cleanup();
+    reject(new Error("O serviço de feedback não respondeu a tempo."));
+  }, feedbackResponseTimeoutInMilliseconds);
 
   try {
-    responsePayload = await response.json();
-  } catch {
-    throw new Error("Resposta inválida do serviço de feedback.");
+    transportForm.submit();
+  } catch (error) {
+    cleanup();
+    reject(error);
   }
-
-  const wasAccepted = responsePayload?.success === true
-    || responsePayload?.success === "true";
-
-  if (!response.ok || !wasAccepted) {
-    const responseError = new Error(
-      responsePayload?.message || "Envio automático recusado."
-    );
-
-    responseError.name = "FormSubmitResponseError";
-    throw responseError;
-  }
-};
-
-const submitFeedbackSilently = async (feedbackPayload) => {
-  const fallbackPayload = {
-    ...feedbackPayload,
-    _captcha: "false",
-    _next: appConfig.feedbackConfirmationUrl
-  };
-  const response = await fetch(appConfig.feedbackFallbackUrl, {
-    body: createEncodedPayload(fallbackPayload),
-    headers: {
-      Accept: "text/html",
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    },
-    method: "POST",
-    redirect: "follow"
-  });
-
-  const responseUrl = new URL(response.url);
-  const confirmationUrl = new URL(appConfig.feedbackConfirmationUrl);
-  const wasConfirmed = response.ok
-    && responseUrl.origin === confirmationUrl.origin
-    && responseUrl.pathname === confirmationUrl.pathname
-    && responseUrl.searchParams.get("feedback") === "accepted";
-
-  if (!wasConfirmed) {
-    throw new Error("O serviço não confirmou a entrega do feedback.");
-  }
-};
+});
 
 const finishFeedbackSubmission = () => {
   localStorage.setItem(feedbackLastSubmitAtKey, String(Date.now()));
@@ -508,6 +548,13 @@ const submitFeedback = async () => {
     return;
   }
 
+  if (!hasConfiguredFeedbackBackend()) {
+    updateStatus(getCopy("feedbackNotConfigured"), {
+      isError: true
+    });
+    return;
+  }
+
   const cooldownSeconds = getFeedbackCooldownSeconds();
 
   if (cooldownSeconds > 0) {
@@ -532,29 +579,10 @@ const submitFeedback = async () => {
   setFeedbackControlsDisabled(true);
 
   try {
-    const response = await fetch(feedbackSubmitUrl, {
-      body: createEncodedPayload(feedbackPayload),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-      },
-      method: "POST"
-    });
-
-    await validateFormSubmitResponse(response);
+    await submitFeedbackToBackend(feedbackPayload);
     finishFeedbackSubmission();
   } catch (error) {
-    console.error("Erro ao enviar feedback automaticamente:", error);
-
-    if (error.name !== "FormSubmitResponseError") {
-      try {
-        await submitFeedbackSilently(feedbackPayload);
-        finishFeedbackSubmission();
-        return;
-      } catch (fallbackError) {
-        console.error("Erro ao repetir o envio silencioso:", fallbackError);
-      }
-    }
+    console.error("Erro ao enviar feedback:", error);
 
     updateStatus(getCopy("formSubmitError"), {
       isError: true
@@ -660,10 +688,23 @@ const initializePage = () => {
   setLanguage(activeLanguage);
 };
 
+const updateFeedbackAvailability = () => {
+  syncReasonSelection();
+
+  if (!hasConfiguredFeedbackBackend()) {
+    updateStatus(getCopy("feedbackNotConfigured"), {
+      isError: true
+    });
+  }
+};
+
 uninstallElements.reasonInputs.forEach((input) => {
   input.addEventListener("change", () => {
     syncReasonSelection();
-    updateStatus("");
+
+    if (hasConfiguredFeedbackBackend()) {
+      updateStatus("");
+    }
   });
 });
 
@@ -694,7 +735,7 @@ uninstallElements.languageDialog.addEventListener("click", (event) => {
 uninstallElements.languageOptionButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setLanguage(button.dataset.languageOption);
-    updateStatus("");
+    updateFeedbackAvailability();
     closeLanguageDialog({
       shouldFocusTrigger: true
     });
@@ -711,6 +752,7 @@ window.addEventListener("keydown", (event) => {
 });
 
 initializePage();
+updateFeedbackAvailability();
 configureChromeWebStoreLink();
 initFloatingTools();
 loadUninstallTheme().catch((error) => {

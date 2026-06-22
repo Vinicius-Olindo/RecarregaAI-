@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.7
+// RecarregaAi! 2.2.8
 
 import { initFloatingTools } from "./modules/floating-tools.js";
 import { extendPageTranslations } from "./modules/extended-translations.js";
@@ -34,7 +34,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desenvolvido por:",
     footerHome: "Início",
-    footerLegal: "© RecarregaAi! 2.2.7. Política atualizada em 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.2.8. Política atualizada em 19/06/2026.",
     footerPrivacy: "Privacidade",
     headerContact: "Contato",
     headerNavLabel: "Navegação da política",
@@ -90,7 +90,7 @@ const privacyTranslations = extendPageTranslations({
     sectionFeedbackBody2:
       "Caso enviado, o formulário pode incluir motivo da desinstalação, comentário, e-mail opcional, idioma, navegador, versão da extensão e data do envio.",
     sectionFeedbackBody3:
-      "O envio do feedback é realizado por meio do serviço FormSubmit. Essas informações são usadas apenas para entender problemas, corrigir falhas e melhorar a extensão.",
+      "O envio do feedback é realizado por meio do serviço Google Apps Script. Essas informações são usadas apenas para entender problemas, corrigir falhas e melhorar a extensão.",
     sectionFeedbackTitle: "5. Feedback de desinstalação",
     sectionLimitedUseBody1:
       "O uso das informações pela extensão segue a Política de Dados do Usuário da Chrome Web Store, incluindo os requisitos de Limited Use.",
@@ -121,7 +121,7 @@ const privacyTranslations = extendPageTranslations({
     sectionSharingBody1:
       "A extensão não vende dados do usuário, não compartilha dados para publicidade e não utiliza analytics de terceiros nem informações para rastreamento.",
     sectionSharingBody2:
-      "O único envio externo previsto ocorre quando o usuário envia voluntariamente o formulário de feedback de desinstalação, processado pelo FormSubmit.",
+      "O único envio externo previsto ocorre quando o usuário envia voluntariamente o formulário de feedback de desinstalação, processado pelo Google Apps Script.",
     sectionSharingTitle: "6. Compartilhamento de dados",
     sectionTypingBody1:
       "Quando um timer está ativo, o RecarregaAi! verifica localmente se há foco em campos como <code>input</code>, <code>textarea</code> ou áreas editáveis da página. Ele também pode identificar se há áudio, vídeo, gravação, fluxo de mídia ou contexto de áudio em uso. Se houver atividade sensível, o timer daquela guia pode ser pausado temporariamente e retomado depois que a atividade terminar.",
@@ -166,7 +166,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Developed by:",
     footerHome: "Home",
-    footerLegal: "© RecarregaAi! 2.2.7. Policy updated on 06/19/2026.",
+    footerLegal: "© RecarregaAi! 2.2.8. Policy updated on 06/19/2026.",
     footerPrivacy: "Privacy",
     headerContact: "Contact",
     headerNavLabel: "Policy navigation",
@@ -222,7 +222,7 @@ const privacyTranslations = extendPageTranslations({
     sectionFeedbackBody2:
       "If submitted, the form may include uninstall reason, comment, optional email, language, browser, extension version and submission date.",
     sectionFeedbackBody3:
-      "Feedback is submitted through FormSubmit. This information is used only to understand problems, fix issues and improve the extension.",
+      "Feedback is submitted through Google Apps Script. This information is used only to understand problems, fix issues and improve the extension.",
     sectionFeedbackTitle: "5. Uninstall feedback",
     sectionLimitedUseBody1:
       "The extension's use of information follows the Chrome Web Store User Data Policy, including Limited Use requirements.",
@@ -253,7 +253,7 @@ const privacyTranslations = extendPageTranslations({
     sectionSharingBody1:
       "The extension does not sell user data, does not share data for advertising, and does not use third-party analytics or information for tracking.",
     sectionSharingBody2:
-      "The only expected external submission happens when the user voluntarily sends the uninstall feedback form, processed by FormSubmit.",
+      "The only expected external submission happens when the user voluntarily sends the uninstall feedback form, processed by Google Apps Script.",
     sectionSharingTitle: "6. Data sharing",
     sectionTypingBody1:
       "When a timer is active, RecarregaAi! locally checks whether fields such as <code>input</code>, <code>textarea</code> or editable page areas have focus. It may also identify whether audio, video, recording, a media stream or an audio context is in use. If sensitive activity is detected, that tab's timer may be paused temporarily and resumed after the activity ends.",
@@ -298,7 +298,7 @@ const privacyTranslations = extendPageTranslations({
     footerFeedback: "Feedback",
     footerDeveloper: "Desarrollado por:",
     footerHome: "Inicio",
-    footerLegal: "© RecarregaAi! 2.2.7. Política actualizada el 19/06/2026.",
+    footerLegal: "© RecarregaAi! 2.2.8. Política actualizada el 19/06/2026.",
     footerPrivacy: "Privacidad",
     headerContact: "Contacto",
     headerNavLabel: "Navegación de la política",
@@ -354,7 +354,7 @@ const privacyTranslations = extendPageTranslations({
     sectionFeedbackBody2:
       "Si se envía, el formulario puede incluir motivo de desinstalación, comentario, email opcional, idioma, navegador, versión de la extensión y fecha de envío.",
     sectionFeedbackBody3:
-      "El feedback se envía por medio de FormSubmit. Esta información se usa solo para entender problemas, corregir fallas y mejorar la extensión.",
+      "El feedback se envía por medio de Google Apps Script. Esta información se usa solo para entender problemas, corregir fallas y mejorar la extensión.",
     sectionFeedbackTitle: "5. Feedback de desinstalación",
     sectionLimitedUseBody1:
       "El uso de la información por parte de la extensión sigue la Política de Datos del Usuario de Chrome Web Store, incluidos los requisitos de Limited Use.",
@@ -385,7 +385,7 @@ const privacyTranslations = extendPageTranslations({
     sectionSharingBody1:
       "La extensión no vende datos del usuario, no comparte datos para publicidad y no utiliza analytics de terceros ni información para rastreo.",
     sectionSharingBody2:
-      "El único envío externo previsto ocurre cuando el usuario envía voluntariamente el formulario de feedback de desinstalación, procesado por FormSubmit.",
+      "El único envío externo previsto ocurre cuando el usuario envía voluntariamente el formulario de feedback de desinstalación, procesado por Google Apps Script.",
     sectionSharingTitle: "6. Compartir datos",
     sectionTypingBody1:
       "Cuando un timer está activo, RecarregaAi! verifica localmente si hay foco en campos como <code>input</code>, <code>textarea</code> o áreas editables de la página. También puede identificar si hay audio, video, grabación, un flujo de medios o un contexto de audio en uso. Si hay actividad sensible, el timer de esa pestaña puede pausarse temporalmente y reanudarse cuando la actividad termine.",

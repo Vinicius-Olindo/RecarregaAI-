@@ -1,12 +1,12 @@
 <!doctype html>
-<!-- RecarregaAi! 2.2.7 -->
+<!-- RecarregaAi! 2.2.8 -->
 <html id="page-root" lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="no-referrer" />
     <meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://formsubmit.co; form-action 'self'; frame-src 'none'; upgrade-insecure-requests" />
+      content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; form-action https://script.google.com; frame-src https://script.google.com https://script.googleusercontent.com; upgrade-insecure-requests" />
     <title>Feedback do RecarregaAi!</title>
     <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon16.png" />
     <link rel="stylesheet" href="CSS/uninstall.css" />
@@ -25,7 +25,7 @@
 
         <div>
           <p class="brand__name">RecarregaAi!</p>
-          <p id="extension-version" class="brand__version">2.2.7</p>
+          <p id="extension-version" class="brand__version">2.2.8</p>
         </div>
       </div>
 
@@ -65,8 +65,6 @@
         class="feedback-form"
         method="POST"
       >
-        <input type="hidden" name="_subject" value="Feedback RecarregaAi!" />
-        <input type="hidden" name="_template" value="table" />
         <input id="feedback-version-input" type="hidden" name="Versao" />
         <input id="feedback-date-input" type="hidden" name="Data" />
         <input id="feedback-browser-input" type="hidden" name="Navegador" />
@@ -197,6 +195,13 @@
           </button>
         </div>
       </form>
+
+      <iframe
+        id="feedback-delivery-frame"
+        name="recarregaai-feedback-delivery"
+        title="Processamento do feedback"
+        hidden
+      ></iframe>
     </main>
 
     <footer class="privacy-footer">
@@ -253,7 +258,7 @@
         </nav>
 
         <p class="privacy-footer__legal" data-i18n="footerLegal">
-          © RecarregaAi! 2.2.7. Todos os direitos reservados.
+          © RecarregaAi! 2.2.8. Todos os direitos reservados.
         </p>
 
         <p class="privacy-footer__developer">
