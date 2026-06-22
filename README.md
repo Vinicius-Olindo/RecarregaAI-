@@ -1,6 +1,6 @@
 # RecarregaAi!
 
-**Versão atual: 2.2.6**
+**Versão atual: 2.2.7**
 
 Extensão para Google Chrome que limpa dados antigos do site aberto, recarrega a
 página sem depender do cache anterior e permite automatizar esse processo com
@@ -175,8 +175,9 @@ O formulário envia os dados diretamente para o endpoint configurado em
 cliente limita o tamanho dos campos e o intervalo entre envios.
 
 O envio usa AJAX como fluxo principal. Se o navegador bloquear a confirmação,
-uma segunda tentativa é feita silenciosamente, sem abrir páginas externas. A
-página permanece aberta e mostra a confirmação após o envio.
+uma segunda tentativa é feita silenciosamente, sem abrir páginas externas. O
+sucesso só aparece quando o serviço retorna ao endereço de confirmação esperado;
+a página permanece aberta para permitir a conferência do resultado.
 
 Ao configurar um novo e-mail de destino, o primeiro envio faz o FormSubmit
 encaminhar uma mensagem de ativação para esse endereço. O responsável deve
