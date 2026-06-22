@@ -1,4 +1,4 @@
-// RecarregaAi! 2.2.3
+// RecarregaAi! 2.2.6
 
 import {
   createEmptyTimerCollection,
