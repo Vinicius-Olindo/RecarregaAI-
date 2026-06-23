@@ -1,7 +1,7 @@
 // RecarregaAi! 2.3.7
 
 const FEEDBACK_RECIPIENT = "olinbytedigital@gmail.com";
-const FEEDBACK_PAGE_ORIGIN = "https://vinicius-olindo.github.io";
+const FEEDBACK_PAGE_ORIGIN = "https://recarregaai.pages.dev";
 const FEEDBACK_RESPONSE_SOURCE = "recarregaai-feedback";
 const EXTENSION_ORIGIN_PATTERN = /^chrome-extension:\/\/[a-p]{32}$/;
 const MAX_SUBMISSIONS_PER_MINUTE = 20;

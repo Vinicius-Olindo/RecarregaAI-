@@ -64,8 +64,8 @@ O site publicado oferece:
 
 As páginas `privacy.html` e `uninstall.html` pertencem funcionalmente à extensão e, por isso, são mantidas em `extension/public/`. Durante a montagem do site, elas são copiadas para a raiz pública, preservando estes endereços:
 
-- `https://vinicius-olindo.github.io/RecarregaAI-/privacy.html`
-- `https://vinicius-olindo.github.io/RecarregaAI-/uninstall.html`
+- `https://recarregaai.pages.dev/privacy.html`
+- `https://recarregaai.pages.dev/uninstall.html`
 
 ### Gerar o site
 
